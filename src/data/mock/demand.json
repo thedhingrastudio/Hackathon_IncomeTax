@@ -1,0 +1,12 @@
+{
+  "demandId": "tax-demand-001",
+  "taxpayerId": "taxpayer-demo-001",
+  "assessmentYear": "2026-27",
+  "processingId": "processing-demo-2026-27-001",
+  "amount": 18420,
+  "currency": "INR",
+  "status": "action_required",
+  "createdOn": "2026-08-04",
+  "source": "simulated_cpc_processing",
+  "prototypeData": true
+}

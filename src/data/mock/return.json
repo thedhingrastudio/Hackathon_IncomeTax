@@ -1,0 +1,11 @@
+{
+  "returnId": "itr-demo-2026-27-001",
+  "taxpayerId": "taxpayer-demo-001",
+  "assessmentYear": "2026-27",
+  "filingStatus": "processed",
+  "taxLiability": 18420,
+  "selfAssessmentTaxClaimed": 0,
+  "currency": "INR",
+  "filedOn": "2026-07-18",
+  "prototypeData": true
+}

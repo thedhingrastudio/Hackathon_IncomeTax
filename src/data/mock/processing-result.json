@@ -1,0 +1,11 @@
+{
+  "processingId": "processing-demo-2026-27-001",
+  "taxpayerId": "taxpayer-demo-001",
+  "returnId": "itr-demo-2026-27-001",
+  "assessmentYear": "2026-27",
+  "status": "processed",
+  "processedOn": "2026-08-04",
+  "selfAssessmentTaxRecognised": 0,
+  "currency": "INR",
+  "prototypeData": true
+}

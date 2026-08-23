@@ -1,0 +1,12 @@
+{
+  "paymentId": "payment-demo-001",
+  "taxpayerId": "taxpayer-demo-001",
+  "assessmentYear": "2026-27",
+  "paymentType": "self_assessment_tax",
+  "amount": 18420,
+  "currency": "INR",
+  "paymentDate": "2026-07-15",
+  "challanReference": "MOCK-2481",
+  "status": "confirmed",
+  "prototypeData": true
+}

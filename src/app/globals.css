@@ -1,0 +1,33 @@
+@import "ux4g-web-components/styles.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: #f7f7f8;
+}
+
+.prototype-shell {
+  width: min(100% - 40px, 960px);
+  margin: 0 auto;
+  padding: 64px 0;
+}
+
+.prototype-shell h1 {
+  margin-top: 12px;
+}
+
+.prototype-shell p {
+  max-width: 680px;
+}
+
+.prototype-label {
+  font-size: 0.875rem;
+}

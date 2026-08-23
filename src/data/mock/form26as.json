@@ -1,0 +1,17 @@
+{
+  "recordId": "26as-demo-2026-27-001",
+  "taxpayerId": "taxpayer-demo-001",
+  "assessmentYear": "2026-27",
+  "entries": [
+    {
+      "entryId": "26as-entry-demo-001",
+      "paymentType": "self_assessment_tax",
+      "amount": 18420,
+      "currency": "INR",
+      "paymentDate": "2026-07-15",
+      "challanReference": "MOCK-2481",
+      "status": "reflected"
+    }
+  ],
+  "prototypeData": true
+}
