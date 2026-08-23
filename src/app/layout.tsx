@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import UX4GRuntime from "../components/ux4g/UX4GRuntime";
+import PortalShell from "../components/portal/PortalShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,10 +16,10 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <body>
         <UX4GRuntime />
-        {children}
+        <PortalShell>{children}</PortalShell>
       </body>
     </html>
   );
