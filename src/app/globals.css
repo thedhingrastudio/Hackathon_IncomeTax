@@ -338,8 +338,14 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .action-readiness p svg { width: 1rem; color: var(--workspace-accent); }
 .action-readiness strong { display: block; font-size: 1.75rem; letter-spacing: -.035em; }
 .action-readiness > span { color: var(--workspace-muted); }
+.action-submitted-state { margin-block: 1.25rem .25rem; padding-block: 1rem; border-block: 1px solid var(--workspace-border); }
+.action-submitted-state p { display: flex; align-items: center; gap: .5rem; margin-bottom: .45rem; color: var(--workspace-accent); font-weight: 650; }
+.action-submitted-state p svg { width: 1rem; }
+.action-submitted-state strong { font-size: .9375rem; letter-spacing: .02em; }
 .action-ready-status { color: var(--workspace-ink) !important; font-weight: 650; }
 .action-workspace-step .understanding-primary-action { margin-top: .35rem; }
+.action-secondary-action { display: flex; width: fit-content; margin-top: .85rem; gap: .5rem; }
+.action-secondary-action svg { width: 1rem; }
 .action-dependency { display: inline-flex; min-height: 32px; align-items: center; border: 1px solid var(--workspace-border); border-radius: 999px; padding-inline: .75rem; color: var(--workspace-muted); font-size: .8125rem; font-weight: 650; }
 .government-process { border-top: 1px solid var(--workspace-border); }
 .government-process summary { display: flex; min-height: 52px; align-items: center; color: var(--workspace-ink); font-weight: 650; cursor: pointer; }
@@ -347,6 +353,21 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .government-process p { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin-bottom: .5rem; color: var(--workspace-muted); font-size: .875rem; }
 .government-process p span { min-width: 3.5rem; color: var(--workspace-muted); font-size: .75rem; font-weight: 700; text-transform: uppercase; }
 .government-process svg { width: .9rem; }
+.consequence-review { display: grid; width: min(100% - 3rem, 680px); gap: 1.75rem; margin-inline: auto; padding-block: 2.5rem 3rem; color: var(--workspace-ink); }
+.consequence-review-header h2 { margin-bottom: .65rem; font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 540; letter-spacing: -.045em; line-height: 1.08; }
+.consequence-review-header > p:last-child { max-width: 580px; margin-bottom: 0; color: var(--workspace-muted); font-size: 1.05rem; }
+.consequence-review-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--workspace-border); }
+.consequence-review-facts > div { min-width: 0; padding: 1rem 1rem 1rem 0; border-bottom: 1px solid var(--workspace-border); }
+.consequence-review-facts dt { color: var(--workspace-muted); font-size: .8125rem; font-weight: 650; }
+.consequence-review-facts dd { margin: .35rem 0 0; overflow-wrap: anywhere; font-weight: 650; }
+.government-request { padding-left: 1rem; border-left: 3px solid var(--workspace-accent); }
+.government-request h3 { margin-bottom: .2rem; font-size: 1.15rem; }
+.government-request p:last-child { margin-bottom: 0; color: var(--workspace-muted); }
+.consequence-review-notice { padding: 1rem 1.15rem; border: 1px solid color-mix(in oklch, var(--workspace-warning) 45%, var(--workspace-border)); border-radius: .65rem; background: color-mix(in oklch, var(--workspace-warning) 6%, var(--workspace-surface-strong)); }
+.consequence-review-notice p { margin: .3rem 0 0; color: var(--workspace-muted); font-size: .875rem; }
+.consequence-review-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.submission-result-icon { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: color-mix(in oklch, var(--workspace-accent) 12%, transparent); color: var(--workspace-accent); }
+.submission-result-icon svg { width: 1.3rem; }
 
 @media (min-width: 1024px) {
   .desktop-workspace.is-open { grid-template-columns: minmax(0, 47fr) minmax(0, 53fr); height: 100vh; overflow: hidden; }

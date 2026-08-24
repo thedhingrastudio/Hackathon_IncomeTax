@@ -4,7 +4,20 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { OutstandingDemand } from "../../types/tax";
 import type { DemandUnderstanding } from "../../lib/ai";
-import { createTaxDemandCase } from "../../lib/workflows";
+import {
+  createTaxDemandCase,
+  prepareAssistedDemandResponse,
+  prepareRectificationDraft,
+  recordDemandResponse,
+  recordRectification,
+  submitAssistedDemandResponse,
+  submitRectification,
+  transitionCase,
+  type AssistedDemandResponseDraft,
+  type AssistedDemandResponseSubmission,
+  type RectificationDraft,
+  type RectificationSubmission,
+} from "../../lib/workflows";
 import { getStoredCase, saveCase } from "../../lib/storage/case-storage";
 import AssistanceDrawerHandle from "../assistance/AssistanceDrawerHandle";
 import AssistanceWorkspace, { type AssistanceSurface } from "../assistance/AssistanceWorkspace";
@@ -13,6 +26,10 @@ const navigation = [["Dashboard", "/"], ["Returns", "/returns"], ["Payments & Ta
 const assistanceId = "assistance-workspace";
 export default function PortalShell({ children, taxpayerId, taxpayerName, demand, understanding }: { children: ReactNode; taxpayerId: string; taxpayerName: string; demand: OutstandingDemand; understanding: DemandUnderstanding | null }) {
   const pathname = usePathname(); const router = useRouter(); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(false); const [assistanceSurface, setAssistanceSurface] = useState<AssistanceSurface>("home");
+  const [rectificationDraft, setRectificationDraft] = useState<RectificationDraft | null>(null);
+  const [rectificationSubmission, setRectificationSubmission] = useState<RectificationSubmission | null>(null);
+  const [responseDraft, setResponseDraft] = useState<AssistedDemandResponseDraft | null>(null);
+  const [responseSubmission, setResponseSubmission] = useState<AssistedDemandResponseSubmission | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const assistanceHandleRef = useRef<HTMLButtonElement>(null);
   const assistanceCloseRef = useRef<HTMLButtonElement>(null);
@@ -66,8 +83,59 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
 
   function reviewRectification() {
     if (!understanding || understanding.specification.primaryAction.actionId !== "start_corrective_plan") return;
-    if (!getStoredCase()) saveCase(createTaxDemandCase(understanding.evidence, taxpayerId));
-    router.push("/pending-actions/demand/assist/rectification");
+    const prepared = prepareRectificationDraft(understanding.workflowContext);
+    if (!prepared.success) return;
+    let taxCase = getStoredCase() ?? createTaxDemandCase(understanding.evidence, taxpayerId);
+    if (taxCase.state === "PLAN_READY") taxCase = transitionCase(taxCase, "RECTIFICATION_REVIEW") ?? taxCase;
+    saveCase(taxCase);
+    setRectificationDraft(prepared.data);
+    setAssistanceSurface("rectification_review");
+  }
+
+  function confirmRectification() {
+    if (!understanding || !rectificationDraft) return;
+    const submitted = submitRectification(rectificationDraft, understanding.evidence, rectificationSubmission);
+    if (!submitted.success) return;
+    const taxCase = getStoredCase();
+    if (!taxCase) return;
+    const recorded = recordRectification(taxCase, submitted.data);
+    if (!recorded) return;
+    saveCase(recorded);
+    setRectificationSubmission(submitted.data);
+    setAssistanceSurface("action");
+  }
+
+  function reviewDemandResponse() {
+    if (!understanding) return;
+    const saved = getStoredCase();
+    const submittedCorrection = rectificationSubmission ?? (saved?.rectificationReference ? {
+      reference: saved.rectificationReference,
+      status: "submitted" as const,
+      assessmentYear: saved.assessmentYear,
+      amount: saved.demandAmount,
+      correction: "tax_credit_mismatch" as const,
+    } : null);
+    const prepared = prepareAssistedDemandResponse(understanding.workflowContext, submittedCorrection);
+    if (!prepared.success || !saved || !submittedCorrection) return;
+    const reviewing = saved.state === "DEMAND_RESPONSE_REVIEW" ? saved : transitionCase(saved, "DEMAND_RESPONSE_REVIEW");
+    if (!reviewing) return;
+    saveCase(reviewing);
+    setRectificationSubmission(submittedCorrection);
+    setResponseDraft(prepared.data);
+    setAssistanceSurface("demand_response_review");
+  }
+
+  function confirmDemandResponse() {
+    if (!responseDraft || !rectificationSubmission) return;
+    const submitted = submitAssistedDemandResponse(responseDraft, rectificationSubmission);
+    if (!submitted.success) return;
+    const taxCase = getStoredCase();
+    if (!taxCase) return;
+    const recorded = recordDemandResponse(taxCase, submitted.data);
+    if (!recorded) return;
+    saveCase(recorded);
+    setResponseSubmission(submitted.data);
+    setAssistanceSurface("demand_response_submitted");
   }
 
   return <div className={`desktop-workspace ${assistanceOpen ? "is-open" : "is-closed"}`}>
@@ -88,6 +156,6 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   </div>
   </div>
   <div className="assistance-handle-anchor"><AssistanceDrawerHandle controls={assistanceId} expanded={assistanceOpen} handleRef={assistanceHandleRef} onOpen={openAssistance} /></div>
-  {assistanceOpen ? <AssistanceWorkspace closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onClose={closeAssistance} onFix={assistanceSurface === "action" ? reviewRectification : showCorrectivePlan} onUnderstand={understandDemand} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
+  {assistanceOpen ? <AssistanceWorkspace closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onBackToAction={() => setAssistanceSurface("action")} onClose={closeAssistance} onConfirmDemandResponse={confirmDemandResponse} onConfirmRectification={confirmRectification} onFix={assistanceSurface === "action" ? reviewRectification : showCorrectivePlan} onReviewResponse={reviewDemandResponse} onUnderstand={understandDemand} rectificationDraft={rectificationDraft} rectificationSubmission={rectificationSubmission} responseDraft={responseDraft} responseSubmission={responseSubmission} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
   </div>;
 }

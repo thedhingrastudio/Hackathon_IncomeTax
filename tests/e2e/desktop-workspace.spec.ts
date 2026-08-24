@@ -125,15 +125,57 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await saveReviewScreenshot(page, testInfo, "action-workspace-plan");
 
   await workspace.getByRole("button", { name: "Review correction" }).click();
-  await expect(page).toHaveURL(/\/pending-actions\/demand\/assist\/rectification$/);
-  await expect(page.getByLabel("Tax credit correction review").getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
-  await expect(page.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
-  const storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  await expect(page).toHaveURL(/\/pending-actions\/demand$/);
+  await expect(workspace.getByRole("heading", { name: "Review correction" })).toBeVisible();
+  await expect(workspace.getByText("You're asking Income Tax to include this payment in your processed return.", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Tax Credit Mismatch Correction", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
+  let storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
   expect(storedCase).not.toBeNull();
   expect(JSON.parse(storedCase!)).toMatchObject({ state: "RECTIFICATION_REVIEW" });
   expect(JSON.parse(storedCase!)).not.toHaveProperty("rectificationReference");
-  await expect(workspace).toBeVisible();
-  await saveReviewScreenshot(page, testInfo, "fix-this-corrective-flow");
+  await saveReviewScreenshot(page, testInfo, "rectification-review");
+
+  await workspace.getByRole("button", { name: "Back" }).click();
+  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  expect(JSON.parse(storedCase!)).not.toHaveProperty("rectificationReference");
+  await workspace.getByRole("button", { name: "Review correction" }).click();
+
+  await workspace.getByRole("button", { name: "Confirm and submit correction" }).click();
+  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  await expect(workspace.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Ready for review", { exact: true })).toBeVisible();
+  await expect(workspace.getByRole("button", { name: "Review response" })).toBeVisible();
+  storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  expect(JSON.parse(storedCase!)).toMatchObject({ state: "RECTIFICATION_SUBMITTED", rectificationReference: "RECT-DEMO-01842" });
+  await saveReviewScreenshot(page, testInfo, "action-workspace-after-rectification");
+
+  await workspace.getByRole("button", { name: "Review response" }).click();
+  await expect(workspace.getByRole("heading", { name: "Review demand response" })).toBeVisible();
+  await expect(workspace.getByText("I disagree with this demand", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Rectification / Revised Return filed at CPC", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
+  storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  expect(JSON.parse(storedCase!)).toMatchObject({ state: "DEMAND_RESPONSE_REVIEW" });
+  expect(JSON.parse(storedCase!)).not.toHaveProperty("demandResponseReference");
+  await saveReviewScreenshot(page, testInfo, "demand-response-review");
+
+  await workspace.getByRole("button", { name: "Back" }).click();
+  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  expect(JSON.parse(storedCase!)).not.toHaveProperty("demandResponseReference");
+  await workspace.getByRole("button", { name: "Review response" }).click();
+
+  await workspace.getByRole("button", { name: "Confirm and submit response" }).click();
+  await expect(workspace.getByRole("heading", { name: "Response submitted" })).toBeVisible();
+  await expect(workspace.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
+  storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  expect(JSON.parse(storedCase!)).toMatchObject({ state: "WAITING_FOR_REVIEW", rectificationReference: "RECT-DEMO-01842", demandResponseReference: "DEMAND-RESP-DEMO-18420" });
+  expect(JSON.parse(storedCase!).state).not.toBe("RESOLVED");
+  await saveReviewScreenshot(page, testInfo, "demand-response-submitted");
 
   await workspace.getByRole("button", { name: "Close assistance" }).click();
   await expect(workspace).toBeHidden();

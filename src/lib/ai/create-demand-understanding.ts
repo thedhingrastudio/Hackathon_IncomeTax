@@ -3,11 +3,13 @@ import type { ActionSurfaceSpecification, UnderstandingSurfaceSpecification } fr
 import { createEvidencePacket, reconcileTaxCase } from "../reconciliation/index.ts";
 import type { EvidencePacket } from "../reconciliation/evidence-packet.ts";
 import type { ReconciliationInput } from "../reconciliation/types.ts";
+import type { AssistedWorkflowContext } from "../workflows";
 import { getApprovedWorkflowPlan } from "../rules/approved-workflows.ts";
 import { getAssistanceEngine } from "./provider.ts";
 
 export type DemandUnderstanding = {
   evidence: EvidencePacket;
+  workflowContext: AssistedWorkflowContext;
   specification: UnderstandingSurfaceSpecification;
   actionSpecification: ActionSurfaceSpecification;
 };
@@ -25,7 +27,19 @@ export function createDemandUnderstanding(records: ReconciliationInput, provider
     });
     const parsed = safeParseUnderstandingSurface(output);
     const actionParsed = safeParseActionSurface(getAssistanceEngine(provider).generateActionSurface({ intent: "understand_outstanding_demand", evidence, approvedWorkflowPlan: getApprovedWorkflowPlan(reconciliation.diagnosis) }));
-    return parsed.success && actionParsed.success ? { evidence, specification: parsed.data as UnderstandingSurfaceSpecification, actionSpecification: actionParsed.data as ActionSurfaceSpecification } : null;
+    const approvedWorkflowPlan = [...getApprovedWorkflowPlan(reconciliation.diagnosis)];
+    const workflowContext: AssistedWorkflowContext = {
+      evidence,
+      approvedWorkflowPlan,
+      records: {
+        taxReturn: records.taxReturn!,
+        payment: records.payment!,
+        form26as: records.form26as!,
+        processingResult: records.processingResult!,
+        outstandingDemand: records.outstandingDemand!,
+      },
+    };
+    return parsed.success && actionParsed.success ? { evidence, workflowContext, specification: parsed.data as UnderstandingSurfaceSpecification, actionSpecification: actionParsed.data as ActionSurfaceSpecification } : null;
   } catch {
     return null;
   }
