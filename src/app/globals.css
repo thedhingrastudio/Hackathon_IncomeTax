@@ -76,6 +76,34 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .external-service { color: var(--ux4g-text-neutral-secondary); font-size: .75rem; }
 .help-guidance { max-width: 760px; }
 .help-guidance p { color: var(--ux4g-text-neutral-secondary); }
+.workflow-panel { max-width: 880px; margin-inline: auto; }
+.response-stepper { margin-bottom: var(--ux4g-space-4); }
+.response-context { color: var(--ux4g-text-neutral-secondary); font-size: .875rem; margin-bottom: var(--ux4g-space-10); text-align: center; }
+.workflow-heading { max-width: 720px; margin-bottom: var(--ux4g-space-8); }
+.workflow-heading h1 { margin-bottom: var(--ux4g-space-4); }
+.workflow-heading > p:last-child { color: var(--ux4g-text-neutral-secondary); }
+.workflow-heading h1:focus { outline: none; }
+.response-options { display: grid; gap: var(--ux4g-space-4); margin: 0; padding: 0; border: 0; }
+.response-option { align-items: flex-start; min-height: 72px; border: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); border-radius: var(--ux4g-radius-md); padding: var(--ux4g-padding-m); background: var(--ux4g-bg-neutral-elevated); }
+.response-option:has(.ux4g-radio-input:checked) { border-color: var(--ux4g-border-color-primary-strong); background: var(--ux4g-bg-primary-soft); }
+.response-option .ux4g-radio-content { display: flex; flex-direction: column; gap: var(--ux4g-space-2); }
+.response-option small { color: var(--ux4g-text-neutral-secondary); }
+.response-options.has-error { border-left: var(--ux4g-border-width-lg) solid var(--ux4g-border-color-error-strong); padding-left: var(--ux4g-padding-s); }
+.reason-options { display: grid; gap: var(--ux4g-space-4); margin: 0 0 var(--ux4g-space-8); padding: 0; border: 0; }
+.reason-options legend { margin-bottom: var(--ux4g-space-5); font-weight: var(--ux4g-font-weight-semibold); }
+.reason-options.has-error { border-left: var(--ux4g-border-width-lg) solid var(--ux4g-border-color-error-strong); padding-left: var(--ux4g-padding-s); }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ux4g-space-6); }
+.field-error { color: var(--ux4g-text-status-error); font-size: .875rem; margin-top: var(--ux4g-space-3); }
+.workflow-actions { display: flex; flex-wrap: wrap; gap: var(--ux4g-space-4); margin-top: var(--ux4g-space-8); }
+.review-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ux4g-space-6) var(--ux4g-space-10); margin: 0; }
+.review-list > div { min-width: 0; }
+.review-list dd { margin-top: var(--ux4g-space-2); overflow-wrap: anywhere; }
+.consequence-message { margin-top: var(--ux4g-space-6); }
+.response-success { margin-bottom: var(--ux4g-space-8); }
+.response-success h1 { margin-bottom: var(--ux4g-space-3); }
+.response-success h1:focus { outline: none; }
+.response-success p { margin-bottom: 0; }
+.payment-unavailable-card { margin-block: var(--ux4g-space-8); }
 .other-action-areas { margin-top: var(--ux4g-space-10); }
 .other-action-areas ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ux4g-space-6); margin: 0; padding: 0; list-style: none; }
 .other-action-areas li { display: flex; flex-direction: column; gap: var(--ux4g-space-2); border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); padding-top: var(--ux4g-padding-s); }
@@ -113,10 +141,17 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
   .demand-card__header, .demand-card__body, .demand-card__footer { padding-block: var(--ux4g-padding-m); }
   .demand-card__body dl, .shortcut-grid { grid-template-columns: 1fr; }
   .record-details, .supporting-records, .service-grid, .tax-record-grid, .service-catalogue, .other-action-areas ul { grid-template-columns: 1fr; }
+  .form-grid, .review-list { grid-template-columns: 1fr; }
   .record-details { gap: var(--ux4g-space-6); }
   .demand-overview { align-items: flex-start; flex-direction: column; padding-block: var(--ux4g-padding-m); }
   .demand-amount { font-size: 2rem; }
   .government-actions .ux4g-btn { width: 100%; justify-content: center; min-height: 44px; }
+  .workflow-panel { width: 100%; }
+  .response-stepper { margin-bottom: var(--ux4g-space-4); }
+  .response-context { margin-bottom: var(--ux4g-space-8); text-align: left; }
+  .response-option { min-height: 80px; }
+  .workflow-actions { flex-direction: column; }
+  .workflow-actions .ux4g-btn { width: 100%; justify-content: center; min-height: 44px; }
   .service-list li > div { align-items: flex-start; flex-direction: column; gap: var(--ux4g-space-2); }
   .demand-card .ux4g-btn { width: 100%; justify-content: center; min-height: 44px; }
   .shortcut-card p { min-height: auto; }
