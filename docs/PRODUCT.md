@@ -133,42 +133,31 @@ The system should explain the problem and orchestrate the required workflows.
 
 # Product Philosophy
 
-The interaction model is:
+The normal Income Tax portal is the default and remains fully usable. AI is a quiet, optional assistance layer that the citizen intentionally opens without losing their current government context.
 
-Intent
+The product model is:
 
-→ Context
+Standard portal
 
-→ Deterministic reconciliation
+→ optional right-side Assistance Workspace
 
-→ Diagnosis
+→ contextual generated UI
 
-→ Generated graphical interface
+→ structured citizen review
 
-→ Citizen decision
+→ government workflow
 
-→ Government workflow
+→ case tracking.
 
-→ Status
-
-The guiding phrase is:
+The guiding principles are:
 
 > Conversational intelligence, graphical interaction.
 
-Natural language may help the citizen express their problem.
+> Conversation controls the interface. It does not become the interface.
 
-The primary user experience should not be a continuous chat conversation.
+Natural language controls what the workspace presents. The response should normally be the most useful graphical representation of verified context, not a growing transcript.
 
-Once the system understands the case, information should be presented using appropriate graphical components such as:
-
-- comparisons;
-- status indicators;
-- evidence;
-- explanations;
-- action plans;
-- forms;
-- confirmations;
-- progress timelines.
+The government side reflects the system's structure: services, forms, records, notices, returns, payments and workflows. The assistance side reflects the citizen's situation: priorities, deadlines, explanations, relationships, recommended next actions and status.
 
 ---
 
@@ -200,33 +189,21 @@ The underlying service remains accessible without AI.
 
 # AI-Assisted Experience
 
-AI assistance can be entered in two ways.
+In the desktop portal-only state, assistance is represented only by a quiet persistent handle on the right edge. Opening it creates one persistent Assistance Workspace beside the current portal page; the portal compresses but does not reload or disappear.
 
-## Contextual assistance
+The workspace begins with priorities, deadlines and a persistent natural-language input. Selecting the ₹18,420 Outstanding Demand synchronises both sides: the portal shows the government record while the workspace shows the citizen-facing context.
 
-From the Outstanding Demand page:
+The citizen can choose **Understand this** or ask a question such as:
 
-> Help me understand this
+> Why is this ₹18,420 showing?
 
-The system already understands which demand the citizen is viewing.
-
-## Natural-language assistance
-
-From the dashboard:
-
-> Tell us what's happened...
-
-Example:
-
-> "I already paid this tax. Why does it say I owe ₹18,420?"
-
-The system interprets the intent and opens the relevant case.
+The workspace then selects an approved graphical representation: a comparison of ₹18,420 paid against ₹0 recognised, a plain-language explanation, traceable sources and an approved **Fix this** action. It subsequently supports the corrective action sequence, rigid consequence reviews and persistent case tracking without becoming a chatbot transcript.
 
 ---
 
 # AI Assistance Is Optional
 
-The prototype includes an AI Assistance control.
+The target interaction uses a closed-by-default assistance drawer rather than a large dashboard AI card or toggle as its defining entry point.
 
 When AI assistance is disabled:
 
@@ -234,7 +211,7 @@ When AI assistance is disabled:
 - government records remain visible;
 - forms remain usable;
 - deterministic validation continues;
-- AI-generated explanations and recommendations disappear.
+- the Assistance Workspace remains closed and AI-generated explanations and recommendations are not required.
 
 The citizen never loses access to the underlying service.
 
@@ -289,36 +266,31 @@ The citizen retains control over:
 
 # Generative UI Principle
 
-Generative UI does not mean that the AI writes arbitrary webpages.
+Generative UI does not mean that AI writes arbitrary webpages. The assistance layer produces a validated surface specification using approved representations:
 
-The system uses a trusted component catalogue.
+- Attention;
+- DeadlineCalendar;
+- Comparison;
+- Explanation;
+- SourceTrace;
+- Checklist;
+- Decision;
+- ActionPlan;
+- Timeline.
 
-The assistance layer produces structured UI instructions.
+These are representations rather than a catalogue of generic cards. The model may select an approved representation, layout enum, section ordering and supporting copy. Authoritative facts are resolved from deterministic application state through validated `dataRef` bindings. Interactive operations use approved `actionId` values.
 
-Those instructions are validated.
-
-The application then renders approved components.
-
-Initial component families include:
-
-- notice;
-- source check;
-- amount comparison;
-- diagnosis;
-- evidence;
-- action plan;
-- review;
-- timeline.
-
-The composition may adapt to the user's situation.
-
-The design system remains controlled.
+As the citizen approaches authorization, the interface becomes deliberately less generative and more rigid. AI cannot rearrange or cross the final review and confirmation boundary.
 
 ---
 
 # Design Direction
 
-UX4G is the design-system foundation.
+The target presentation foundation is shadcn/ui for structural primitives, Magic UI used selectively for meaningful motion or visual relationships, and project-owned tokens and styling.
+
+The interaction model comes first; the application must not be designed around a component library.
+
+**Migration status:** the current implementation still contains UX4G code and dependencies. The target presentation migration has not yet been implemented.
 
 The prototype should feel like a credible evolution of an Indian government digital service rather than a generic AI startup.
 
@@ -340,6 +312,8 @@ Avoid unnecessary:
 - futuristic decorative effects.
 
 The interface should feel calm, trustworthy and understandable.
+
+The desktop Assistance Workspace is specified first. Mobile assistance will be designed separately and must not be implemented by merely compressing the desktop split-screen layout.
 
 ---
 

@@ -2,1130 +2,224 @@
 
 ## Purpose
 
-This document defines the user journeys and application states for the hackathon prototype.
+This document defines the standard and optional assisted journeys for the synthetic ₹18,420 Outstanding Demand scenario. Both experiences use the same records, deterministic reconciliation, workflows, consequence gates, submissions and persistent case state.
 
-The prototype focuses on one synthetic Income Tax problem:
-
-> A taxpayer has already paid ₹18,420 in Self-Assessment Tax, but the processed return recognises ₹0 of that payment and an outstanding demand of ₹18,420 is created.
-
-The service supports two ways of resolving the same underlying problem:
-
-1. Standard government-service navigation without AI.
-2. Optional AI-assisted diagnosis and orchestration.
-
-Both experiences operate on the same synthetic taxpayer records and the same simulated government workflows.
-
----
-
-# Core UX Principle
-
-The citizen should not be required to understand the internal structure of the Income Tax portal before they can understand their problem.
-
-The AI-assisted experience follows:
-
-Intent
-
-→ Context
-
-→ Diagnosis
-
-→ Evidence
-
-→ Action Plan
-
-→ Citizen Review
-
-→ Government Action
-
-→ Case Status
-
-The experience should use:
+The governing principles are:
 
 > Conversational intelligence, graphical interaction.
 
-Natural language may be used to express intent.
+> Conversation controls the interface. It does not become the interface.
 
-The primary experience after intent is understood should consist of normal graphical UI rather than a chat transcript.
+The normal Income Tax portal is the default interface. AI is optional and never replaces access to government services.
 
----
+## Shared portal structure
 
-# Shared Portal Structure
+The portal provides Dashboard, Returns, Payments and Tax Records, Pending Actions, Services and Help. Only the Outstanding Demand scenario is implemented deeply.
 
-The prototype represents a small subset of the Income Tax portal.
+The synthetic citizen is Rohan Mehta. The relevant Assessment Year is 2026–27 and the Outstanding Demand is ₹18,420. All identity, financial and government information is synthetic.
 
-Primary navigation:
+Existing routes may remain as implementation or deep-link details. Conceptually, portal browsing, government workflows and case tracking remain distinct, while the intended assisted desktop experience occurs in one persistent workspace beside the current portal context.
 
-* Dashboard
-* Returns
-* Payments
-* Pending Actions
-* Services
-* Help
+## Experience A — Standard non-AI journey
 
-Only the Outstanding Demand problem is implemented deeply.
+The conventional route remains:
 
-Other areas exist primarily to make the service understandable and browsable.
+Dashboard → Pending Actions → Outstanding Demand → Submit Response → Select response → Review → Confirm and submit.
 
----
+AI must not be required at any point.
 
-# Prototype User
+### Dashboard and Pending Actions
 
-Name:
+The Dashboard provides normal navigation, Quick Links or Tools, account information, items needing attention and government advisories or updates. The ₹18,420 Outstanding Demand is the primary attention item.
 
-Rohan Mehta
+Pending Actions shows the demand, AY 2026–27 and its official `Action required` status, with a conventional action to view it.
 
-Assessment Year:
+### Outstanding Demand
 
-2026–27
+The demand detail shows the amount, Assessment Year, official status and synthetic processing reference. Standard actions remain **Pay now** and **Submit response**.
 
-Outstanding Demand:
+The response flow offers:
 
-₹18,420
+- Demand is correct;
+- Demand was already paid;
+- I disagree with this demand.
 
-All personal, financial and government information is synthetic.
+For this scenario, the appropriate response is **I disagree with this demand**, because the processed return must first be corrected.
 
----
+### Separate conventional correction
 
-# Route Model
+Without assistance, the citizen manually discovers and uses:
 
-The intended route structure is:
+Services → Rectification → New Request → AY 2026–27 → Tax Credit Mismatch Correction.
 
-`/`
+The review shows the existing ₹18,420 payment, payment date 15 July 2026, synthetic challan `MOCK-2481`, correction type, evidence and the message **Nothing has been submitted yet**. Submission requires explicit citizen confirmation and returns `RECT-DEMO-01842`.
 
-Dashboard.
+The citizen then returns to the demand response, chooses **I disagree with this demand**, cites the filed Rectification, reviews the ₹18,420 disputed amount and explicitly confirms submission. The simulated response reference is `DEMAND-RESP-DEMO-18420`.
 
-`/returns`
+This procedural separation is preserved because it demonstrates the government structure that assistance helps the citizen navigate.
 
-Read-only Returns overview.
+## Experience B — Persistent Assistance Workspace
 
-`/payments`
+The assisted journey is expressed as seven states of one persistent workspace. It is not a sequence of unrelated AI pages and it does not bypass validation or citizen confirmation.
 
-Read-only Tax Payments overview.
+### State 0 — Portal only
 
-`/pending-actions`
+The Income Tax portal occupies the full desktop workspace. Normal navigation, Quick Links or Tools, attention items and government advisories remain available.
 
-Pending Actions overview.
+AI appears only as a quiet persistent affordance on the right edge. There is no dominant dashboard AI card, permanent chatbot or required AI toggle interaction.
 
-`/pending-actions/demand`
+### State 1 — Assistance home
 
-Outstanding Demand detail.
+The citizen intentionally opens the drawer. The portal compresses but remains visible on the left; the Assistance Workspace opens on the right at an approximate 47% portal / 53% assistance split.
 
-`/services`
+The Assistance Home contains:
 
-Services overview.
+- welcome and current context;
+- things that need attention;
+- dates to remember or a calendar;
+- a persistent natural-language composer at the bottom;
+- an optional voice-input affordance.
 
-`/services/rectification`
+The composer controls the workspace above it. It does not begin a permanent message transcript.
 
-Relevant Tax Credit Rectification workflow.
+### State 2 — Context selected
 
-`/services/demand-response`
+Selecting the ₹18,420 Outstanding Demand attention item synchronises both sides.
 
-Relevant Response to Outstanding Demand workflow.
+Left: the portal navigates to or reveals the actual Outstanding Demand record.
 
-`/case/tax-demand-001`
+Right: the workspace shows:
 
-Combined case tracker for the assisted journey.
+**Outstanding demand**
 
-Routes may evolve during implementation, but the conceptual separation between portal browsing, government workflows and case tracking should remain.
+₹18,420 · AY 2026–27
 
----
+Income Tax is waiting for your response.
 
-# Experience A — Standard Non-AI Journey
+Primary contextual action: **Understand why this is showing**.
 
-## Goal
+### State 3 — Understanding
 
-Allow an experienced taxpayer, accountant or citizen who does not want AI assistance to navigate and complete the underlying government workflow directly.
+The citizen chooses **Understand this** or asks a question such as **Why is this ₹18,420 showing?**
 
-AI must not be required.
+The workspace selects a Comparison representation:
 
----
+- You paid: ₹18,420, Confirmed;
+- Processed return recognised: ₹0;
+- Difference: ₹18,420 not counted.
 
-## ST-01 — Dashboard
+It then presents the verified explanation:
 
-### Purpose
+> The payment exists in Income Tax records but was not included when the return was processed.
 
-Give the taxpayer an overview of their account.
+Primary action: **Fix this**.
 
-### Display
+Secondary progressive disclosure: **Why we think this** reveals traceable evidence without requiring blind trust.
 
-Rohan Mehta
+### State 4 — Action workspace
 
-Assessment Year 2026–27
+After **Fix this**, the workspace shows the approved outcome-oriented sequence:
 
-Primary navigation.
+1. **Correct your tax credit** — the existing ₹18,420 payment has been found, everything required is ready, and the citizen can review the correction.
+2. **Respond to the demand** — prepared after Step 1 and started only after the Rectification exists.
 
-A prominent account item:
+Human outcomes appear before government machinery. Government terminology may be shown secondarily, for example `Rectification → Tax Credit Mismatch Correction`.
 
-**1 item needs your attention**
+### State 5 — Review and consequence
 
-Outstanding Demand
+As the citizen approaches a consequential action, the experience becomes less generative and more rigid.
 
-₹18,420
+Understanding is flexible and adaptive. Authorization is structured and deterministic.
 
-Assessment Year 2026–27
+Before each simulated submission, show:
 
-### Actions
+- exactly what will be submitted;
+- authoritative Assessment Year and monetary values;
+- the government workflow;
+- supporting evidence and references;
+- **Nothing has been submitted yet**;
+- an explicit **Confirm and submit** action.
 
-**View demand**
+AI may not rearrange this review, change authoritative values, advance workflow state or cross the confirmation boundary. Rectification must be confirmed before Demand Response can be prepared and confirmed.
 
-If AI assistance is enabled, the dashboard may also contain:
+### State 6 — Tracking
 
-**Need help with something?**
+After both submissions, the same Assistance Workspace becomes the citizen-facing case tracker:
 
-This is secondary to the normal portal.
+**Outstanding demand · ₹18,420**
 
----
+**Waiting for Income Tax review**
 
-## ST-02 — Pending Actions
-
-### Purpose
-
-Show government actions requiring taxpayer attention.
-
-### Display
-
-Outstanding Demand
-
-₹18,420
-
-Assessment Year 2026–27
-
-Status:
-
-Action required
-
-### Action
-
-**View**
-
----
-
-## ST-03 — Outstanding Demand Detail
-
-### Display
-
-Outstanding Demand
-
-₹18,420
-
-Assessment Year 2026–27
-
-Status:
-
-Action required
-
-Relevant demand reference and synthetic processing information may be shown.
-
-### Standard actions
-
-**Pay now**
-
-**Submit response**
-
-If AI assistance is enabled, additionally show:
-
-**Not sure why this is showing?**
-
-**Help me understand this**
-
-This contextual AI action must disappear when AI assistance is disabled.
-
----
-
-## ST-04 — Submit Response
-
-The conventional interface asks the taxpayer to choose how they want to respond.
-
-Simplified prototype options:
-
-### Demand is correct
-
-Use when the taxpayer agrees that the amount is payable.
-
-### Demand was already paid
-
-Use when the taxpayer has already paid the demand itself.
-
-### I disagree with this demand
-
-Use when the taxpayer believes the demand is incorrect or another corrective action is underway.
-
-The interface may contain short explanations but should retain the recognisable government classification model.
-
-For this synthetic scenario, the correct eventual route is:
-
-**I disagree with this demand**
-
-because the underlying processed record first needs correction.
-
----
-
-# Standard Scenario Requires a Separate Correction
-
-The taxpayer must discover that resolving this problem requires a second government service.
-
-They navigate manually:
-
-Services
-
-→ Rectification
-
-→ New Request
-
-→ Assessment Year 2026–27
-
-→ Tax Credit Mismatch Correction
-
-This procedural separation is intentional in the prototype because it demonstrates the complexity the AI-assisted experience is designed to orchestrate.
-
----
-
-## ST-05 — Services
-
-### Display
-
-A browsable set of government services.
-
-Deep implementation is required only for:
-
-**Rectification**
-
-and:
-
-**Response to Outstanding Demand**
-
-Other services may appear as prototype placeholders.
-
----
-
-## ST-06 — Rectification
-
-### Display
-
-New Rectification Request
-
-Assessment Year:
-
-2026–27
-
-Request Type:
-
-**Tax Credit Mismatch Correction**
-
-The taxpayer manually chooses the correct service.
-
-### Continue
-
----
-
-## ST-07 — Tax Credit Correction Form
-
-The taxpayer sees structured tax information.
-
-### Existing payment
-
-₹18,420
-
-15 July 2026
-
-Self-Assessment Tax
-
-Synthetic Challan:
-
-MOCK-2481
-
-### Processed return
-
-Self-Assessment Tax recognised:
-
-₹0
-
-### Correction
-
-Apply the existing Self-Assessment Tax payment to the processed return.
-
-### Action
-
-**Review request**
-
----
-
-## ST-08 — Rectification Review
-
-The taxpayer sees:
-
-Assessment Year
-
-2026–27
-
-Payment
-
-₹18,420
-
-Payment date
-
-15 July 2026
-
-Challan
-
-MOCK-2481
-
-Correction Type
-
-Tax Credit Mismatch Correction
-
-### Consequence message
-
-Nothing has been submitted yet.
-
-### Action
-
-**Confirm and submit**
-
----
-
-## ST-09 — Rectification Submitted
-
-The simulated government system returns:
-
-Rectification Request ID:
-
-`RECT-DEMO-01842`
-
-Status:
-
-Submitted
-
-The standard interface should make clear that this is only one part of resolving the demand.
-
-The taxpayer must return to:
-
-Pending Actions
-
-→ Outstanding Demand
-
-→ Submit Response
-
----
-
-## ST-10 — Demand Response After Rectification
-
-The taxpayer chooses:
-
-**I disagree with this demand**
-
-Reason:
-
-**Rectification filed**
-
-Reference:
-
-`RECT-DEMO-01842`
-
-Amount disputed:
-
-₹18,420
-
-### Action
-
-**Review response**
-
----
-
-## ST-11 — Demand Response Review
-
-Display:
-
-Outstanding Demand:
-
-₹18,420
-
-Response:
-
-Disagree
-
-Reason:
-
-Rectification filed
-
-Rectification reference:
-
-RECT-DEMO-01842
-
-Amount disputed:
-
-₹18,420
-
-### Consequence message
-
-Nothing has been submitted yet.
-
-### Action
-
-**Confirm and submit**
-
----
-
-## ST-12 — Demand Response Submitted
-
-Mock response ID:
-
-`DEMAND-RESP-DEMO-18420`
-
-Status:
-
-Submitted
-
-The conventional experience may show the two government submissions separately.
-
-This is intentionally less integrated than the AI-assisted case tracker.
-
----
-
-# Experience B — AI-Assisted Journey
-
-## Goal
-
-Allow the citizen to begin from their real problem rather than selecting a government procedure.
-
-The AI-assisted journey must use the same underlying synthetic government records and workflows as the standard journey.
-
-It must not bypass validation or final citizen confirmation.
-
----
-
-# AI Entry Point 1 — Contextual Help
-
-From the Outstanding Demand page:
-
-**Help me understand this**
-
-Because the user is already looking at the demand, the system automatically knows:
-
-* the demand reference;
-* Assessment Year;
-* amount;
-* taxpayer;
-* current government state.
-
-The user should not have to repeat this information.
-
-This is the primary hackathon demo entry point.
-
----
-
-# AI Entry Point 2 — Natural Language
-
-From the dashboard:
-
-**Need help with something?**
-
-Input:
-
-> Tell us what's happened...
-
-Example user input:
-
-> I already paid this tax. Why does it say I owe ₹18,420?
-
-The input may initially be interpreted by a deterministic mock intent system.
-
-A real LLM adapter may be connected later.
-
-After the intent is understood, the experience converges with the contextual-help journey.
-
-Do not create a permanent chat transcript.
-
----
-
-## AI-01 — Assistance Requested
-
-State:
-
-`ASSISTANCE_REQUESTED`
-
-The interface transitions from the normal government page into an assistance surface.
-
-The surrounding portal remains recognisable.
-
----
-
-## AI-02 — Checking Records
-
-State:
-
-`CHECKING_RECORDS`
-
-### Purpose
-
-Make system activity understandable without exposing technical implementation details.
-
-### Display
-
-**Checking this demand**
-
-We're comparing the information Income Tax already has.
-
-Progress may include:
-
-✓ Outstanding Demand
-
-✓ Filed return
-
-✓ Tax payments
-
-✓ Form 26AS
-
-✓ Processing result
-
-The system is reading synthetic records only.
-
-No LLM is responsible for financial calculations.
-
----
-
-## AI-03 — Diagnosis
-
-State:
-
-`DIAGNOSIS_READY`
-
-This is one of the hero moments of the prototype.
-
-### Display
-
-# We found the problem
-
-### Your payment
-
-₹18,420
-
-Paid 15 July 2026
-
-Confirmed
-
-### Processed return
-
-₹0
-
-Self-Assessment Tax recognised
-
-### Difference
-
-₹18,420
-
-### Explanation
-
-Your ₹18,420 payment exists, but it was not included in the return Income Tax processed.
-
-This explanation is based on deterministic reconciliation results.
-
-### Primary action
-
-**Fix this**
-
-### Secondary disclosure
-
-**Why do we think this?**
-
----
-
-## AI-04 — Evidence
-
-Evidence should be progressively disclosed.
-
-The simplest view shows:
-
-Payment record:
-
-₹18,420 confirmed
-
-Form 26AS:
-
-₹18,420 reflected
-
-Processed return:
-
-₹0 recognised
-
-Outstanding Demand:
-
-₹18,420
-
-A deeper view may reveal:
-
-* synthetic challan reference;
-* payment date;
-* Assessment Year;
-* processing reference;
-* record sources.
-
-The citizen should be able to inspect why the system reached its conclusion.
-
----
-
-## AI-05 — Resolution Plan
-
-State:
-
-`PLAN_READY`
-
-This is the second major hero moment.
-
-### Display
-
-# Here's how we'll fix this
-
-Two actions are required.
-
-### Step 1 — Correct your tax credit
-
-Add your existing ₹18,420 Self-Assessment Tax payment to the processed return.
-
-Evidence ready:
-
-✓ Payment
-
-✓ Form 26AS
-
-Status:
-
-Ready
-
-### Step 2 — Respond to the demand
-
-Tell Income Tax that the ₹18,420 demand is being corrected.
-
-This step begins after the rectification request exists.
-
-### Action
-
-**Review step 1**
-
-The citizen sees one outcome-oriented workflow rather than having to discover two separate services.
-
----
-
-## AI-06 — Rectification Review
-
-State:
-
-`RECTIFICATION_REVIEW`
-
-At this point the interface becomes deliberately more rigid and form-like.
-
-AI has finished assisting.
-
-The citizen is now reviewing a government action.
-
-### Display
-
-Assessment Year:
-
-2026–27
-
-Existing payment:
-
-₹18,420
-
-Payment date:
-
-15 July 2026
-
-Synthetic challan:
-
-MOCK-2481
-
-Correction:
-
-Tax Credit Mismatch Correction
-
-### Evidence
-
-Payment confirmed
-
-Form 26AS reflected
-
-### Consequence message
-
-Nothing has been submitted yet.
-
-### Confirmation
-
-The citizen explicitly confirms that the information is correct.
-
-### Action
-
-**Confirm and submit correction**
-
----
-
-## AI-07 — Rectification Submitted
-
-State:
-
-`RECTIFICATION_SUBMITTED`
-
-Mock Rectification ID:
-
-`RECT-DEMO-01842`
-
-Status:
-
-Submitted
-
-The orchestrator now has the prerequisite needed for the second government action.
-
-The user should not have to manually return to another portal section.
-
----
-
-## AI-08 — Demand Response Prepared
-
-State:
-
-`DEMAND_RESPONSE_REVIEW`
-
-### Display
-
-# One final action
-
-Your tax-credit correction has been submitted.
-
-We can now respond to the ₹18,420 demand.
-
-### Prepared response
-
-Response:
-
-Disagree with demand
-
-Reason:
-
-Rectification filed
-
-Rectification reference:
-
-RECT-DEMO-01842
-
-Amount disputed:
-
-₹18,420
-
-### Plain-language explanation
-
-We're telling Income Tax that this demand is being corrected because the tax payment already exists.
-
-### Consequence message
-
-Nothing has been submitted yet.
-
-### Action
-
-**Confirm and submit response**
-
----
-
-## AI-09 — Demand Response Submitted
-
-State:
-
-`DEMAND_RESPONSE_SUBMITTED`
-
-Mock response reference:
-
-`DEMAND-RESP-DEMO-18420`
-
-The citizen has now completed both government actions.
-
----
-
-## AI-10 — Combined Case Tracker
-
-Route:
-
-`/case/tax-demand-001`
-
-State:
-
-`WAITING_FOR_REVIEW`
-
-### Display
-
-# Your ₹18,420 tax demand
-
-We're fixing this.
+**Nothing you need to do right now.**
 
 Timeline:
 
-✓ Payment found
+- ✓ Payment found;
+- ✓ Problem identified;
+- ✓ Correction submitted — `RECT-DEMO-01842`;
+- ✓ Demand response submitted — `DEMAND-RESP-DEMO-18420`;
+- ● Income Tax review;
+- ○ Resolved.
 
-15 July 2026
+The portal remains usable beside it. The persistent case remains `WAITING_FOR_REVIEW`; the prototype does not automatically resolve it.
 
-✓ Rectification submitted
+## Contextual synchronization
 
-RECT-DEMO-01842
+Portal and assistance state are coordinated without merging their responsibilities. Selecting an attention item may update both the government page on the left and the citizen context on the right. Closing assistance returns the portal to its full workspace without discarding the portal route or persisted case.
 
-✓ Demand response submitted
+The left side remains authoritative government structure. The right side explains and orchestrates the citizen's verified situation.
 
-DEMAND-RESP-DEMO-18420
+## Persistent composer
 
-● Income Tax review
+The composer remains available at the bottom of Assistance Home and supported contextual surfaces. Examples include:
 
-Waiting
+- Why do I owe this?
+- I already paid this.
+- What do I need to do this month?
+- Do I need to respond to anything?
+- Show me proof.
+- What happens next?
 
-○ Resolved
+The interpreted intent changes the representation above the composer. Prior turns may inform context, but a chat-message stack is not the primary output or navigation model.
 
-### Reassurance
+## Progressive rigidity
 
-No action is required from you right now in this simulated case.
+The assistance experience deliberately narrows its freedom:
 
-### Secondary action
+- flexible: natural-language intent and selection of useful context;
+- adaptive: comparison, explanation, evidence emphasis and progressive disclosure;
+- structured: approved action plan and government workflow information;
+- rigid: declarations, authoritative review, confirmation and submission.
 
-**View details**
+The representation layer may help the citizen understand and decide. Deterministic workflow code alone enforces prerequisites and transitions.
 
-This screen should feel like a persistent mini-application for the citizen's specific problem.
+## Assistance off
 
-It should not resemble a chat conversation.
+When assistance is unavailable or not invoked, the Dashboard, navigation, records, Outstanding Demand, Rectification, Demand Response, deterministic validation and citizen-controlled submissions remain usable. Closing or disabling assistance does not erase persistent case state or modify authoritative records.
 
----
+## Accessibility and resilience
 
-## AI-11 — Resolved State
+All critical controls must be semantic and keyboard accessible, with visible focus, meaningful labels and non-colour-only status communication. Critical content must load before decorative effects, and completed workflow state must recover after reload.
 
-State:
+If assistance output fails validation or a safe diagnosis cannot be determined, the interface falls back to the conventional portal and must not invent an explanation or workflow.
 
-`RESOLVED`
+## Mobile direction
 
-The case tracker updates to:
+The desktop Assistance Workspace is specified first. Mobile assistance interaction will be designed separately and must not be implemented by merely compressing the desktop split-screen layout.
 
-✓ Payment found
+Existing critical mobile journeys must remain usable during migration, but this document does not invent the final mobile assistance model.
 
-✓ Rectification submitted
+## Critical desktop demonstration journey
 
-✓ Demand response submitted
-
-✓ Income Tax review completed
-
-✓ Demand resolved
-
-Outstanding Demand:
-
-₹0
-
-The resolution is simulated.
-
----
-
-# AI Assistance Toggle
-
-AI assistance must be optional.
-
-The setting may initially be stored in localStorage.
-
-Example:
-
-`aiAssistanceEnabled = true`
-
-or:
-
-`aiAssistanceEnabled = false`
-
----
-
-## AI Assistance On
-
-May show:
-
-* contextual help;
-* dashboard natural-language input;
-* generated diagnosis;
-* generated evidence;
-* generated action plan.
-
----
-
-## AI Assistance Off
-
-Must remove:
-
-* natural-language assistance;
-* contextual AI help;
-* AI diagnosis;
-* AI recommendations.
-
-Must retain:
-
-* dashboard;
-* navigation;
-* returns;
-* payments;
-* pending actions;
-* demand detail;
-* government forms;
-* deterministic validations.
-
-Turning AI off must not break the service.
-
----
-
-# Progressive Rigidity
-
-The AI-assisted interface should become more structured as the user approaches a consequential action.
-
-## Soft
-
-Intent input.
-
-Example:
-
-> I already paid this.
-
-## Adaptive
-
-Diagnosis.
-
-Evidence.
-
-Comparisons.
-
-Recommended action plan.
-
-## Structured
-
-Rectification details.
-
-Demand-response details.
-
-## Rigid
-
-Declarations.
-
-Final confirmation.
-
-Government submission.
-
-This progression should be reflected visually.
-
----
-
-# Generative UI Surfaces
-
-The experience should be thought of as surfaces rather than a sequence of chat messages.
-
-## Intent Surface
-
-What problem is the citizen trying to solve?
-
-## Understanding Surface
-
-What records is the system examining?
-
-## Evidence Surface
-
-What did the system find?
-
-## Action Surface
-
-What needs to happen?
-
-## Consequence Surface
-
-What exactly is the citizen authorising?
-
-## Case Surface
-
-What is happening after submission?
-
----
-
-# Core UI Blocks
-
-Initial trusted Generative UI components may include:
-
-`NoticeBlock`
-
-`SourceCheckBlock`
-
-`AmountComparisonBlock`
-
-`DiagnosisBlock`
-
-`EvidenceBlock`
-
-`ActionPlanBlock`
-
-`ReviewBlock`
-
-`TimelineBlock`
-
-These components are controlled by the application.
-
-The assistance engine may compose them but may not generate unrestricted interface code.
-
----
-
-# Mobile Behaviour
-
-All critical flows must work on a narrow mobile viewport.
-
-On mobile:
-
-* content becomes single-column;
-* tables should become stacked comparisons where necessary;
-* primary actions remain easy to reach;
-* touch targets remain large;
-* critical information must not require horizontal scrolling;
-* contextual assistance remains available when AI is enabled.
-
----
-
-# Accessibility Behaviour
-
-All critical actions must be keyboard accessible.
-
-Do not rely only on colour to communicate:
-
-* payment confirmed;
-* mismatch;
-* warning;
-* success;
-* progress.
-
-Focus states must remain visible.
-
-Plain-language explanations should precede government terminology where possible.
-
----
-
-# Slow Connection Behaviour
-
-Critical content should load before decorative content.
-
-The user should not lose completed government-action state after a reload.
-
-Eventually show:
-
-> Your progress is saved.
-
-when relevant.
-
----
-
-# Critical Demo Journey
-
-The strongest presentation path is:
-
-1. Show the normal Income Tax portal.
-2. Open the ₹18,420 Outstanding Demand.
-3. Briefly show the conventional response options.
-4. Return to the demand.
-5. Select **Help me understand this**.
-6. Show the records being checked.
-7. Reveal the ₹18,420 versus ₹0 comparison.
-8. Reveal the two-step corrective plan.
-9. Review and submit the Rectification.
-10. Review and submit the Demand Response.
-11. Show the combined case tracker.
-12. Briefly disable AI and demonstrate that normal portal usage remains available.
-
-This is the hero experience around which implementation and visual polish should be prioritised.
+1. Show the full conventional Income Tax portal.
+2. Open the quiet Assistance Workspace affordance.
+3. Select the ₹18,420 Outstanding Demand attention item.
+4. Keep the government demand visible on the left and its citizen context on the right.
+5. Ask **Why is this ₹18,420 showing?** or choose **Understand this**.
+6. Show the verified ₹18,420 versus ₹0 Comparison and Explanation.
+7. Reveal SourceTrace on request.
+8. Choose **Fix this** and show the two-step ActionPlan.
+9. Review and explicitly confirm Rectification.
+10. Review and explicitly confirm Demand Response.
+11. Show the persistent Tracking state.
+12. Close assistance and demonstrate that the normal portal remains usable.

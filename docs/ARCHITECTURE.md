@@ -33,9 +33,14 @@ React.
 
 TypeScript.
 
-## Government Design System
+## Target presentation foundation
 
-UX4G.
+- React and Next.js;
+- shadcn/ui for structural primitives;
+- Magic UI selectively for meaningful motion and visual relationships;
+- project-owned design tokens and styling.
+
+**Migration status:** this target has not been implemented. The repository currently still contains UX4G code and dependencies. This documentation change does not install, remove or migrate presentation packages.
 
 ## Validation
 
@@ -106,7 +111,7 @@ OpenAI API behind a server-side adapter.
             └───────────┬───────────┘
                         │
                         ▼
-                  UI BLOCK PLAN
+              SURFACE SPECIFICATION
                         │
                         ▼
                   ZOD VALIDATION
@@ -252,24 +257,21 @@ Do not create unrelated deep routes unless the product scope changes explicitly.
 
 ---
 
-# Layer 2 — UX4G Integration
+# Layer 2 — Target Presentation Architecture
 
-Location:
+The target presentation layer contains these responsibilities:
 
-`src/components/ux4g`
+* **Base UI primitives** — accessible structural controls built from shadcn/ui and project-owned tokens;
+* **WorkspaceShell** — preserves the portal on the left and manages the desktop Assistance Workspace on the right;
+* **AssistanceDrawerHandle** — the quiet, closed-by-default entry point;
+* **Generative Surface Renderer** — renders validated surface specifications;
+* **Trusted Representation Registry** — maps approved representation types to application-owned React components;
+* **Data Binding Resolver** — resolves validated `dataRef` paths against deterministic context;
+* **Approved Action Registry** — maps approved `actionId` values to application-owned behaviour.
 
-Responsibilities:
+The interaction model comes before the component library. Magic UI must be used only where motion communicates a meaningful relationship or state change, not as decorative AI branding.
 
-* initialize UX4G;
-* provide reusable wrappers where useful;
-* keep government design-system usage consistent;
-* centralize any compatibility work required between UX4G and React/Next.js.
-
-Existing runtime:
-
-`UX4GRuntime.tsx`
-
-Before creating custom UI, check whether UX4G already provides an appropriate component or pattern.
+Current implementation note: `src/components/ux4g` and `UX4GRuntime.tsx` still exist during migration. They are not the future target architecture and must not be removed until an implementation task explicitly authorises it.
 
 ---
 
@@ -297,7 +299,9 @@ Examples:
 
 `ServiceCard`
 
-`AIAssistanceToggle`
+`AssistanceDrawerHandle` (target)
+
+`WorkspaceShell` (target)
 
 These are normal reusable portal components.
 
@@ -311,25 +315,25 @@ Location:
 
 `src/components/generative-ui`
 
-Initial trusted components:
+Target trusted representations:
 
-`SourceCheck`
+`Attention`
 
-`AmountComparison`
+`DeadlineCalendar`
 
-`DiagnosisCard`
+`Comparison`
 
-`EvidencePanel`
+`Explanation`
+
+`SourceTrace`
+
+`Checklist`
+
+`Decision`
 
 `ActionPlan`
 
-`ActionStep`
-
-`ConsequenceReview`
-
-`CaseTimeline`
-
-`GenerativeUIRenderer`
+`Timeline`
 
 The application owns these components.
 
@@ -349,48 +353,54 @@ arbitrary HTML / React
 browser
 ```
 
-Implement:
+Target flow:
 
 ```text
+EVIDENCE / CONTEXT
+        ↓
 ASSISTANCE ENGINE
         ↓
-STRUCTURED UI BLOCKS
+SURFACE SPECIFICATION
         ↓
 ZOD SCHEMA
         ↓
-VALIDATION
+TRUSTED REPRESENTATION REGISTRY
         ↓
-COMPONENT REGISTRY
+RESOLVE dataRef BINDINGS
         ↓
-TRUSTED REACT COMPONENTS
+RENDERED ASSISTANCE WORKSPACE
 ```
 
 Example conceptual response:
 
 ```json
 {
+  "surface": "understanding",
+  "layout": "stack",
   "blocks": [
     {
-      "type": "amount_comparison",
-      "paidAmount": 18420,
-      "processedAmount": 0
+      "type": "comparison",
+      "variant": "financial_mismatch",
+      "items": [
+        { "label": "You paid", "valueRef": "evidence.payment.amount" },
+        { "label": "Processed return", "valueRef": "evidence.processedReturn.recognisedTax" }
+      ],
+      "differenceRef": "reconciliation.difference"
     },
     {
-      "type": "diagnosis",
-      "diagnosis": "payment_missing_from_processed_return"
+      "type": "explanation",
+      "factSetRef": "diagnosis.primary"
     },
     {
-      "type": "action_plan",
-      "actions": [
-        "tax_credit_rectification",
-        "respond_to_demand"
-      ]
+      "type": "source_trace",
+      "collapsed": true
     }
-  ]
+  ],
+  "primaryAction": { "actionId": "review_rectification", "label": "Fix this" }
 }
 ```
 
-The exact schema will be defined in code later.
+The model selects approved representations and may generate supporting copy. It does not provide authoritative amounts directly when a deterministic binding is available. The exact V2 schema will be defined in a later implementation task; the current code remains unchanged.
 
 ---
 
@@ -507,7 +517,7 @@ Define shared TypeScript types for:
 * demand records;
 * reconciliation output;
 * workflow state;
-* Generative UI blocks.
+* Generative UI representations and surface specifications.
 
 Avoid duplicating incompatible types across components.
 
@@ -957,7 +967,7 @@ For the hackathon, these may remain local simulations if server APIs add unneces
 ## Client Responsibilities
 
 * interactive UI;
-* AI Assistance toggle;
+* Assistance Workspace open/closed state when implemented;
 * navigation;
 * user confirmation;
 * local case-state presentation;
@@ -970,6 +980,16 @@ For the hackathon, these may remain local simulations if server APIs add unneces
 * validate model responses;
 * enforce approved tool/workflow access;
 * prevent secrets from reaching the browser.
+
+---
+
+# Desktop Workspace State
+
+The target desktop shell preserves one portal route and one contextual Assistance Workspace. Closed, the portal occupies the full workspace. Open, the portal remains visible on the left and assistance occupies the right at an approximate 47/53 split.
+
+Portal navigation state and assistance surface state are coordinated but remain separate. Selecting an attention item may update the portal context and the assistance context together. Closing the workspace must not discard the current portal route, government workflow state or persistent case.
+
+The desktop Assistance Workspace is specified first. Mobile assistance interaction will be designed separately and must not be implemented by merely compressing the desktop split-screen layout.
 
 ---
 
@@ -1045,7 +1065,7 @@ Reusable components should account for:
 * non-colour-only status communication;
 * mobile touch targets.
 
-Prefer UX4G accessibility patterns wherever applicable.
+Use accessible primitives and application-owned accessibility requirements regardless of presentation library.
 
 ---
 
@@ -1108,10 +1128,13 @@ src/
 │   │   └── normal Income Tax UI
 │   │
 │   ├── ux4g/
-│   │   └── UX4G integration
+│   │   └── current presentation implementation during migration
+│   │
+│   ├── assistance-workspace/  (target)
+│   │   └── persistent workspace shell and surfaces
 │   │
 │   └── generative-ui/
-│       └── trusted adaptive UI
+│       └── trusted representations and binding/action registries
 │
 ├── data/
 │   └── mock/

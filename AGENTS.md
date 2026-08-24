@@ -20,32 +20,17 @@ All taxpayer, financial, government, payment, return and identity information in
 
 ## Product Principle
 
-The citizen should understand their problem and desired outcome.
-
-They should not have to understand the internal machinery of the government portal in order to resolve it.
+The citizen should understand their problem and desired outcome without first understanding the internal machinery of the government portal.
 
 The core interaction philosophy is:
 
 Intent → Context → Diagnosis → Generated Interface → Citizen Decision → Government Workflow → Status
 
-Use:
+Use **conversational intelligence, graphical interaction**.
 
-**Conversational intelligence, graphical interaction.**
+**Conversation controls the interface. It does not become the interface.**
 
-Do not create a chatbot-first product.
-
-Natural language is an input mechanism.
-
-The primary output should be clear graphical user interface components such as:
-
-- comparisons
-- evidence
-- summaries
-- action plans
-- forms
-- progress states
-- confirmations
-- timelines
+AI is neither the website nor the default interface. Natural language is a persistent control for an optional Assistance Workspace, not the start of a permanent transcript. The primary output should be graphical representations such as comparisons, evidence, explanations, action plans, forms, confirmations and timelines.
 
 ---
 
@@ -65,20 +50,25 @@ This path should remain understandable and functional without AI.
 
 ### AI-Assisted Experience
 
-When AI assistance is enabled, the citizen may:
+AI is represented by a quiet, persistent drawer handle while the conventional portal occupies the full workspace. When the citizen intentionally invokes assistance, a persistent right-side Assistance Workspace opens while the current government page remains visible and contextual on the left.
 
-- ask for help from the dashboard;
-- use natural language;
-- request contextual help from an Outstanding Demand page;
+Within this workspace, the citizen may:
+
+- see priorities, deadlines and contextual explanations;
+- use natural language to control the workspace;
+- request help from a supported portal context;
 - allow the system to compare relevant synthetic records;
-- receive a plain-language diagnosis;
-- receive a generated corrective workflow;
+- receive a plain-language diagnosis and graphical representation;
+- receive an approved corrective workflow;
 - review all information;
-- explicitly confirm final actions.
+- explicitly confirm final actions;
+- track the resulting case.
 
 AI assistance must remain optional.
 
 Turning AI assistance off must not prevent use of the underlying government service.
+
+The government side reflects the system's structure. The assistance side reflects the citizen's situation.
 
 ---
 
@@ -137,7 +127,7 @@ AI may:
 - explain discrepancies;
 - recommend a workflow from an approved set;
 - generate plain-language explanations;
-- determine which approved UI blocks should be presented;
+- determine which approved representation is most useful;
 - prepare information for citizen review.
 
 AI must NOT:
@@ -159,36 +149,35 @@ All financial calculations and record comparisons must come from deterministic c
 
 ## Generative UI
 
-Do not allow an LLM to generate arbitrary HTML, JavaScript, React, URLs or application code for rendering.
+Do not allow an LLM to generate arbitrary HTML, JavaScript, React, CSS, URLs or application code for rendering.
 
-Generative UI must work through a trusted structured schema.
-
-Example flow:
+Generative UI V2 works through a trusted surface specification:
 
 AI / Mock Assistance Engine
 
-→ structured UI blocks
+→ validated surface specification
 
-→ schema validation
+→ trusted representation registry
 
-→ trusted React component mapping
+→ deterministic `dataRef` binding resolution
 
-→ rendered interface
+→ rendered Assistance Workspace
 
-Approved initial UI block families include:
+The approved representation grammar is:
 
-- notice
-- source_check
-- amount_comparison
-- diagnosis
-- evidence
-- action_plan
-- review
-- timeline
+- Attention
+- DeadlineCalendar
+- Comparison
+- Explanation
+- SourceTrace
+- Checklist
+- Decision
+- ActionPlan
+- Timeline
 
-The AI may choose and populate approved components.
+These are representations, not nine generic cards. Surface types are constrained to `home`, `understanding`, `decision`, `action`, `review` and `status`. Layout choices are constrained to approved enums.
 
-It may not invent new executable components at runtime.
+The AI may choose approved representations, layouts, progressive disclosure and supporting `copy`. Authoritative values must be supplied through validated `dataRef` bindings. Actions must use application-approved `actionId` values. The AI may not invent executable components, arbitrary layout values or authoritative facts at runtime.
 
 ---
 
@@ -252,38 +241,33 @@ Trusted UI components used by the adaptive experience.
 
 Normal government portal interface components.
 
-### `src/components/ux4g`
+### Target presentation components
 
-UX4G integration and reusable wrappers.
+Future presentation responsibilities include base UI primitives, the Assistance Workspace shell, the Generative Surface Renderer, a Trusted Representation Registry, a Data Binding Resolver and an Approved Action Registry.
+
+The repository still contains `src/components/ux4g` during migration. Do not treat that current implementation detail as the target architecture, and do not remove it except in an explicitly authorised implementation increment.
 
 ---
 
 ## Design System
 
-Use UX4G as the government design-system foundation.
+The target presentation foundation is:
 
-Before implementing or materially changing UI, inspect the UX4G design instructions available under:
+- shadcn/ui for structural UI primitives;
+- Magic UI selectively for motion that explains meaningful relationships or state change;
+- project-owned visual tokens and product styling.
 
-`.agents/skills/ux4g-design/`
+The interaction model comes before the component library. The application must remain a credible, trustworthy government service rather than a generic startup dashboard.
 
-Prefer official UX4G:
-
-- design tokens;
-- components;
-- accessibility patterns;
-- spacing conventions;
-- navigation conventions;
-- responsive behavior.
-
-Custom components are allowed when UX4G does not provide the interaction required for the AI-native experience.
-
-Custom components should visually belong to the same overall system.
+Current implementation note: UX4G code and dependencies still exist. The presentation migration has not yet happened. Do not install, remove or replace presentation dependencies unless the current task explicitly authorises that migration step.
 
 Do not turn the interface into a generic startup dashboard.
 
 Do not use excessive gradients, sparkles, AI imagery, robot avatars or persistent chatbot bubbles.
 
 The intelligence should be visible through adaptation and clarity rather than decorative AI branding.
+
+The desktop Assistance Workspace is specified first. Do not implement mobile by simply shrinking the desktop split-screen model. Mobile assistance interaction will be specified separately.
 
 ---
 
@@ -343,9 +327,10 @@ Before making changes:
 
 1. Read this file.
 2. Read the relevant documents in `/docs`.
-3. Read the UX4G skill when performing UI work.
-4. Stay inside the requested increment.
-5. Do not begin later increments without being asked.
+3. Read the current target design and interaction documents when performing UI work.
+4. Distinguish the current UX4G implementation from the target presentation architecture.
+5. Stay inside the requested increment.
+6. Do not begin later increments without being asked.
 
 Before completing an implementation task:
 

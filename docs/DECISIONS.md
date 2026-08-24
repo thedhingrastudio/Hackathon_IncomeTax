@@ -58,7 +58,8 @@ AI is an assistance layer, not a mandatory intermediary.
 
 ## DEC-004 — Contextual AI Is the Primary Demo Entry Point
 
-**Status:** Accepted
+**Status:** Superseded
+**Superseded by:** DEC-016
 **Date:** 23 August 2026
 
 The primary AI-assisted demo begins from the Outstanding Demand page with:
@@ -90,7 +91,8 @@ A permanent chat transcript is not the primary interaction model.
 
 ## DEC-006 — UX4G Is the Design-System Foundation
 
-**Status:** Accepted
+**Status:** Superseded
+**Superseded by:** DEC-015
 **Date:** 23 August 2026
 
 The application will use UX4G as the government UI foundation.
@@ -225,6 +227,70 @@ Codex should not autonomously redefine:
 * core UX philosophy.
 
 Each increment should be reviewed before continuing.
+
+---
+
+## DEC-015 — Presentation Foundation Migrates Away From UX4G
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+The target presentation foundation is shadcn/ui for structural primitives, Magic UI used selectively for meaningful motion and visual relationships, and project-owned product tokens and styling.
+
+The interaction model comes before the component library. The product must continue to feel like a credible and trustworthy public service.
+
+**Reason:**
+
+The product requires a more flexible adaptive workspace and visual language than the previous UX4G-based direction provided.
+
+This decision does not change deterministic reconciliation, data authority, workflow semantics, consequence gates, persistent case state or the conventional non-AI journey.
+
+**Migration note:**
+
+UX4G code and dependencies remain in the current implementation. This decision defines the target and does not claim that migration is complete.
+
+---
+
+## DEC-016 — Assistance Is a Persistent Contextual Workspace
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+AI assistance lives in a quiet, closed-by-default right drawer. When intentionally invoked on desktop, it opens into an approximate 47% portal / 53% assistance workspace while preserving the current government page on the left.
+
+The government side reflects the system's structure. The assistance side reflects the citizen's situation. The assisted journey progresses through states of one persistent workspace rather than unrelated AI pages.
+
+The desktop model does not define mobile. Mobile assistance must be designed separately and must not merely shrink the desktop split-screen layout.
+
+---
+
+## DEC-017 — Conversation Controls the Interface
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+Natural language is a persistent control/input for the Assistance Workspace. Responses primarily change the graphical representation above the composer rather than accumulating as a chat transcript.
+
+Conversation may select context, request an explanation, reveal evidence or suggest an approved next action. It is not the primary rendered interface.
+
+---
+
+## DEC-018 — Generative UI Uses Representations and Data Bindings
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+The model chooses from approved representations, surfaces and layouts and may generate supporting copy. Authoritative facts are referenced through validated `dataRef` bindings and supplied by deterministic application state. Interactive operations use an Approved Action Registry and validated `actionId` values.
+
+The model cannot generate arbitrary HTML, React, CSS, animation code, authoritative facts or government actions.
 
 ---
 

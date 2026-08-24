@@ -46,6 +46,8 @@ The product should use:
 
 > Conversational intelligence, graphical interaction.
 
+> Conversation controls the interface. It does not become the interface.
+
 A conversational input may begin the interaction.
 
 The output should normally become structured graphical UI rather than a long chat conversation.
@@ -177,6 +179,16 @@ The AI may not invent additional government workflow identifiers.
 
 ---
 
+## Available Representations
+
+The application provides the assistance engine with the approved representation types, variants and permitted surface/layout combinations. The engine may select only from this input; a representation is not valid merely because a model names it.
+
+## Approved Actions
+
+The application provides the current set of approved `actionId` values and their availability for the present workflow state. The model may suggest a label for an approved action, but it cannot add an action, make an unavailable action valid or execute it.
+
+---
+
 # AI May
 
 AI may:
@@ -189,10 +201,14 @@ AI may:
 * explain why the system reached a diagnosis;
 * recommend an approved workflow;
 * prepare information for citizen review;
-* compose an approved set of Generative UI blocks;
+* compose an approved set of Generative UI representations;
 * determine an appropriate level of explanation;
 * generate plain-language supporting copy;
 * ask for missing information when the approved workflow requires it.
+* choose an approved representation and layout variant;
+* prioritise verified evidence;
+* decide progressive disclosure;
+* order approved informational sections within permitted bounds.
 
 ---
 
@@ -227,6 +243,9 @@ Deterministic application code is responsible for:
 * financial arithmetic;
 * Assessment Year matching;
 * payment matching;
+* authoritative deadlines and whether they apply;
+* determining whether an item genuinely requires attention;
+* official statuses and record relationships;
 * identifying record mismatches;
 * calculating the ₹18,420 discrepancy;
 * checking payment status;
@@ -290,61 +309,65 @@ Generative UI uses structured data.
 
 It does not use unrestricted runtime code generation.
 
-The flow is:
+The target V2 flow is:
 
 Assistance Engine
 
-→ Structured UI Blocks
+→ Surface Specification
 
 → Zod Validation
 
-→ Trusted Component Registry
+→ Trusted Representation Registry
 
-→ React Components
+→ `dataRef` Binding Resolution
 
-The model may choose from approved components.
+→ Assistance Workspace
+
+The model may choose from approved representations, surfaces and layout enums.
 
 The model may not create arbitrary executable components.
 
 ---
 
-# Approved Initial UI Block Types
+# Approved Representation Grammar
 
-The initial block catalogue is:
+The V2 representation grammar is:
 
-`notice`
+`Attention` — what genuinely requires the citizen's attention.
 
-Used to surface important government or account information.
+`DeadlineCalendar` — when the citizen needs to care.
 
-`source_check`
+`Comparison` — what differs between verified records.
 
-Used to communicate which records are being examined.
+`Explanation` — what a verified condition means in plain language.
 
-`amount_comparison`
+`SourceTrace` — why the citizen should believe the explanation.
 
-Used to visually compare authoritative monetary records.
+`Checklist` — whether prerequisites and evidence are available.
 
-`diagnosis`
+`Decision` — what genuine choice remains with the citizen.
 
-Used to explain the deterministic diagnosis.
+`ActionPlan` — what approved sequence needs to happen.
 
-`evidence`
+`Timeline` — what has happened and what is happening now.
 
-Used to show why the diagnosis is supported.
+These are representations, not nine generic rectangular cards. Additional types require an explicit product decision and schema change before implementation.
 
-`action_plan`
+# Surface, Field and Layout Vocabulary
 
-Used to explain the approved corrective workflow.
+Approved surface types are `home`, `understanding`, `decision`, `action`, `review` and `status`.
 
-`review`
+Structured fields fall into four categories:
 
-Used before a consequential government action.
+`dataRef` — a reference to deterministic application data, such as `evidence.payment.amount`.
 
-`timeline`
+`copy` — human-facing supporting language that may be model-generated.
 
-Used to represent persistent case status.
+`enum` — a controlled choice such as an approved representation, variant or layout.
 
-Additional block types require an explicit product decision before implementation.
+`actionId` — an application-approved action identifier.
+
+Approved layout enums are `stack`, `split`, `hero-detail`, `compact-grid` and `progressive`. The model may not output arbitrary widths, positions, CSS values or animation instructions.
 
 ---
 
@@ -386,7 +409,7 @@ The exact implementation schema may evolve, but an assistance response should co
 * recognised intent;
 * diagnosis;
 * plain-language summary;
-* UI blocks;
+* approved representations;
 * approved actions;
 * missing information;
 * warnings if relevant.
@@ -395,34 +418,50 @@ Example conceptual output:
 
 ```json
 {
-  "caseId": "tax-demand-001",
-  "intent": "understand_outstanding_demand",
-  "diagnosis": "payment_missing_from_processed_return",
-  "summary": "Your payment exists, but it was not included in the return that was processed.",
+  "surface": "understanding",
+  "layout": "stack",
   "blocks": [
     {
-      "type": "amount_comparison"
+      "type": "comparison",
+      "variant": "financial_mismatch",
+      "items": [
+        {
+          "label": "You paid",
+          "valueRef": "evidence.payment.amount",
+          "statusRef": "evidence.payment.status"
+        },
+        {
+          "label": "Processed return",
+          "valueRef": "evidence.processedReturn.recognisedTax"
+        }
+      ],
+      "differenceRef": "reconciliation.difference"
     },
     {
-      "type": "diagnosis"
+      "type": "explanation",
+      "factSetRef": "diagnosis.primary"
     },
     {
-      "type": "evidence"
+      "type": "source_trace",
+      "collapsed": true
     },
     {
-      "type": "action_plan"
+      "type": "action_plan",
+      "workflowRef": "approvedResolution"
     }
   ],
-  "actions": [
-    "tax_credit_rectification",
-    "respond_to_demand"
-  ]
+  "primaryAction": {
+    "actionId": "review_rectification",
+    "label": "Fix this"
+  }
 }
 ```
 
 This example is illustrative.
 
 The actual runtime schema must be defined and validated in code.
+
+This is a target V2 contract. The current runtime schema remains unchanged until a separate implementation task migrates it.
 
 ---
 
