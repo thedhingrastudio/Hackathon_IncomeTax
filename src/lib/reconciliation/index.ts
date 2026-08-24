@@ -1,4 +1,6 @@
 export { reconcileTaxCase } from "./reconcile-tax-case";
+export { createEvidencePacket } from "./evidence-packet";
+export type { EvidencePacket } from "./evidence-packet";
 export type {
   DemandEvidence,
   Form26ASEvidence,

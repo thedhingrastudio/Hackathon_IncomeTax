@@ -63,6 +63,7 @@ export interface NoticeBlock extends BaseBlock {
 
 export interface SourceCheckBlock extends BaseBlock {
   type: "source_check";
+  summary?: string;
   sources: Array<{
     source: GovernmentRecordSource;
     label: string;

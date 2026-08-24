@@ -18,6 +18,7 @@ a { color: inherit; }
 .taxpayer-summary { display: flex; align-items: center; gap: var(--ux4g-space-4); white-space: nowrap; }
 .taxpayer-summary > span { width: 40px; height: 40px; }
 .menu-button { display: none; }
+.mobile-navigation { display: none; }
 .main-content { flex: 1; padding-block: var(--ux4g-padding-2xl); }
 .account-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: var(--ux4g-space-8); align-items: start; margin-bottom: var(--ux4g-space-12); }
 h1, h2, h3, p { margin-top: 0; }
@@ -64,6 +65,31 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .government-actions { border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); padding-top: var(--ux4g-padding-xl); }
 .government-actions > p { color: var(--ux4g-text-neutral-secondary); }
 .action-row { display: flex; flex-wrap: wrap; gap: var(--ux4g-space-4); margin-block: var(--ux4g-space-6) var(--ux4g-space-3); }
+.demand-assistance-entry { margin-top: var(--ux4g-space-8); }
+.demand-assistance-entry p { margin-block: var(--ux4g-space-3) var(--ux4g-space-5); }
+.assisted-results { display: grid; gap: var(--ux4g-space-8); }
+.generative-block .ux4g-card-header h2 { margin: 0; }
+.generative-summary { color: var(--ux4g-text-neutral-secondary); }
+.source-check-list, .action-plan-list { display: grid; gap: var(--ux4g-space-4); margin: 0; padding: 0; list-style: none; }
+.source-check-list li { display: flex; justify-content: space-between; gap: var(--ux4g-space-6); padding-block: var(--ux4g-padding-xs); border-bottom: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-default); }
+.source-check-list span, .comparison-status { color: var(--ux4g-text-neutral-secondary); text-transform: capitalize; }
+.amount-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ux4g-space-6); margin: 0; }
+.amount-comparison > div { min-width: 0; padding: var(--ux4g-padding-l); background: var(--ux4g-bg-neutral-soft); border-top: var(--ux4g-border-width-md) solid var(--ux4g-border-color-neutral-strong); }
+.amount-comparison .comparison-difference { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: var(--ux4g-space-6); padding-block: var(--ux4g-padding-s); background: transparent; }
+.comparison-amount { margin-block: var(--ux4g-space-3); font-size: 2rem; line-height: var(--ux4g-line-height-44); }
+.evidence-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ux4g-space-6); margin: 0; }
+.evidence-list > div, .action-plan-list li { border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); padding-top: var(--ux4g-padding-s); }
+.evidence-list dd { margin-top: var(--ux4g-space-2); overflow-wrap: anywhere; }
+.evidence-details { margin-top: var(--ux4g-space-6); border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); padding-top: var(--ux4g-padding-s); }
+.evidence-details summary { min-height: 44px; display: flex; align-items: center; color: var(--ux4g-text-brand-primary-default); font-weight: var(--ux4g-font-weight-semibold); cursor: pointer; }
+.evidence-details dl { display: grid; gap: var(--ux4g-space-4); margin: var(--ux4g-space-4) 0 0; }
+.evidence-details dd { overflow-wrap: anywhere; margin-top: var(--ux4g-space-2); font-weight: var(--ux4g-font-weight-medium); }
+.action-plan-list { counter-reset: assisted-step; }
+.action-plan-list li { counter-increment: assisted-step; }
+.action-plan-list li strong::before { content: "Step " counter(assisted-step) " · "; }
+.action-plan-list p { margin-block: var(--ux4g-space-3) 0; }
+.action-plan-status { color: var(--ux4g-text-neutral-secondary); font-weight: var(--ux4g-font-weight-semibold); }
+.assisted-fallback .workflow-actions { margin-bottom: 0; }
 .supporting-text { color: var(--ux4g-text-neutral-secondary); font-size: .875rem; }
 .service-grid p, .tax-record-grid p { color: var(--ux4g-text-neutral-secondary); }
 .service-catalogue { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ux4g-space-6); }
@@ -118,10 +144,13 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 @media (max-width: 1023px) {
   .portal-navbar .ux4g-navbar-wrap { flex-wrap: wrap; padding-block: var(--ux4g-padding-s); }
   .menu-button { display: inline-flex; margin-left: auto; }
-  .portal-links { display: none; order: 3; width: 100%; flex-direction: column; align-items: stretch; padding: var(--ux4g-padding-s) 0; }
-  .portal-links.is-open { display: flex; }
-  .portal-links a { width: 100%; padding-inline: var(--ux4g-padding-m); }
-  .portal-links a[aria-current="page"] { box-shadow: inset var(--ux4g-border-width-lg) 0 0 var(--ux4g-border-color-primary-strong); }
+  .desktop-portal-links { display: none; }
+  .mobile-navigation.is-open { display: block; order: 3; width: 100%; padding-top: var(--ux4g-padding-s); border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); }
+  .mobile-navigation__links { margin: 0; padding: 0; list-style: none; }
+  .mobile-navigation__links a { display: flex; align-items: center; width: 100%; min-height: 48px; padding-inline: var(--ux4g-padding-m); text-decoration: none; }
+  .mobile-navigation__links a[aria-current="page"] { color: var(--ux4g-text-brand-primary-default); box-shadow: inset var(--ux4g-border-width-lg) 0 0 var(--ux4g-border-color-primary-strong); font-weight: var(--ux4g-font-weight-semibold); }
+  .mobile-navigation .ai-preference { margin-block: var(--ux4g-space-5) var(--ux4g-space-3); border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); border-left: 0; padding: var(--ux4g-padding-m); background: var(--ux4g-bg-neutral-soft); }
+  .mobile-navigation .ai-preference > p { margin-top: var(--ux4g-space-2); }
   .taxpayer-summary { display: none; }
   .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -146,6 +175,11 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
   .demand-overview { align-items: flex-start; flex-direction: column; padding-block: var(--ux4g-padding-m); }
   .demand-amount { font-size: 2rem; }
   .government-actions .ux4g-btn { width: 100%; justify-content: center; min-height: 44px; }
+  .demand-assistance-entry .ux4g-btn { width: 100%; justify-content: center; min-height: 44px; }
+  .amount-comparison, .evidence-list { grid-template-columns: 1fr; }
+  .amount-comparison .comparison-difference { grid-column: auto; }
+  .comparison-amount { font-size: 1.75rem; line-height: var(--ux4g-line-height-36); }
+  .generative-block .ux4g-card-header, .generative-block .ux4g-card-body { padding: var(--ux4g-padding-m); }
   .workflow-panel { width: 100%; }
   .response-stepper { margin-bottom: var(--ux4g-space-4); }
   .response-context { margin-bottom: var(--ux4g-space-8); text-align: left; }

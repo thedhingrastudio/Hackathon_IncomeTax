@@ -8,7 +8,7 @@ import {
   SUPPORTED_DIAGNOSES,
 } from "../types/generative-ui.ts";
 
-const identifier = z.string().trim().min(1).max(100);
+const identifier = z.string().trim().min(1).max(100).regex(/^[a-zA-Z0-9_-]+$/);
 const displayText = z.string().trim().min(1).max(500);
 const amount = z.number().int().nonnegative().finite();
 const currency = z.literal("INR");
@@ -28,6 +28,7 @@ export const sourceCheckBlockSchema = z.object({
   id: identifier,
   type: z.literal(GENERATIVE_UI_BLOCK_TYPES[1]),
   title: displayText,
+  summary: displayText.optional(),
   sources: z.array(z.object({
     source,
     label: displayText,
