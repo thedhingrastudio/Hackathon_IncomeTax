@@ -1,5 +1,4 @@
 import Link from "next/link";
-import AIAssistancePreference from "../components/portal/AIAssistancePreference";
 import CaseAwareDemandProgress from "../components/portal/CaseAwareDemandProgress";
 import { getOutstandingDemand, getTaxpayer } from "../data/mock";
 import { formatAssessmentYear, formatIndianCurrency, formatRecordLabel } from "../lib/format-tax";
@@ -19,7 +18,6 @@ export default function Home() {
   return <>
     <section className="account-heading" aria-labelledby="dashboard-title">
       <div><p className="eyebrow">Account overview</p><h1 id="dashboard-title">Welcome, {firstName}</h1><p>Assessment Year {formatAssessmentYear(demand.assessmentYear)}</p></div>
-      <AIAssistancePreference />
     </section>
     <section className="attention-section" aria-labelledby="attention-title">
       <div className="section-heading"><div><p className="eyebrow">Pending actions</p><h2 id="attention-title">{pendingDemandCount} item needs your attention</h2></div><Link className="ux4g-text-link-md" href="/pending-actions">View all pending actions</Link></div>

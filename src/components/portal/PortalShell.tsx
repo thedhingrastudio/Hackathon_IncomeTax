@@ -2,11 +2,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { OutstandingDemand } from "../../types/tax";
+import AssistanceDrawerHandle from "../assistance/AssistanceDrawerHandle";
+import AssistanceWorkspace from "../assistance/AssistanceWorkspace";
 import { AIAssistanceControl } from "./AIAssistancePreference";
 const navigation = [["Dashboard", "/"], ["Returns", "/returns"], ["Payments & Tax Records", "/payments"], ["Pending Actions", "/pending-actions"], ["Services", "/services"], ["Help", "/help"]] as const;
-export default function PortalShell({ children, taxpayerName }: { children: ReactNode; taxpayerName: string }) {
-  const pathname = usePathname(); const [open, setOpen] = useState(false);
+const assistanceId = "assistance-workspace";
+export default function PortalShell({ children, taxpayerName, demand }: { children: ReactNode; taxpayerName: string; demand: OutstandingDemand }) {
+  const pathname = usePathname(); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const assistanceHandleRef = useRef<HTMLButtonElement>(null);
+  const assistanceCloseRef = useRef<HTMLButtonElement>(null);
   const taxpayerInitials = taxpayerName.split(" ").map((part) => part[0]).join("");
 
   useEffect(() => {
@@ -19,7 +25,30 @@ export default function PortalShell({ children, taxpayerName }: { children: Reac
     document.addEventListener("keydown", closeMenu);
     return () => document.removeEventListener("keydown", closeMenu);
   }, [open]);
-  return <div className="site-shell">
+  useEffect(() => {
+    function closeAssistance(event: KeyboardEvent) {
+      if (event.key === "Escape" && assistanceOpen) {
+        setAssistanceOpen(false);
+        window.setTimeout(() => assistanceHandleRef.current?.focus(), 0);
+      }
+    }
+    document.addEventListener("keydown", closeAssistance);
+    return () => document.removeEventListener("keydown", closeAssistance);
+  }, [assistanceOpen]);
+
+  function openAssistance() {
+    setAssistanceOpen(true);
+    window.setTimeout(() => assistanceCloseRef.current?.focus(), 0);
+  }
+
+  function closeAssistance() {
+    setAssistanceOpen(false);
+    window.setTimeout(() => assistanceHandleRef.current?.focus(), 0);
+  }
+
+  return <div className={`desktop-workspace ${assistanceOpen ? "is-open" : "is-closed"}`}>
+  <div className="portal-workspace">
+  <div className="site-shell">
     <a className="skip-link" href="#main-content">Skip to main content</a>
     <header><div className="government-masthead"><div className="portal-container government-masthead__inner"><span>भारत सरकार</span><span aria-hidden="true">|</span><span>Government of India</span></div></div>
       <nav className="ux4g-navbar portal-navbar" aria-label="Primary navigation"><div className="ux4g-navbar-wrap portal-container">
@@ -32,5 +61,9 @@ export default function PortalShell({ children, taxpayerName }: { children: Reac
     </header>
     <main className="portal-container main-content" id="main-content" tabIndex={-1}>{children}</main>
     <footer className="ux4g-footer-wrapper ux4g-footer-primary portal-footer"><div className="ux4g-footer-row portal-container"><p>Income Tax e-Filing</p><p>Synthetic demo data</p></div></footer>
+  </div>
+  </div>
+  <div className="assistance-handle-anchor"><AssistanceDrawerHandle controls={assistanceId} expanded={assistanceOpen} handleRef={assistanceHandleRef} onOpen={openAssistance} /></div>
+  {assistanceOpen ? <AssistanceWorkspace closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onClose={closeAssistance} taxpayerName={taxpayerName} /> : null}
   </div>;
 }
