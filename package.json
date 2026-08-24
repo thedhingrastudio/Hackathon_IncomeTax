@@ -19,6 +19,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test --experimental-strip-types src/lib/reconciliation/reconcile-tax-case.test.ts"
+    "test": "node --test --experimental-strip-types src/lib/reconciliation/reconcile-tax-case.test.ts src/schemas/generative-ui.test.ts"
   }
 }
