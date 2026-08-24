@@ -1,0 +1,2 @@
+import PageHeading from "../../components/portal/PageHeading";
+export default function HelpPage() { return <><PageHeading eyebrow="Support" title="Help and support" description="Find guidance for using Income Tax online services." /><section className="help-guidance" aria-labelledby="help-guidance-title"><h2 id="help-guidance-title">How can we help?</h2><p>Browse the Services area to find the task you need, or review Pending Actions for items that require your attention.</p></section></>; }

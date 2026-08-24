@@ -5,7 +5,6 @@ body { background: var(--ux4g-bg-neutral-default); color: var(--ux4g-text-neutra
 a { color: inherit; }
 .site-shell { display: flex; min-height: 100vh; flex-direction: column; }
 .portal-container { width: min(calc(100% - (2 * var(--ux4g-padding-xl))), 1200px); margin-inline: auto; }
-.prototype-strip { padding: var(--ux4g-padding-xs) var(--ux4g-padding-m); background: var(--ux4g-bg-neutral-soft); color: var(--ux4g-text-neutral-secondary); text-align: center; font-size: .75rem; }
 .government-masthead { border-bottom: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-default); background: var(--ux4g-bg-neutral-elevated); }
 .government-masthead__inner { display: flex; gap: var(--ux4g-space-4); align-items: center; min-height: 36px; font-size: .75rem; }
 .portal-navbar { background: var(--ux4g-bg-neutral-elevated); border-bottom: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-default); }
@@ -49,6 +48,38 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .placeholder-page { max-width: 760px; }
 .placeholder-page .ux4g-context-alert { margin-block: var(--ux4g-space-8); }
 .placeholder-page .ux4g-context-alert p { margin: var(--ux4g-space-3) 0 0; }
+.page-heading { max-width: 760px; margin-bottom: var(--ux4g-space-10); }
+.page-heading h1 { margin-bottom: var(--ux4g-space-4); }
+.page-heading > p:last-child { color: var(--ux4g-text-neutral-secondary); margin-bottom: 0; }
+.back-link { display: inline-flex; min-height: 44px; align-items: center; margin-bottom: var(--ux4g-space-4); }
+.record-section { margin-bottom: var(--ux4g-space-10); }
+.record-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ux4g-space-8) var(--ux4g-space-10); margin: 0; }
+.record-details > div { min-width: 0; }
+.record-details dd { overflow-wrap: anywhere; margin-top: var(--ux4g-space-2); }
+.record-status, .success-status { display: inline-flex; align-items: center; gap: var(--ux4g-space-3); color: var(--ux4g-text-status-success); white-space: nowrap; }
+.supporting-records, .service-grid, .tax-record-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ux4g-space-6); }
+.supporting-records h2, .service-grid h2, .tax-record-grid h3 { font-size: 1.25rem; margin-bottom: var(--ux4g-space-3); }
+.demand-overview { display: flex; justify-content: space-between; align-items: center; gap: var(--ux4g-space-8); border-block: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); padding-block: var(--ux4g-padding-xl); margin-bottom: var(--ux4g-space-10); }
+.demand-amount { font-size: 2.5rem; margin-bottom: 0; white-space: nowrap; }
+.government-actions { border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); padding-top: var(--ux4g-padding-xl); }
+.government-actions > p { color: var(--ux4g-text-neutral-secondary); }
+.action-row { display: flex; flex-wrap: wrap; gap: var(--ux4g-space-4); margin-block: var(--ux4g-space-6) var(--ux4g-space-3); }
+.supporting-text { color: var(--ux4g-text-neutral-secondary); font-size: .875rem; }
+.service-grid p, .tax-record-grid p { color: var(--ux4g-text-neutral-secondary); }
+.service-catalogue { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ux4g-space-6); }
+.service-group .ux4g-card-header p { color: var(--ux4g-text-neutral-secondary); margin: var(--ux4g-space-3) 0 0; }
+.service-group h2 { font-size: 1.25rem; margin-bottom: 0; }
+.service-list { margin: 0; padding: 0; list-style: none; }
+.service-list li + li { border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-default); }
+.service-list li > div { display: flex; justify-content: space-between; align-items: center; gap: var(--ux4g-space-6); min-height: 52px; padding-block: var(--ux4g-padding-s); }
+.service-name { font-weight: var(--ux4g-font-weight-medium); }
+.external-service { color: var(--ux4g-text-neutral-secondary); font-size: .75rem; }
+.help-guidance { max-width: 760px; }
+.help-guidance p { color: var(--ux4g-text-neutral-secondary); }
+.other-action-areas { margin-top: var(--ux4g-space-10); }
+.other-action-areas ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ux4g-space-6); margin: 0; padding: 0; list-style: none; }
+.other-action-areas li { display: flex; flex-direction: column; gap: var(--ux4g-space-2); border-top: var(--ux4g-border-width-sm) solid var(--ux4g-border-color-neutral-strong); padding-top: var(--ux4g-padding-s); }
+.other-action-areas li span { color: var(--ux4g-text-neutral-secondary); font-size: .875rem; }
 .portal-footer { margin-top: var(--ux4g-space-10); padding-block: var(--ux4g-padding-s); }
 .portal-footer .ux4g-footer-row { justify-content: space-between; gap: var(--ux4g-space-6); }
 .portal-footer p { margin: 0; }
@@ -69,7 +100,6 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 @media (max-width: 639px) {
   .portal-container { width: min(calc(100% - (2 * var(--ux4g-padding-m))), 1200px); }
   .government-masthead__inner { justify-content: center; }
-  .prototype-strip { padding-block: var(--ux4g-padding-2xs); font-size: .6875rem; line-height: var(--ux4g-line-height-16); }
   .portal-navbar .ux4g-navbar-wrap { min-height: 64px; }
   .service-identity small { display: none; }
   .service-emblem { width: 40px; height: 40px; }
@@ -82,6 +112,12 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
   .demand-card__header { flex-direction: column; }
   .demand-card__header, .demand-card__body, .demand-card__footer { padding-block: var(--ux4g-padding-m); }
   .demand-card__body dl, .shortcut-grid { grid-template-columns: 1fr; }
+  .record-details, .supporting-records, .service-grid, .tax-record-grid, .service-catalogue, .other-action-areas ul { grid-template-columns: 1fr; }
+  .record-details { gap: var(--ux4g-space-6); }
+  .demand-overview { align-items: flex-start; flex-direction: column; padding-block: var(--ux4g-padding-m); }
+  .demand-amount { font-size: 2rem; }
+  .government-actions .ux4g-btn { width: 100%; justify-content: center; min-height: 44px; }
+  .service-list li > div { align-items: flex-start; flex-direction: column; gap: var(--ux4g-space-2); }
   .demand-card .ux4g-btn { width: 100%; justify-content: center; min-height: 44px; }
   .shortcut-card p { min-height: auto; }
   .portal-footer { margin-top: var(--ux4g-space-8); padding-block: var(--ux4g-padding-xs); }

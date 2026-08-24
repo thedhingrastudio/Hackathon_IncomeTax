@@ -1,25 +1,31 @@
 import Link from "next/link";
 import AIAssistancePreference from "../components/portal/AIAssistancePreference";
+import { getOutstandingDemand, getTaxpayer } from "../data/mock";
+import { formatAssessmentYear, formatIndianCurrency, formatRecordLabel } from "../lib/format-tax";
 
 const shortcuts = [
   { title: "File or view return", text: "Access your Income Tax returns.", href: "/returns" },
-  { title: "Tax payments", text: "View payment services and history.", href: "/payments" },
+  { title: "Payments & Tax Records", text: "View payments and tax-information records.", href: "/payments" },
   { title: "Pending actions", text: "Review items that need your response.", href: "/pending-actions" },
   { title: "Services", text: "Browse available Income Tax services.", href: "/services" },
 ];
 
 export default function Home() {
+  const taxpayer = getTaxpayer();
+  const demand = getOutstandingDemand();
+  const firstName = taxpayer.name.split(" ")[0];
+  const pendingDemandCount = demand.status === "action_required" ? 1 : 0;
   return <>
     <section className="account-heading" aria-labelledby="dashboard-title">
-      <div><p className="eyebrow">Account overview</p><h1 id="dashboard-title">Welcome, Rohan</h1><p>Assessment Year 2026–27</p></div>
+      <div><p className="eyebrow">Account overview</p><h1 id="dashboard-title">Welcome, {firstName}</h1><p>Assessment Year {formatAssessmentYear(demand.assessmentYear)}</p></div>
       <AIAssistancePreference />
     </section>
     <section className="attention-section" aria-labelledby="attention-title">
-      <div className="section-heading"><div><p className="eyebrow">Pending actions</p><h2 id="attention-title">1 item needs your attention</h2></div><Link className="ux4g-text-link-md" href="/pending-actions">View all pending actions</Link></div>
+      <div className="section-heading"><div><p className="eyebrow">Pending actions</p><h2 id="attention-title">{pendingDemandCount} item needs your attention</h2></div><Link className="ux4g-text-link-md" href="/pending-actions">View all pending actions</Link></div>
       <article className="ux4g-card ux4g-card-outline ux4g-card-vertical demand-card">
-        <div className="ux4g-card-header demand-card__header"><div><p className="eyebrow">Outstanding Demand</p><h3>₹18,420</h3></div><span className="demand-status" role="status"><span className="ux4g-badge-icon-warning ux4g-badge-m" aria-hidden="true">!</span><strong>Action required</strong></span></div>
-        <div className="ux4g-card-body demand-card__body"><dl><div><dt>Assessment Year</dt><dd>2026–27</dd></div><div><dt>Demand status</dt><dd>Response pending</dd></div></dl><p>Review this demand and choose how you want to respond.</p></div>
-        <div className="ux4g-card-footer demand-card__footer"><Link className="ux4g-btn ux4g-btn-primary ux4g-btn-md" href="/pending-actions">View demand</Link></div>
+        <div className="ux4g-card-header demand-card__header"><div><p className="eyebrow">Outstanding Demand</p><h3>{formatIndianCurrency(demand.amount, demand.currency)}</h3></div><span className="demand-status" role="status"><span className="ux4g-badge-icon-warning ux4g-badge-m" aria-hidden="true">!</span><strong>{formatRecordLabel(demand.status)}</strong></span></div>
+        <div className="ux4g-card-body demand-card__body"><dl><div><dt>Assessment Year</dt><dd>{formatAssessmentYear(demand.assessmentYear)}</dd></div><div><dt>Demand status</dt><dd>Response pending</dd></div></dl><p>Review this demand and choose how you want to respond.</p></div>
+        <div className="ux4g-card-footer demand-card__footer"><Link className="ux4g-btn ux4g-btn-primary ux4g-btn-md" href="/pending-actions/demand">View demand</Link></div>
       </article>
     </section>
     <section aria-labelledby="shortcuts-title">

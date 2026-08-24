@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import UX4GRuntime from "../components/ux4g/UX4GRuntime";
 import PortalShell from "../components/portal/PortalShell";
+import { getTaxpayer } from "../data/mock";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,11 +16,13 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const taxpayer = getTaxpayer();
+
   return (
     <html lang="en" data-theme="light">
       <body>
         <UX4GRuntime />
-        <PortalShell>{children}</PortalShell>
+        <PortalShell taxpayerName={taxpayer.name}>{children}</PortalShell>
       </body>
     </html>
   );
