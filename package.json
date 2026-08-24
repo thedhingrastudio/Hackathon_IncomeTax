@@ -20,7 +20,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test --experimental-strip-types src/lib/reconciliation/reconcile-tax-case.test.ts src/schemas/generative-ui.test.ts src/lib/ai/increment-6.test.ts src/lib/storage/ai-assistance-preference.test.ts",
+    "test": "node --test --experimental-strip-types src/lib/reconciliation/reconcile-tax-case.test.ts src/schemas/generative-ui.test.ts src/lib/ai/increment-6.test.ts src/lib/storage/ai-assistance-preference.test.ts src/lib/workflows/corrective-workflow.test.ts",
     "test:e2e": "npm run build && powershell -NoProfile -ExecutionPolicy Bypass -File tests/e2e/run-mobile-smoke.ps1"
   }
 }

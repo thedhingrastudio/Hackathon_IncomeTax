@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { GenerativeUIRenderer } from "../generative-ui";
 import { createDemandAssistance } from "../../lib/ai";
 import { reconcileTaxCase } from "../../lib/reconciliation";
@@ -31,6 +32,7 @@ export default function AssistedDemandExperience({ records, provider }: { record
 }
 
 function EnabledAssistedDemandExperience({ records, provider }: { records: ReconciliationInput; provider: string }) {
+  const router = useRouter();
   const [checking, setChecking] = useState(true);
   const result = useMemo(
     () => createDemandAssistance(reconcileTaxCase(records), provider),
@@ -46,7 +48,9 @@ function EnabledAssistedDemandExperience({ records, provider }: { records: Recon
   if (!result || result.status !== "ready") return <Fallback title="We couldn't safely determine why this demand exists" body="The available records did not support a safe explanation. You can inspect the records or use the conventional response service." showResponse />;
 
   return <section className="assisted-results" aria-label="Assisted demand explanation">
-    <GenerativeUIRenderer blocks={result.response.blocks} />
+    <GenerativeUIRenderer blocks={result.response.blocks} onWorkflowAction={(action) => {
+      if (action === "tax_credit_rectification") router.push("/pending-actions/demand/assist/rectification");
+    }} />
     <div className="workflow-actions"><Link className="ux4g-btn ux4g-btn-outline-primary ux4g-btn-md" href="/pending-actions/demand">Back to demand</Link></div>
   </section>;
 }

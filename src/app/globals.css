@@ -89,6 +89,7 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .action-plan-list li strong::before { content: "Step " counter(assisted-step) " · "; }
 .action-plan-list p { margin-block: var(--ux4g-space-3) 0; }
 .action-plan-status { color: var(--ux4g-text-neutral-secondary); font-weight: var(--ux4g-font-weight-semibold); }
+.action-plan-list .ux4g-btn { margin-top: var(--ux4g-space-5); }
 .assisted-fallback .workflow-actions { margin-bottom: 0; }
 .supporting-text { color: var(--ux4g-text-neutral-secondary); font-size: .875rem; }
 .service-grid p, .tax-record-grid p { color: var(--ux4g-text-neutral-secondary); }
@@ -129,6 +130,19 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .response-success h1 { margin-bottom: var(--ux4g-space-3); }
 .response-success h1:focus { outline: none; }
 .response-success p { margin-bottom: 0; }
+.corrective-workflow { display: grid; gap: var(--ux4g-space-8); }
+.corrective-workflow .workflow-heading { margin-bottom: 0; }
+.corrective-card .ux4g-card-header h2 { margin-bottom: 0; }
+.corrective-card p:last-child { margin-bottom: 0; }
+.formal-action-label { color: var(--ux4g-text-neutral-secondary); font-weight: var(--ux4g-font-weight-semibold); }
+.consequence-message p { margin: var(--ux4g-space-3) 0 0; }
+.next-action { border-top: var(--ux4g-border-width-md) solid var(--ux4g-border-color-neutral-strong); padding-top: var(--ux4g-padding-l); }
+.next-action p { color: var(--ux4g-text-neutral-secondary); }
+.submission-summary { display: grid; gap: var(--ux4g-space-5); margin: 0 0 var(--ux4g-space-6); padding: 0; list-style: none; }
+.submission-summary li { display: flex; gap: var(--ux4g-space-4); align-items: flex-start; }
+.submission-summary li > span { color: var(--ux4g-text-status-success); font-weight: var(--ux4g-font-weight-bold); }
+.submission-summary li div { display: flex; min-width: 0; flex-direction: column; gap: var(--ux4g-space-2); }
+.submission-summary li div span { overflow-wrap: anywhere; }
 .payment-unavailable-card { margin-block: var(--ux4g-space-8); }
 .other-action-areas { margin-top: var(--ux4g-space-10); }
 .other-action-areas ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ux4g-space-6); margin: 0; padding: 0; list-style: none; }

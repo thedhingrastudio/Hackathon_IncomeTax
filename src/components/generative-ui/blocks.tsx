@@ -8,6 +8,7 @@ import type {
   ReviewBlock as ReviewBlockData,
   SourceCheckBlock as SourceCheckBlockData,
   TimelineBlock as TimelineBlockData,
+  ApprovedWorkflowAction,
 } from "../../types/generative-ui";
 
 function Card({ title, headingId, className = "", children }: { title: string; headingId: string; className?: string; children: React.ReactNode }) {
@@ -42,9 +43,9 @@ export function EvidenceBlock({ block }: { block: EvidenceBlockData }) {
   return <Card title={block.title} headingId={`${block.id}-title`}><dl className="evidence-list">{block.items.map((item, index) => <div key={`${item.source}-${item.reference ?? index}`}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>{referencedItems.length ? <details className="evidence-details"><summary>View record details</summary><dl>{referencedItems.map((item) => <div key={`${item.source}-${item.reference}`}><dt>{item.label}</dt><dd>{item.reference}</dd></div>)}</dl></details> : null}</Card>;
 }
 
-export function ActionPlanBlock({ block }: { block: ActionPlanBlockData }) {
+export function ActionPlanBlock({ block, onAction }: { block: ActionPlanBlockData; onAction?: (action: ApprovedWorkflowAction) => void }) {
   const statusLabels = { ready: "Ready to review", blocked: "Starts after step 1", pending: "Starts after step 1", complete: "Complete" } as const;
-  return <Card title={block.title} headingId={`${block.id}-title`}>{block.summary ? <p>{block.summary}</p> : null}<ol className="action-plan-list">{block.steps.map((step) => <li key={step.action}><strong>{step.title}</strong><p>{step.description}</p><p className="action-plan-status">{statusLabels[step.status]}</p></li>)}</ol></Card>;
+  return <Card title={block.title} headingId={`${block.id}-title`}>{block.summary ? <p>{block.summary}</p> : null}<ol className="action-plan-list">{block.steps.map((step) => <li key={step.action}><strong>{step.title}</strong><p>{step.description}</p><p className="action-plan-status">{statusLabels[step.status]}</p>{step.status === "ready" && onAction ? <button className="ux4g-btn ux4g-btn-primary ux4g-btn-md" type="button" onClick={() => onAction(step.action)}>Review correction</button> : null}</li>)}</ol></Card>;
 }
 
 export function ReviewBlock({ block }: { block: ReviewBlockData }) {
