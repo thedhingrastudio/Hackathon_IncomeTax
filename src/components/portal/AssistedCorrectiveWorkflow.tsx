@@ -14,7 +14,11 @@ import {
   type RectificationDraft,
   type RectificationSubmission,
   type WorkflowResult,
+  recordDemandResponse,
+  recordRectification,
+  transitionCase,
 } from "../../lib/workflows";
+import { getStoredCase, saveCase } from "../../lib/storage/case-storage";
 
 export default function AssistedCorrectiveWorkflow({ context, preparedRectification }: { context: AssistedWorkflowContext; preparedRectification: WorkflowResult<RectificationDraft> }) {
   const [state, setState] = useState<AssistedWorkflowState>("rectification_review");
@@ -25,6 +29,14 @@ export default function AssistedCorrectiveWorkflow({ context, preparedRectificat
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => { headingRef.current?.focus(); }, [state]);
+  useEffect(() => {
+    const timer=setTimeout(()=>{const saved = getStoredCase();
+      if (!saved) return;
+      if (saved.state === "WAITING_FOR_REVIEW") setState("demand_response_submitted");
+      else if (saved.rectificationReference) { setRectification({ reference: saved.rectificationReference, status: "submitted", assessmentYear: saved.assessmentYear, amount: saved.demandAmount, correction: "tax_credit_mismatch" }); setState("rectification_submitted"); }
+      else { const reviewing = transitionCase(saved, "RECTIFICATION_REVIEW"); if (reviewing) saveCase(reviewing); }},0);
+    return()=>clearTimeout(timer);
+  }, []);
 
   if (!preparedRectification.success) return <ValidationFailure errors={errors} />;
   const draft = preparedRectification.data;
@@ -33,6 +45,7 @@ export default function AssistedCorrectiveWorkflow({ context, preparedRectificat
     const result = submitRectification(draft, context.evidence, rectification);
     if ("errors" in result) { setErrors(result.errors); return; }
     setRectification(result.data);
+    const current = getStoredCase(); if (current) { const saved = recordRectification(current, result.data); if (saved) saveCase(saved); }
     setErrors([]);
     setState("rectification_submitted");
   }
@@ -41,6 +54,7 @@ export default function AssistedCorrectiveWorkflow({ context, preparedRectificat
     const result = prepareAssistedDemandResponse(context, rectification);
     if ("errors" in result) { setErrors(result.errors); return; }
     setResponseDraft(result.data);
+    const current = getStoredCase(); if (current) { const saved = transitionCase(current, "DEMAND_RESPONSE_REVIEW"); if (saved) saveCase(saved); }
     setErrors([]);
     setState("demand_response_review");
   }
@@ -50,6 +64,7 @@ export default function AssistedCorrectiveWorkflow({ context, preparedRectificat
     const result = submitAssistedDemandResponse(responseDraft, rectification);
     if ("errors" in result) { setErrors(result.errors); return; }
     setResponseSubmission(result.data);
+    const current = getStoredCase(); if (current) { const saved = recordDemandResponse(current, result.data); if (saved) saveCase(saved); }
     setErrors([]);
     setState("demand_response_submitted");
   }
@@ -58,7 +73,7 @@ export default function AssistedCorrectiveWorkflow({ context, preparedRectificat
   if (state === "rectification_review") return <RectificationReview draft={draft} headingRef={headingRef} onSubmit={confirmRectification} />;
   if (state === "rectification_submitted" && rectification) return <RectificationSubmitted draft={draft} submission={rectification} headingRef={headingRef} onContinue={reviewDemandResponse} />;
   if (state === "demand_response_review" && responseDraft) return <DemandResponseReview draft={responseDraft} headingRef={headingRef} onBack={() => setState("rectification_submitted")} onSubmit={confirmDemandResponse} />;
-  if (state === "demand_response_submitted" && rectification && responseSubmission) return <Completion rectification={rectification} response={responseSubmission} headingRef={headingRef} />;
+  if (state === "demand_response_submitted") { const saved=getStoredCase(); const correction=rectification ?? (saved?.rectificationReference ? {reference:saved.rectificationReference,status:"submitted" as const,assessmentYear:saved.assessmentYear,amount:saved.demandAmount,correction:"tax_credit_mismatch" as const}:null); const response=responseSubmission ?? (saved?.demandResponseReference ? {reference:saved.demandResponseReference,status:"submitted" as const,assessmentYear:saved.assessmentYear,rectificationReference:saved.rectificationReference!}:null); if(correction&&response)return <Completion rectification={correction} response={response} headingRef={headingRef} />; }
   return <ValidationFailure errors={["rectification_required"]} />;
 }
 
@@ -102,7 +117,7 @@ function Completion({ rectification, response, headingRef }: { rectification: Re
   return <section className="workflow-panel corrective-workflow" aria-label="Assisted corrective workflow complete">
     <div className="ux4g-alert ux4g-alert-success response-success" role="status"><div><h1 ref={headingRef} tabIndex={-1}>Your requests have been submitted</h1><p>Income Tax still needs to review these requests.</p></div></div>
     <FactsCard title="Submitted requests"><ul className="submission-summary"><li><span aria-hidden="true">âœ“</span><div><strong>Tax credit correction</strong><span>{rectification.reference}</span></div></li><li><span aria-hidden="true">âœ“</span><div><strong>Demand response</strong><span>{response.reference}</span></div></li></ul><p className="supporting-text">The outstanding demand has not been marked as resolved.</p></FactsCard>
-    <div className="workflow-actions"><Link className="ux4g-btn ux4g-btn-primary ux4g-btn-md" href="/">Back to Dashboard</Link><Link className="ux4g-btn ux4g-btn-outline-primary ux4g-btn-md" href="/pending-actions/demand">View demand details</Link></div>
+    <div className="workflow-actions"><Link className="ux4g-btn ux4g-btn-primary ux4g-btn-md" href="/case/CASE-DEMO-18420">View case status</Link><Link className="ux4g-btn ux4g-btn-outline-primary ux4g-btn-md" href="/">Back to Dashboard</Link></div>
   </section>;
 }
 

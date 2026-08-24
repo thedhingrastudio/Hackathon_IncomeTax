@@ -22,6 +22,7 @@ function monitorBrowser(page: Page) {
   });
   page.on("pageerror", (error) => diagnostics.pageErrors.push(error.stack ?? error.message));
   page.on("requestfailed", (request) => {
+    if (request.failure()?.errorText === "net::ERR_ABORTED" && request.resourceType() === "fetch") return;
     const failure = `${request.method()} ${request.url()}: ${request.failure()?.errorText ?? "unknown error"}`;
     diagnostics.failedRequests.push(failure);
     if (request.url().includes("/_next/")) {
@@ -201,6 +202,18 @@ test("assisted corrective workflow requires both citizen confirmations", async (
   await expect(page.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
   await expect(page.getByText("Income Tax still needs to review these requests.", { exact: true })).toBeVisible();
   await expect(page.getByText("The outstanding demand has not been marked as resolved.", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "View case status" }).click();
+  await expect(page).toHaveURL(/\/case\/CASE-DEMO-18420$/);
+  await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
+  await expect(page.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
+  await expect(page.getByText("Nothing right now.", { exact: true })).toBeVisible();
+  await expect(page.getByText("RECT-DEMO-01842", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("DEMAND-RESP-DEMO-18420", { exact: true }).first()).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
+  const caseMenu=await openMenu(page);await caseMenu.menu.locator(".ux4g-switch-control").click();await expect(caseMenu.menu.getByRole("switch")).not.toBeChecked();await caseMenu.menuButton.click();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
 
   const hydrationErrors = diagnostics.consoleErrors.filter((message) => /hydration|hydrated|server rendered html/i.test(message));
   expect(hydrationErrors, "React hydration errors").toEqual([]);

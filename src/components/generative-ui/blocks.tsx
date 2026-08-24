@@ -53,5 +53,5 @@ export function ReviewBlock({ block }: { block: ReviewBlockData }) {
 }
 
 export function TimelineBlock({ block }: { block: TimelineBlockData }) {
-  return <Card title={block.title} headingId={`${block.id}-title`}><ol>{block.items.map((item) => <li key={item.id}><strong>{item.title}</strong>{item.description ? <p>{item.description}</p> : null}<p>Status: {item.status}</p></li>)}</ol></Card>;
+  return <Card title={block.title} headingId={`${block.id}-title`} className="timeline-block"><ol>{block.items.map((item) => <li key={item.id} aria-current={item.status === "current" ? "step" : undefined}><strong>{item.title}</strong>{item.description ? <p>{item.description}</p> : null}<p>Status: {item.status === "complete" ? "Complete" : item.status === "current" ? "Current" : "Pending"}</p></li>)}</ol></Card>;
 }

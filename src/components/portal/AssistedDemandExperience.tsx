@@ -5,7 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GenerativeUIRenderer } from "../generative-ui";
 import { createDemandAssistance } from "../../lib/ai";
-import { reconcileTaxCase } from "../../lib/reconciliation";
+import { createEvidencePacket, reconcileTaxCase } from "../../lib/reconciliation";
+import { createTaxDemandCase } from "../../lib/workflows";
+import { getStoredCase, saveCase } from "../../lib/storage/case-storage";
 import { useAIAssistancePreference } from "../../lib/storage/ai-assistance-preference";
 import type { ReconciliationInput } from "../../lib/reconciliation";
 import type { SourceCheckBlock } from "../../types/generative-ui";
@@ -38,6 +40,10 @@ function EnabledAssistedDemandExperience({ records, provider }: { records: Recon
     () => createDemandAssistance(reconcileTaxCase(records), provider),
     [provider, records],
   );
+  useEffect(() => {
+    const reconciliation = reconcileTaxCase(records);
+    if (result?.status === "ready" && reconciliation.status === "matched" && !getStoredCase()) saveCase(createTaxDemandCase(createEvidencePacket(reconciliation), records.payment!.taxpayerId));
+  }, [records, result]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setChecking(false), 350);
