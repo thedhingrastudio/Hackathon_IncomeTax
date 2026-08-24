@@ -111,14 +111,27 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("Everything required is ready.", { exact: true })).toBeVisible();
   await expect(workspace.getByRole("heading", { name: "Respond to the demand" })).toBeVisible();
   await expect(workspace.getByText("Starts after Step 1", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Corrective plan", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Form 26AS", { exact: true })).toHaveCount(0);
   await expect(workspace.getByText("processing-demo-2026-27-001", { exact: true })).toHaveCount(0);
+  const composer = workspace.getByLabel("Ask about your taxes");
+  const governmentProcess = workspace.getByText("Government process", { exact: true });
+  await governmentProcess.scrollIntoViewIfNeeded();
+  await expect(governmentProcess).toBeVisible();
+  await expect(composer).toBeVisible();
+  await governmentProcess.click();
+  await expect(workspace.getByText(/Response to Outstanding Demand/)).toBeVisible();
   await page.waitForTimeout(350);
   await saveReviewScreenshot(page, testInfo, "action-workspace-plan");
 
   await workspace.getByRole("button", { name: "Review correction" }).click();
   await expect(page).toHaveURL(/\/pending-actions\/demand\/assist\/rectification$/);
   await expect(page.getByLabel("Tax credit correction review").getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
+  await expect(page.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
+  const storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  expect(storedCase).not.toBeNull();
+  expect(JSON.parse(storedCase!)).toMatchObject({ state: "RECTIFICATION_REVIEW" });
+  expect(JSON.parse(storedCase!)).not.toHaveProperty("rectificationReference");
   await expect(workspace).toBeVisible();
   await saveReviewScreenshot(page, testInfo, "fix-this-corrective-flow");
 
