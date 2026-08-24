@@ -12,6 +12,28 @@ The model selects a useful approved representation of verified context. It does 
 
 Prohibited output includes arbitrary HTML, React, JavaScript, CSS, URLs, animation instructions, government statuses, financial calculations, workflows and executable actions.
 
+## No Echo Rule
+
+A valid surface is not useful merely because its facts are correct. The Assistance Workspace must not reproduce information solely because the same information is available in the conventional portal.
+
+A representation may include information only when it serves at least one assistance purpose: interpreting verified records, comparing records, prioritizing what matters, explaining a condition, establishing evidence or provenance, or recommending or enabling an approved action.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+Repeating an authoritative value remains valid when that value is required by a Comparison, SourceTrace, explanation or consequential review. Surface composition should reject decorative or context-free duplication even when its `dataRef` is valid.
+
+## Professional Utility Boundary
+
+Generative UI supplements a capable conventional tax workspace; it does not justify weakening that workspace. The portal retains direct services, official terminology, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows and detailed disclosures.
+
+Where clarity benefits from translation, prefer a human-readable label paired with the official or professional term rather than deleting the professional vocabulary.
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
+
 ## Representation grammar
 
 Representations describe how information should be understood. They are not nine generic rectangular cards.

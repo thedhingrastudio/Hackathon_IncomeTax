@@ -5,6 +5,11 @@ New-Item -ItemType Directory -Path $artifactsDirectory -Force | Out-Null
 $serverOutput = Join-Path $artifactsDirectory "next-server.out.log"
 $serverError = Join-Path $artifactsDirectory "next-server.err.log"
 
+$existingListener = Get-NetTCPConnection -LocalPort 3100 -State Listen -ErrorAction SilentlyContinue
+if ($existingListener) {
+  throw "Port 3100 is already in use by process $($existingListener.OwningProcess). Stop the stale server before running browser tests."
+}
+
 $server = Start-Process `
   -FilePath "node.exe" `
   -ArgumentList @("node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "3100") `

@@ -159,6 +159,34 @@ Natural language controls what the workspace presents. The response should norma
 
 The government side reflects the system's structure: services, forms, records, notices, returns, payments and workflows. The assistance side reflects the citizen's situation: priorities, deadlines, explanations, relationships, recommended next actions and status.
 
+## No Echo Rule
+
+The Assistance Workspace must not reproduce information merely because it is already visible in the conventional portal. Assistance should present information only when it is needed to interpret verified records, compare records, prioritize what matters, explain a condition, establish evidence or provenance, or recommend or enable an approved action.
+
+Bad redundancy repeats the same Outstanding Demand and amount on both sides without adding meaning. A useful division leaves the official demand, reference, section, processing details and service actions in the portal while Assistance compares the amount paid with the amount recognised and explains the discrepancy.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+This rule does not prohibit repeating an amount when the value is necessary for a Comparison, SourceTrace, explanation or consequential review.
+
+## Professional Utility Rule
+
+The conventional portal is not a deliberately inferior or beginner-only experience. It must remain a capable hands-on tax workspace for ordinary taxpayers who choose not to use AI, experienced taxpayers, Chartered Accountants and other professional users.
+
+Improving clarity must not remove official tax terminology where professionally useful, direct service access, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows or detailed disclosures.
+
+Where useful, use a dual-label pattern:
+
+- Correct tax-credit details — Tax Credit Mismatch Correction
+- Investment gains — Schedule Capital Gains
+- Taxes already paid — Schedule Tax Paid
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
+
 ---
 
 # Standard Experience

@@ -4,6 +4,7 @@ import { useRef } from "react"
 import {
   AnimatePresence,
   motion,
+  useReducedMotion,
   useInView,
   type MotionProps,
   type UseInViewOptions,
@@ -45,6 +46,7 @@ export function BlurFade({
   ...props
 }: BlurFadeProps) {
   const ref = useRef(null)
+  const shouldReduceMotion = useReducedMotion()
   const inViewResult = useInView(ref, { once: true, margin: inViewMargin })
   const isInView = !inView || inViewResult
   const defaultVariants: Variants = {
@@ -74,13 +76,13 @@ export function BlurFade({
     <AnimatePresence>
       <motion.div
         ref={ref}
-        initial="hidden"
+        initial={shouldReduceMotion ? "visible" : "hidden"}
         animate={isInView ? "visible" : "hidden"}
         exit="hidden"
         variants={combinedVariants}
         transition={{
           delay: 0.04 + delay,
-          duration,
+          duration: shouldReduceMotion ? 0 : duration,
           ease: "easeOut",
           ...(shouldTransitionFilter ? { filter: { duration } } : {}),
         }}

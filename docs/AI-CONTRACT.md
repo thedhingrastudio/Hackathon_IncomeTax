@@ -210,6 +210,13 @@ AI may:
 * decide progressive disclosure;
 * order approved informational sections within permitted bounds.
 
+The ability to select and compose a valid representation does not authorize redundant output. The Assistance Workspace must not reproduce a portal fact merely because it is available in the Evidence Packet or through an approved `dataRef`. Each included fact must be necessary to interpret verified records, compare records, prioritize what matters, explain a condition, establish evidence or provenance, or recommend or enable an approved action.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+An amount or other authoritative value may be repeated when necessary for a Comparison, SourceTrace, explanation or consequential review.
+
 ---
 
 # AI Must Not
@@ -586,6 +593,15 @@ The following remain available:
 * citizen-controlled submission.
 
 AI must not become a mandatory gatekeeper.
+
+The conventional portal must remain a capable professional tax workspace, not a deliberately inferior or beginner-only fallback. AI assistance must not be used as a reason to remove official terminology where professionally useful, direct service access, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows or detailed disclosures.
+
+Prefer dual labels where useful: a human-readable label paired with the official or professional term.
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
 
 ---
 

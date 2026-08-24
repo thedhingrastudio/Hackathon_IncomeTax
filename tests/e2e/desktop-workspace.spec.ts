@@ -27,9 +27,12 @@ async function assertNoHorizontalOverflow(page: Page) {
 test("desktop Assistance Home opens as a persistent split workspace", async ({ page }, testInfo) => {
   const diagnostics = collectDiagnostics(page);
   await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
 
   const portal = page.locator(".portal-workspace");
   const openButton = page.getByRole("button", { name: "Open assistance" });
+  const assistanceHandle = page.locator(".assistance-handle");
   await expect(openButton).toBeVisible();
   await expect(openButton).toHaveAttribute("aria-expanded", "false");
   await expect(page.getByRole("complementary", { name: "Assistance Workspace" })).toBeHidden();
@@ -41,6 +44,8 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
 
   await openButton.click();
   const workspace = page.getByRole("complementary", { name: "Assistance Workspace" });
+  await expect(assistanceHandle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator(".desktop-workspace")).toHaveClass(/is-open/);
   await expect(workspace).toBeVisible();
   await expect(workspace.getByRole("heading", { name: "Welcome, Rohan" })).toBeVisible();
   await expect(workspace.getByText("Outstanding Demand", { exact: true })).toBeVisible();
@@ -49,7 +54,10 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("Action required", { exact: true })).toBeVisible();
   await expect(workspace.getByText("No upcoming deadlines in the current demo data.", { exact: true })).toBeVisible();
   await expect(workspace.getByLabel("Ask about your taxes")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Outstanding Demand" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Account status" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recent activity" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Quick access" })).toBeVisible();
   await expect(page.locator(".desktop-workspace")).toHaveClass(/is-open/);
   await expect(page.locator(".desktop-portal-links")).toBeHidden();
   await expect(page.getByRole("button", { name: /menu/i })).toBeVisible();
@@ -65,20 +73,52 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   expect(openWorkspace!.width / combinedWidth).toBeLessThan(0.56);
   await assertNoHorizontalOverflow(page);
   await saveReviewScreenshot(page, testInfo, "dashboard-assistance-open");
+  await saveReviewScreenshot(page, testInfo, "assistance-home-before-demand");
 
-  await workspace.getByRole("link", { name: "Understand this" }).click();
+  await workspace.getByRole("button", { name: "Understand this" }).click();
+  await expect(workspace.getByRole("heading", { name: "Checking why this is showing…" })).toBeVisible();
+  await expect(workspace.getByText("Checking records connected to this demand", { exact: true })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "checking-connected-records");
   await expect(page).toHaveURL(/\/pending-actions\/demand$/);
   await expect(page.getByRole("heading", { name: "Outstanding Demand" })).toBeVisible();
   await expect(workspace).toBeVisible();
-  await saveReviewScreenshot(page, testInfo, "outstanding-demand-assistance-open");
+  await expect(workspace.getByRole("heading", { name: "Understanding your demand" })).toBeVisible();
+  await expect(workspace.getByLabel("You paid: ₹18,420, Confirmed")).toBeVisible();
+  await expect(workspace.getByLabel("Return recognised: ₹0")).toBeVisible();
+  await expect(workspace.locator(".understanding-comparison").getByText("₹18,420", { exact: true })).toHaveCount(2);
+  await expect(workspace.getByText("not counted", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Your payment exists in Income Tax records, but it wasn't included when your return was processed.", { exact: true })).toBeVisible();
+  await expect(workspace.getByLabel("Ask about your taxes")).toHaveAttribute("placeholder", "Ask a follow-up…");
+  await expect(workspace.locator("[data-chat-message]" )).toHaveCount(0);
+  const sourceTrigger = workspace.getByRole("button", { name: "Why we think this" });
+  await expect(sourceTrigger).toHaveAttribute("aria-expanded", "false");
+  await expect(workspace.getByText("These connected Income Tax records support the explanation.", { exact: true })).toBeHidden();
+  await saveReviewScreenshot(page, testInfo, "understanding-surface");
+
+  await sourceTrigger.click();
+  await expect(sourceTrigger).toHaveAttribute("aria-expanded", "true");
+  const sourceTrace = workspace.locator(".source-trace-content");
+  for (const label of ["Payment", "Form 26AS", "Processed return", "Outstanding demand"]) await expect(sourceTrace.getByText(label, { exact: true })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "why-we-think-this-expanded");
+
+  await workspace.getByRole("button", { name: "Fix this" }).click();
+  await expect(page).toHaveURL(/\/pending-actions\/demand\/assist\/rectification$/);
+  await expect(page.getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
+  await expect(workspace).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "fix-this-corrective-flow");
 
   await workspace.getByRole("button", { name: "Close assistance" }).click();
   await expect(workspace).toBeHidden();
+  await expect(openButton).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator(".desktop-workspace")).toHaveClass(/is-closed/);
   await expect(openButton).toBeFocused();
   const reopenedPortal = await portal.boundingBox();
   expect(reopenedPortal!.width / 1440).toBeGreaterThan(0.98);
 
-  await openButton.click();
+  await openButton.focus();
+  await page.keyboard.press("Enter");
+  await expect(assistanceHandle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator(".desktop-workspace")).toHaveClass(/is-open/);
   await expect(workspace.getByRole("button", { name: "Close assistance" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(workspace).toBeHidden();
@@ -98,6 +138,29 @@ test("workspace foundation has no horizontal overflow at 1150px", async ({ page 
   await expect(page.getByRole("complementary", { name: "Assistance Workspace" })).toBeVisible();
   await expect(page.getByRole("complementary", { name: "Assistance Workspace" }).getByRole("heading", { name: "Welcome, Rohan" })).toBeVisible();
   await assertNoHorizontalOverflow(page);
+  expect(diagnostics.consoleErrors).toEqual([]);
+  expect(diagnostics.pageErrors).toEqual([]);
+  expect(diagnostics.failedRequests).toEqual([]);
+});
+
+test("professional demand workspace keeps manual services and related records available", async ({ page }, testInfo) => {
+  const diagnostics = collectDiagnostics(page);
+  await page.goto("/pending-actions/demand");
+  await expect(page.getByRole("heading", { name: "Demand details" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Related tax records" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "View payment" })).toHaveAttribute("href", "/payments");
+  await expect(page.getByRole("link", { name: "View Form 26AS" })).toHaveAttribute("href", "/payments/form-26as");
+  await expect(page.getByRole("link", { name: "View return" })).toHaveAttribute("href", "/returns");
+  await expect(page.getByRole("link", { name: "Respond to demand" })).toHaveAttribute("href", "/pending-actions/demand/respond");
+  await expect(page.getByRole("link", { name: "Pay demand" })).toHaveAttribute("href", "/pending-actions/demand/pay");
+  await assertNoHorizontalOverflow(page);
+  await saveReviewScreenshot(page, testInfo, "outstanding-demand-assistance-closed");
+
+  await page.getByRole("button", { name: "Open assistance" }).click();
+  await expect(page.getByRole("complementary", { name: "Assistance Workspace" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Related tax records" })).toBeVisible();
+  await assertNoHorizontalOverflow(page);
+  await saveReviewScreenshot(page, testInfo, "outstanding-demand-assistance-open");
   expect(diagnostics.consoleErrors).toEqual([]);
   expect(diagnostics.pageErrors).toEqual([]);
   expect(diagnostics.failedRequests).toEqual([]);

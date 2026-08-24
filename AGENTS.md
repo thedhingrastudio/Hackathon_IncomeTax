@@ -70,6 +70,26 @@ Turning AI assistance off must not prevent use of the underlying government serv
 
 The government side reflects the system's structure. The assistance side reflects the citizen's situation.
 
+### No Echo Rule
+
+The Assistance Workspace must not reproduce information merely because it is already available in the conventional portal. Information belongs in Assistance only when it is needed to interpret verified records, compare records, prioritize what matters, explain a condition, establish evidence or provenance, or recommend or enable an approved action.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+An authoritative value may be repeated when it is necessary for a Comparison, SourceTrace, explanation or consequential review. Do not repeat a portal fact without adding one of these assistance functions.
+
+### Professional Utility Rule
+
+The conventional portal is not a deliberately inferior or beginner-only experience. It must remain a capable hands-on tax workspace for ordinary taxpayers who decline AI assistance, experienced taxpayers, Chartered Accountants and other professional users.
+
+Improving clarity must not remove official tax terminology where professionally useful, direct service access, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows or detailed disclosures. Prefer dual labels where useful: a human-readable label followed by the official or professional term.
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
+
 ---
 
 ## Core Synthetic Scenario
@@ -284,9 +304,7 @@ The prototype must be:
 - usable with larger text;
 - designed around clear plain-language labels.
 
-Avoid exposing government terminology when plain language can communicate the same idea.
-
-Government terminology may be revealed progressively when useful.
+Use plain language to improve comprehension without removing professionally useful government terminology. Prefer progressive disclosure or dual labels where both citizen clarity and official terminology are needed.
 
 ---
 
@@ -341,3 +359,13 @@ Before completing an implementation task:
 5. Report any limitations or remaining issues.
 
 Do not automatically commit changes unless explicitly instructed.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

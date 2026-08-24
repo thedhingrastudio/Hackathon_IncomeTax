@@ -294,6 +294,31 @@ The model cannot generate arbitrary HTML, React, CSS, animation code, authoritat
 
 ---
 
+## DEC-019 — Separate Professional Portal Utility From Assistance Interpretation
+
+**Status:** Accepted
+**Date:** 25 August 2026
+
+**Decision:**
+
+The conventional portal remains a capable hands-on tax workspace for ordinary taxpayers who choose not to use AI, experienced taxpayers, Chartered Accountants and other professional users. Improving clarity must not remove official terminology where professionally useful, direct service access, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows or detailed disclosures. Human-readable and official or professional terms should be paired through dual labels where useful.
+
+The Assistance Workspace must not reproduce information merely because it is already present in the portal. It may repeat verified information only when needed to interpret or compare records, prioritize what matters, explain a condition, establish evidence or provenance, or recommend or enable an approved action. Necessary values may therefore recur in Comparison, SourceTrace, explanation and consequential-review representations.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
+
+**Reason:**
+
+The two experiences should divide responsibility rather than duplicate content or make the non-AI path artificially weak. The portal supports authoritative work; Assistance adds interpretation and orchestration across verified records.
+
+---
+
 # Adding Future Decisions
 
 New entries should use:

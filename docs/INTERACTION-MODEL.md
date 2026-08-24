@@ -56,6 +56,26 @@ Closing the workspace restores the full portal without losing the current route,
 
 The workspace may explain or orchestrate the left-side structure, but it does not become the source of government facts or workflow validity.
 
+### No echo between sides
+
+The Assistance Workspace must not mirror information merely because it appears on the conventional portal. Assistance may surface a verified value only when it is required to interpret or compare records, prioritize attention, explain a condition, establish evidence or provenance, or recommend or enable an approved action. This includes necessary repetition inside Comparison, SourceTrace, explanation and consequential-review representations.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+For the supported demand scenario, the portal owns the official Outstanding Demand record, demand reference, processing details and direct actions. Assistance earns its space by showing the relationship between ₹18,420 paid, ₹0 recognised and the resulting ₹18,420 discrepancy.
+
+### Conventional professional utility
+
+The portal must remain a capable hands-on tax workspace for non-AI users, experienced taxpayers, Chartered Accountants and other professional users. It must not be simplified into a deliberately inferior or beginner-only path.
+
+Clarity must not remove official terminology where professionally useful, direct service access, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows or detailed disclosures. Prefer dual labels where useful, with a human-readable label and its official or professional term.
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
+
 ## Seven workspace states
 
 ### State 0 — Portal only

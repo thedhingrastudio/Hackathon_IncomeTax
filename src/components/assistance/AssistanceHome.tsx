@@ -2,7 +2,7 @@ import type { OutstandingDemand } from "@/types/tax";
 import AttentionItem from "./AttentionItem";
 import ImportantDates from "./ImportantDates";
 
-export default function AssistanceHome({ taxpayerName, demand }: { taxpayerName: string; demand: OutstandingDemand }) {
+export default function AssistanceHome({ taxpayerName, demand, onUnderstand }: { taxpayerName: string; demand: OutstandingDemand; onUnderstand: () => void }) {
   const firstName = taxpayerName.split(" ")[0];
 
   return (
@@ -17,7 +17,7 @@ export default function AssistanceHome({ taxpayerName, demand }: { taxpayerName:
           <h3 id="assistance-attention-title">Things that need your attention</h3>
           <span>1 item</span>
         </div>
-        <AttentionItem demand={demand} />
+        <AttentionItem demand={demand} onUnderstand={onUnderstand} />
       </section>
       <ImportantDates />
     </div>

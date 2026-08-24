@@ -9,6 +9,7 @@ export interface AssistanceEngineInput {
 
 export interface AssistanceEngine {
   generate(input: AssistanceEngineInput): unknown;
+  generateUnderstandingSurface(input: AssistanceEngineInput): unknown;
 }
 
 export type AssistanceProvider = "mock";

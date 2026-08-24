@@ -1,18 +1,22 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { OutstandingDemand } from "../../types/tax";
+import type { DemandUnderstanding } from "../../lib/ai";
+import { createTaxDemandCase } from "../../lib/workflows";
+import { getStoredCase, saveCase } from "../../lib/storage/case-storage";
 import AssistanceDrawerHandle from "../assistance/AssistanceDrawerHandle";
-import AssistanceWorkspace from "../assistance/AssistanceWorkspace";
+import AssistanceWorkspace, { type AssistanceSurface } from "../assistance/AssistanceWorkspace";
 import { AIAssistanceControl } from "./AIAssistancePreference";
 const navigation = [["Dashboard", "/"], ["Returns", "/returns"], ["Payments & Tax Records", "/payments"], ["Pending Actions", "/pending-actions"], ["Services", "/services"], ["Help", "/help"]] as const;
 const assistanceId = "assistance-workspace";
-export default function PortalShell({ children, taxpayerName, demand }: { children: ReactNode; taxpayerName: string; demand: OutstandingDemand }) {
-  const pathname = usePathname(); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(false);
+export default function PortalShell({ children, taxpayerId, taxpayerName, demand, understanding }: { children: ReactNode; taxpayerId: string; taxpayerName: string; demand: OutstandingDemand; understanding: DemandUnderstanding | null }) {
+  const pathname = usePathname(); const router = useRouter(); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(false); const [assistanceSurface, setAssistanceSurface] = useState<AssistanceSurface>("home");
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const assistanceHandleRef = useRef<HTMLButtonElement>(null);
   const assistanceCloseRef = useRef<HTMLButtonElement>(null);
+  const checkingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const taxpayerInitials = taxpayerName.split(" ").map((part) => part[0]).join("");
 
   useEffect(() => {
@@ -35,6 +39,7 @@ export default function PortalShell({ children, taxpayerName, demand }: { childr
     document.addEventListener("keydown", closeAssistance);
     return () => document.removeEventListener("keydown", closeAssistance);
   }, [assistanceOpen]);
+  useEffect(() => () => { if (checkingTimerRef.current) clearTimeout(checkingTimerRef.current); }, []);
 
   function openAssistance() {
     setAssistanceOpen(true);
@@ -44,6 +49,20 @@ export default function PortalShell({ children, taxpayerName, demand }: { childr
   function closeAssistance() {
     setAssistanceOpen(false);
     window.setTimeout(() => assistanceHandleRef.current?.focus(), 0);
+  }
+
+  function understandDemand() {
+    router.push("/pending-actions/demand");
+    if (!understanding) { setAssistanceSurface("understanding"); return; }
+    setAssistanceSurface("checking");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    checkingTimerRef.current = setTimeout(() => setAssistanceSurface("understanding"), reducedMotion ? 0 : 1050);
+  }
+
+  function startCorrectivePlan() {
+    if (!understanding || understanding.specification.primaryAction.actionId !== "start_corrective_plan") return;
+    if (!getStoredCase()) saveCase(createTaxDemandCase(understanding.evidence, taxpayerId));
+    router.push("/pending-actions/demand/assist/rectification");
   }
 
   return <div className={`desktop-workspace ${assistanceOpen ? "is-open" : "is-closed"}`}>
@@ -60,10 +79,10 @@ export default function PortalShell({ children, taxpayerName, demand }: { childr
       </div></nav>
     </header>
     <main className="portal-container main-content" id="main-content" tabIndex={-1}>{children}</main>
-    <footer className="ux4g-footer-wrapper ux4g-footer-primary portal-footer"><div className="ux4g-footer-row portal-container"><p>Income Tax e-Filing</p><p>Synthetic demo data</p></div></footer>
+    <footer className="ux4g-footer-wrapper portal-footer"><div className="ux4g-footer-row portal-container"><p>Income Tax e-Filing</p><p>Synthetic demo data</p></div></footer>
   </div>
   </div>
   <div className="assistance-handle-anchor"><AssistanceDrawerHandle controls={assistanceId} expanded={assistanceOpen} handleRef={assistanceHandleRef} onOpen={openAssistance} /></div>
-  {assistanceOpen ? <AssistanceWorkspace closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onClose={closeAssistance} taxpayerName={taxpayerName} /> : null}
+  {assistanceOpen ? <AssistanceWorkspace closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onClose={closeAssistance} onFix={startCorrectivePlan} onUnderstand={understandDemand} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
   </div>;
 }

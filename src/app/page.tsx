@@ -1,35 +1,20 @@
 import Link from "next/link";
 import CaseAwareDemandProgress from "../components/portal/CaseAwareDemandProgress";
-import { getOutstandingDemand, getTaxpayer } from "../data/mock";
-import { formatAssessmentYear, formatIndianCurrency, formatRecordLabel } from "../lib/format-tax";
+import { getOutstandingDemand, getProcessingResult, getTaxPayment, getTaxReturn } from "../data/mock";
+import { formatAssessmentYear, formatIndianCurrency, formatIndianDate, formatRecordLabel } from "../lib/format-tax";
 
-const shortcuts = [
-  { title: "File or view return", text: "Access your Income Tax returns.", href: "/returns" },
-  { title: "Payments & Tax Records", text: "View payments and tax-information records.", href: "/payments" },
-  { title: "Pending actions", text: "Review items that need your response.", href: "/pending-actions" },
-  { title: "Services", text: "Browse available Income Tax services.", href: "/services" },
-];
+const shortcuts = [["File or view return", "/returns"], ["Payments & Tax Records", "/payments"], ["Pending Actions", "/pending-actions"], ["Services", "/services"]] as const;
 
 export default function Home() {
-  const taxpayer = getTaxpayer();
-  const demand = getOutstandingDemand();
-  const firstName = taxpayer.name.split(" ")[0];
-  const pendingDemandCount = demand.status === "action_required" ? 1 : 0;
-  return <>
-    <section className="account-heading" aria-labelledby="dashboard-title">
-      <div><p className="eyebrow">Account overview</p><h1 id="dashboard-title">Welcome, {firstName}</h1><p>Assessment Year {formatAssessmentYear(demand.assessmentYear)}</p></div>
-    </section>
-    <section className="attention-section" aria-labelledby="attention-title">
-      <div className="section-heading"><div><p className="eyebrow">Pending actions</p><h2 id="attention-title">{pendingDemandCount} item needs your attention</h2></div><Link className="ux4g-text-link-md" href="/pending-actions">View all pending actions</Link></div>
-      <article className="ux4g-card ux4g-card-outline ux4g-card-vertical demand-card">
-        <div className="ux4g-card-header demand-card__header"><div><p className="eyebrow">Outstanding Demand</p><h3>{formatIndianCurrency(demand.amount, demand.currency)}</h3></div><span className="demand-status" role="status"><span className="ux4g-badge-icon-warning ux4g-badge-m" aria-hidden="true">!</span><strong>{formatRecordLabel(demand.status)}</strong></span></div>
-        <div className="ux4g-card-body demand-card__body"><dl><div><dt>Assessment Year</dt><dd>{formatAssessmentYear(demand.assessmentYear)}</dd></div><div><dt>Demand status</dt><dd>Response pending</dd></div></dl><p>Review this demand and choose how you want to respond.</p></div>
-        <div className="ux4g-card-footer demand-card__footer"><CaseAwareDemandProgress fallbackHref="/pending-actions/demand" fallbackLabel="View demand" /></div>
-      </article>
-    </section>
-    <section aria-labelledby="shortcuts-title">
-      <div className="section-heading"><div><p className="eyebrow">Online services</p><h2 id="shortcuts-title">Useful shortcuts</h2></div></div>
-      <div className="shortcut-grid">{shortcuts.map((shortcut) => <article className="ux4g-card ux4g-card-outline ux4g-card-vertical shortcut-card" key={shortcut.href}><div className="ux4g-card-body"><h3>{shortcut.title}</h3><p>{shortcut.text}</p><Link className="ux4g-text-link-md" href={shortcut.href}>Open {shortcut.title.toLowerCase()}</Link></div></article>)}</div>
-    </section>
-  </>;
+  const demand = getOutstandingDemand(); const payment = getTaxPayment(); const taxReturn = getTaxReturn(); const processing = getProcessingResult();
+  const assessmentYear = formatAssessmentYear(demand.assessmentYear); const [startYear] = demand.assessmentYear.split("-").map(Number); const financialYear = `${startYear - 1}–${String(startYear).slice(-2)}`;
+  return <div className="professional-dashboard">
+    <header className="portal-page-intro"><p className="eyebrow">Account overview</p><h1>Dashboard</h1><p>FY {financialYear} <span aria-hidden="true">·</span> AY {assessmentYear}</p></header>
+    <div className="dashboard-workspace">
+      <section className="professional-section pending-action-panel" aria-labelledby="attention-title"><div className="professional-section__heading"><div><p className="eyebrow">Pending actions</p><h2 id="attention-title">Outstanding Demand</h2></div><span className="demand-status"><span className="ux4g-badge-icon-warning ux4g-badge-m" aria-hidden="true">!</span><strong>{formatRecordLabel(demand.status)}</strong></span></div><div className="pending-action-summary"><div><strong>{formatIndianCurrency(demand.amount, demand.currency)}</strong><span>AY {assessmentYear}</span></div><dl><div><dt>Status</dt><dd>Response pending</dd></div><div><dt>Demand reference</dt><dd>{demand.demandId}</dd></div></dl><CaseAwareDemandProgress fallbackHref="/pending-actions/demand" fallbackLabel="View demand" /></div></section>
+      <section className="professional-section" aria-labelledby="account-status-title"><div className="professional-section__heading"><div><p className="eyebrow">Tax year</p><h2 id="account-status-title">Account status</h2></div></div><dl className="status-overview"><div><dt>Return</dt><dd>{formatRecordLabel(taxReturn.filingStatus)}</dd></div><div><dt>Self-Assessment Tax</dt><dd>{formatIndianCurrency(payment.amount, payment.currency)} paid</dd></div><div><dt>Outstanding Demand</dt><dd>{formatIndianCurrency(demand.amount, demand.currency)}</dd></div></dl></section>
+      <section className="professional-section dashboard-activity" aria-labelledby="activity-title"><div className="professional-section__heading"><div><p className="eyebrow">Records</p><h2 id="activity-title">Recent activity</h2></div></div><ul className="activity-list"><li><time dateTime={processing.processedOn}>{formatIndianDate(processing.processedOn)}</time><span><strong>Return processed</strong><small>{processing.processingId}</small></span><span>{formatRecordLabel(processing.status)}</span></li><li><time dateTime={taxReturn.filedOn}>{formatIndianDate(taxReturn.filedOn)}</time><span><strong>Income Tax Return filed</strong><small>AY {assessmentYear}</small></span><span>{formatRecordLabel(taxReturn.filingStatus)}</span></li><li><time dateTime={payment.paymentDate}>{formatIndianDate(payment.paymentDate)}</time><span><strong>Self-Assessment Tax payment</strong><small>{payment.challanReference}</small></span><span>{formatIndianCurrency(payment.amount, payment.currency)}</span></li></ul></section>
+      <section className="professional-section dashboard-quick-access" aria-labelledby="quick-access-title"><div className="professional-section__heading"><div><p className="eyebrow">Services</p><h2 id="quick-access-title">Quick access</h2></div></div><nav aria-label="Quick access"><ul>{shortcuts.map(([label, href]) => <li key={href}><Link href={href}>{label}<span aria-hidden="true">→</span></Link></li>)}</ul></nav></section>
+    </div>
+  </div>;
 }
