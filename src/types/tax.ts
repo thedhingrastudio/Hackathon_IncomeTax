@@ -1,10 +1,10 @@
 export type CurrencyCode = "INR";
 export type AssessmentYear = `${number}-${number}`;
 export type PaymentType = "self_assessment_tax";
-export type PaymentStatus = "confirmed";
+export type PaymentStatus = "confirmed" | "pending" | "failed";
 export type FilingStatus = "processed";
 export type ProcessingStatus = "processed";
-export type Form26ASStatus = "reflected";
+export type Form26ASStatus = "reflected" | "not_reflected";
 export type DemandStatus = "action_required";
 
 interface SyntheticRecord {
