@@ -11,8 +11,9 @@ import AssistanceComposer from "./AssistanceComposer";
 import AssistanceHome from "./AssistanceHome";
 import CheckingRecords from "./CheckingRecords";
 import UnderstandingSurface from "./UnderstandingSurface";
+import ActionWorkspace from "./ActionWorkspace";
 
-export type AssistanceSurface = "home" | "checking" | "understanding";
+export type AssistanceSurface = "home" | "checking" | "understanding" | "action";
 
 export default function AssistanceWorkspace({
   closeButtonRef,
@@ -45,7 +46,7 @@ export default function AssistanceWorkspace({
     : surface === "checking" && understanding
       ? <CheckingRecords evidence={understanding.evidence} headingRef={surfaceHeadingRef} />
       : understanding
-        ? <UnderstandingSurface headingRef={surfaceHeadingRef} onFix={onFix} understanding={understanding} />
+        ? surface === "action" ? <ActionWorkspace headingRef={surfaceHeadingRef} onReview={onFix} understanding={understanding} /> : <UnderstandingSurface headingRef={surfaceHeadingRef} onFix={onFix} understanding={understanding} />
         : <section className="assistance-unavailable"><h2 ref={surfaceHeadingRef} tabIndex={-1}>We couldn&apos;t safely explain this demand</h2><p>You can continue using the Outstanding Demand service on the left.</p></section>;
 
   return (

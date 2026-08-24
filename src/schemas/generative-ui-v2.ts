@@ -23,3 +23,14 @@ export const understandingSurfaceSchema = z.object({
 export function safeParseUnderstandingSurface(input: unknown) {
   return understandingSurfaceSchema.safeParse(input);
 }
+
+export const actionSurfaceSchema = z.object({
+  surface: z.literal("action"),
+  blocks: z.tuple([
+    z.object({ type: z.literal("checklist"), variant: z.literal("readiness"), items: z.tuple([z.object({ label: copy, amountRef: z.literal("evidence.payment.amount"), dateRef: z.literal("evidence.payment.date"), typeRef: z.literal("evidence.payment.type"), readinessRef: z.literal("workflow.tax_credit_rectification.ready") }).strict()]) }).strict(),
+    z.object({ type: z.literal("action_plan"), steps: z.tuple([z.object({ workflow: z.literal("tax_credit_rectification"), label: copy }).strict(), z.object({ workflow: z.literal("respond_to_demand"), label: copy, dependencyRef: z.literal("workflow.respond_to_demand.dependency") }).strict()]) }).strict(),
+  ]),
+  primaryAction: z.object({ actionId: z.literal("review_rectification"), label: copy }).strict(),
+}).strict();
+
+export function safeParseActionSurface(input: unknown) { return actionSurfaceSchema.safeParse(input); }

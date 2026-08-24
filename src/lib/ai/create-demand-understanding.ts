@@ -1,5 +1,5 @@
-import { safeParseUnderstandingSurface } from "../../schemas/generative-ui-v2.ts";
-import type { UnderstandingSurfaceSpecification } from "../../types/generative-ui-v2.ts";
+import { safeParseActionSurface, safeParseUnderstandingSurface } from "../../schemas/generative-ui-v2.ts";
+import type { ActionSurfaceSpecification, UnderstandingSurfaceSpecification } from "../../types/generative-ui-v2.ts";
 import { createEvidencePacket, reconcileTaxCase } from "../reconciliation/index.ts";
 import type { EvidencePacket } from "../reconciliation/evidence-packet.ts";
 import type { ReconciliationInput } from "../reconciliation/types.ts";
@@ -9,6 +9,7 @@ import { getAssistanceEngine } from "./provider.ts";
 export type DemandUnderstanding = {
   evidence: EvidencePacket;
   specification: UnderstandingSurfaceSpecification;
+  actionSpecification: ActionSurfaceSpecification;
 };
 
 export function createDemandUnderstanding(records: ReconciliationInput, provider = "mock"): DemandUnderstanding | null {
@@ -23,7 +24,8 @@ export function createDemandUnderstanding(records: ReconciliationInput, provider
       approvedWorkflowPlan: getApprovedWorkflowPlan(reconciliation.diagnosis),
     });
     const parsed = safeParseUnderstandingSurface(output);
-    return parsed.success ? { evidence, specification: parsed.data as UnderstandingSurfaceSpecification } : null;
+    const actionParsed = safeParseActionSurface(getAssistanceEngine(provider).generateActionSurface({ intent: "understand_outstanding_demand", evidence, approvedWorkflowPlan: getApprovedWorkflowPlan(reconciliation.diagnosis) }));
+    return parsed.success && actionParsed.success ? { evidence, specification: parsed.data as UnderstandingSurfaceSpecification, actionSpecification: actionParsed.data as ActionSurfaceSpecification } : null;
   } catch {
     return null;
   }

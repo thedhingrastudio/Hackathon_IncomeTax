@@ -1,7 +1,7 @@
 import { formatIndianCurrency, formatIndianDate } from "../format-tax.ts";
 import type { AssistanceResponse } from "../../types/generative-ui";
 import type { AssistanceEngine, AssistanceEngineInput } from "./types.ts";
-import type { UnderstandingSurfaceSpecification } from "../../types/generative-ui-v2.ts";
+import type { ActionSurfaceSpecification, UnderstandingSurfaceSpecification } from "../../types/generative-ui-v2.ts";
 
 const workflowContent = {
   tax_credit_rectification: {
@@ -15,6 +15,18 @@ const workflowContent = {
 };
 
 export class MockAssistanceEngine implements AssistanceEngine {
+  generateActionSurface(): unknown {
+    const surface: ActionSurfaceSpecification = {
+      surface: "action",
+      blocks: [
+        { type: "checklist", variant: "readiness", items: [{ label: "Payment identified", amountRef: "evidence.payment.amount", dateRef: "evidence.payment.date", typeRef: "evidence.payment.type", readinessRef: "workflow.tax_credit_rectification.ready" }] },
+        { type: "action_plan", steps: [{ workflow: "tax_credit_rectification", label: "Correct your tax credit" }, { workflow: "respond_to_demand", label: "Respond to the demand", dependencyRef: "workflow.respond_to_demand.dependency" }] },
+      ],
+      primaryAction: { actionId: "review_rectification", label: "Review correction" },
+    };
+    return surface;
+  }
+
   generateUnderstandingSurface(): unknown {
     const surface: UnderstandingSurfaceSpecification = {
       surface: "understanding",

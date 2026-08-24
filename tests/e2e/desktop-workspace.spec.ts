@@ -102,8 +102,23 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await saveReviewScreenshot(page, testInfo, "why-we-think-this-expanded");
 
   await workspace.getByRole("button", { name: "Fix this" }).click();
+  await expect(page).toHaveURL(/\/pending-actions\/demand$/);
+  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
+  await expect(workspace.getByText("Payment identified", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("₹18,420", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("15 July 2026 · Self-Assessment Tax", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Everything required is ready.", { exact: true })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Respond to the demand" })).toBeVisible();
+  await expect(workspace.getByText("Starts after Step 1", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Form 26AS", { exact: true })).toHaveCount(0);
+  await expect(workspace.getByText("processing-demo-2026-27-001", { exact: true })).toHaveCount(0);
+  await page.waitForTimeout(350);
+  await saveReviewScreenshot(page, testInfo, "action-workspace-plan");
+
+  await workspace.getByRole("button", { name: "Review correction" }).click();
   await expect(page).toHaveURL(/\/pending-actions\/demand\/assist\/rectification$/);
-  await expect(page.getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
+  await expect(page.getByLabel("Tax credit correction review").getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
   await expect(workspace).toBeVisible();
   await saveReviewScreenshot(page, testInfo, "fix-this-corrective-flow");
 

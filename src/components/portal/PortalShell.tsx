@@ -59,7 +59,12 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     checkingTimerRef.current = setTimeout(() => setAssistanceSurface("understanding"), reducedMotion ? 0 : 1050);
   }
 
-  function startCorrectivePlan() {
+  function showCorrectivePlan() {
+    if (!understanding || understanding.specification.primaryAction.actionId !== "start_corrective_plan") return;
+    setAssistanceSurface("action");
+  }
+
+  function reviewRectification() {
     if (!understanding || understanding.specification.primaryAction.actionId !== "start_corrective_plan") return;
     if (!getStoredCase()) saveCase(createTaxDemandCase(understanding.evidence, taxpayerId));
     router.push("/pending-actions/demand/assist/rectification");
@@ -83,6 +88,6 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   </div>
   </div>
   <div className="assistance-handle-anchor"><AssistanceDrawerHandle controls={assistanceId} expanded={assistanceOpen} handleRef={assistanceHandleRef} onOpen={openAssistance} /></div>
-  {assistanceOpen ? <AssistanceWorkspace closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onClose={closeAssistance} onFix={startCorrectivePlan} onUnderstand={understandDemand} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
+  {assistanceOpen ? <AssistanceWorkspace closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onClose={closeAssistance} onFix={assistanceSurface === "action" ? reviewRectification : showCorrectivePlan} onUnderstand={understandDemand} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
   </div>;
 }
