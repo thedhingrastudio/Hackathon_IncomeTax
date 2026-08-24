@@ -4,6 +4,11 @@ import UX4GRuntime from "../components/ux4g/UX4GRuntime";
 import PortalShell from "../components/portal/PortalShell";
 import { getTaxpayer } from "../data/mock";
 import "./globals.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Income Tax Assistance Prototype",
@@ -19,11 +24,13 @@ export default function RootLayout({
   const taxpayer = getTaxpayer();
 
   return (
-    <html lang="en" data-theme="light">
-      <body>
-        <UX4GRuntime />
-        <PortalShell taxpayerName={taxpayer.name}>{children}</PortalShell>
-      </body>
+    <html lang="en" data-theme="light" className={cn("font-sans", geist.variable)}>
+<body>
+  <TooltipProvider>
+    <UX4GRuntime />
+    <PortalShell taxpayerName={taxpayer.name}>{children}</PortalShell>
+  </TooltipProvider>
+</body>
     </html>
   );
 }
