@@ -36,11 +36,11 @@ TypeScript.
 ## Target presentation foundation
 
 - React and Next.js;
-- shadcn/ui for structural primitives;
+- shadcn/ui and Base UI for structural primitives;
 - Magic UI selectively for meaningful motion and visual relationships;
 - project-owned design tokens and styling.
 
-**Migration status:** this target has not been implemented. The repository currently still contains UX4G code and dependencies. This documentation change does not install, remove or migrate presentation packages.
+Some legacy presentation components remain to be migrated.
 
 ## Validation
 
@@ -271,7 +271,7 @@ The target presentation layer contains these responsibilities:
 
 The interaction model comes before the component library. Magic UI must be used only where motion communicates a meaningful relationship or state change, not as decorative AI branding.
 
-Current implementation note: `src/components/ux4g` and `UX4GRuntime.tsx` still exist during migration. They are not the future target architecture and must not be removed until an implementation task explicitly authorises it.
+Some legacy presentation components remain to be migrated.
 
 ---
 
@@ -1127,10 +1127,10 @@ src/
 │   ├── portal/
 │   │   └── normal Income Tax UI
 │   │
-│   ├── ux4g/
-│   │   └── current presentation implementation during migration
+│   ├── ui/
+│   │   └── structural primitives and project-owned interaction styles
 │   │
-│   ├── assistance-workspace/  (target)
+│   ├── assistance-workspace/
 │   │   └── persistent workspace shell and surfaces
 │   │
 │   └── generative-ui/

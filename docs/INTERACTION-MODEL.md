@@ -4,7 +4,7 @@
 
 This document is the source of truth for the target desktop interaction model. It changes presentation and assistance interaction only. The implemented synthetic records, deterministic reconciliation, Evidence Packet, rules, workflows, consequence gates, persistence, provider abstraction, validation and conventional portal journey remain authoritative.
 
-The current frontend still uses UX4G and separate routes in places. The target described here has not yet been implemented.
+Some legacy presentation components and separate routes remain to be migrated to the target interaction model.
 
 ## Product principles
 

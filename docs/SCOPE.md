@@ -223,11 +223,9 @@ State should eventually persist across page reloads.
 
 ---
 
-## UX4G
+## Presentation System
 
-UX4G remains in the current implementation during migration, but it is no longer the target design-system foundation.
-
-The target presentation foundation is shadcn/ui structural primitives, selectively used Magic UI and project-owned product styling. Dependency and frontend migration are outside this documentation-only task.
+The target presentation foundation is shadcn/ui and Base UI structural primitives, selectively used Magic UI, and project-owned product styling. Some legacy presentation components remain to be migrated in separately authorised implementation work.
 
 ---
 

@@ -89,15 +89,15 @@ A permanent chat transcript is not the primary interaction model.
 
 ---
 
-## DEC-006 — UX4G Is the Design-System Foundation
+## DEC-006 — Use a Government Design-System Foundation
 
 **Status:** Superseded
 **Superseded by:** DEC-015
 **Date:** 23 August 2026
 
-The application will use UX4G as the government UI foundation.
+The application will use an established government design-system foundation.
 
-Custom AI-native components may be created when UX4G does not provide the required interaction.
+Custom assistance components may be created when that foundation does not provide the required interaction.
 
 The final interface should feel like a credible evolution of an Indian government service rather than a generic AI startup.
 
@@ -230,26 +230,26 @@ Each increment should be reviewed before continuing.
 
 ---
 
-## DEC-015 — Presentation Foundation Migrates Away From UX4G
+## DEC-015 — Project-Owned Presentation Foundation
 
 **Status:** Accepted
 **Date:** 24 August 2026
 
 **Decision:**
 
-The target presentation foundation is shadcn/ui for structural primitives, Magic UI used selectively for meaningful motion and visual relationships, and project-owned product tokens and styling.
+The product uses shadcn/ui and Base UI primitives, selective meaningful motion, and project-owned tokens instead of constraining the interaction model to a pre-existing government component system.
 
 The interaction model comes before the component library. The product must continue to feel like a credible and trustworthy public service.
 
 **Reason:**
 
-The product requires a more flexible adaptive workspace and visual language than the previous UX4G-based direction provided.
+The product requires a flexible adaptive workspace and a visual language governed by its own interaction model rather than by a pre-existing component system.
 
 This decision does not change deterministic reconciliation, data authority, workflow semantics, consequence gates, persistent case state or the conventional non-AI journey.
 
 **Migration note:**
 
-UX4G code and dependencies remain in the current implementation. This decision defines the target and does not claim that migration is complete.
+Some legacy presentation components remain to be migrated. This decision defines the target and does not claim that migration is complete.
 
 ---
 

@@ -314,11 +314,11 @@ As the citizen approaches authorization, the interface becomes deliberately less
 
 # Design Direction
 
-The target presentation foundation is shadcn/ui for structural primitives, Magic UI used selectively for meaningful motion or visual relationships, and project-owned tokens and styling.
+The target presentation foundation is shadcn/ui and Base UI for structural primitives, Magic UI used selectively for meaningful motion or visual relationships, and project-owned tokens and styling.
 
 The interaction model comes first; the application must not be designed around a component library.
 
-**Migration status:** the current implementation still contains UX4G code and dependencies. The target presentation migration has not yet been implemented.
+Some legacy presentation components remain to be migrated.
 
 The prototype should feel like a credible evolution of an Indian government digital service rather than a generic AI startup.
 

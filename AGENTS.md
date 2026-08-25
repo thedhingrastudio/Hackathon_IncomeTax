@@ -265,21 +265,21 @@ Normal government portal interface components.
 
 Future presentation responsibilities include base UI primitives, the Assistance Workspace shell, the Generative Surface Renderer, a Trusted Representation Registry, a Data Binding Resolver and an Approved Action Registry.
 
-The repository still contains `src/components/ux4g` during migration. Do not treat that current implementation detail as the target architecture, and do not remove it except in an explicitly authorised implementation increment.
-
 ---
 
-## Design System
+## Target Presentation System
 
-The target presentation foundation is:
+- shadcn/ui and Base UI provide structural and accessible interaction primitives.
+- Project-owned tokens define the product's visual identity, including typography, spacing, colour, surfaces and interaction grammar.
+- Motion must be restrained and used only when it explains a meaningful relationship or state change.
+- The interface should feel credible for a public service through hierarchy, accessibility, language, clarity and interaction quality, not by imitating an existing government design system.
+- Do not automatically choose a government design system because this is a government-service prototype.
+- Do not allow a component library to override the interaction model.
+- The conventional portal must support dense professional utility.
+- The Assistance Workspace must support interpretation and orchestration.
+- Preserve the No Echo Rule.
 
-- shadcn/ui for structural UI primitives;
-- Magic UI selectively for motion that explains meaningful relationships or state change;
-- project-owned visual tokens and product styling.
-
-The interaction model comes before the component library. The application must remain a credible, trustworthy government service rather than a generic startup dashboard.
-
-Current implementation note: UX4G code and dependencies still exist. The presentation migration has not yet happened. Do not install, remove or replace presentation dependencies unless the current task explicitly authorises that migration step.
+The interaction model comes before the component library. The application must remain a credible, trustworthy public service rather than a generic startup dashboard.
 
 Do not turn the interface into a generic startup dashboard.
 
@@ -346,9 +346,8 @@ Before making changes:
 1. Read this file.
 2. Read the relevant documents in `/docs`.
 3. Read the current target design and interaction documents when performing UI work.
-4. Distinguish the current UX4G implementation from the target presentation architecture.
-5. Stay inside the requested increment.
-6. Do not begin later increments without being asked.
+4. Stay inside the requested increment.
+5. Do not begin later increments without being asked.
 
 Before completing an implementation task:
 
