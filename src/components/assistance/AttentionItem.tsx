@@ -15,7 +15,7 @@ export default function AttentionItem({ demand, onUnderstand }: { demand: Outsta
         </div>
         <span className="assistance-status"><span aria-hidden="true" />{formatRecordLabel(demand.status)}</span>
         <Button className="assistance-inline-action" onClick={onUnderstand} type="button" variant="link">
-          Understand this <ArrowRight aria-hidden="true" />
+          Understand this demand <ArrowRight aria-hidden="true" />
         </Button>
       </CardContent>
     </Card>

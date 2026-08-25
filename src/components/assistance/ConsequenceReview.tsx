@@ -28,7 +28,7 @@ export function RectificationReview({ draft, headingRef, onBack, onConfirm }: { 
     </dl>
     <section className="government-request" aria-labelledby="government-request-title"><p className="assistance-kicker">Government request</p><h3 id="government-request-title">Correct tax-credit details</h3><p>Tax Credit Mismatch Correction</p></section>
     <ConsequenceNotice />
-    <div className="consequence-review-actions"><Button className="consequence-primary-action" size="lg" type="button" onClick={onConfirm}>Confirm and submit correction</Button><Button className="consequence-back-action" size="lg" type="button" variant="outline" onClick={onBack}>Back</Button></div>
+    <div className="consequence-review-actions"><Button className="app-action app-action-primary consequence-primary-action" size="lg" type="button" onClick={onConfirm}>Confirm and submit correction</Button><Button className="app-action app-action-tertiary consequence-back-action" size="lg" type="button" variant="ghost" onClick={onBack}>Back</Button></div>
   </section>;
 }
 
@@ -43,7 +43,7 @@ export function DemandResponseReview({ draft, headingRef, onBack, onConfirm }: {
       <Fact label="Assessment Year" value={formatAssessmentYear(draft.assessmentYear)} />
     </dl>
     <ConsequenceNotice />
-    <div className="consequence-review-actions"><Button className="consequence-primary-action" size="lg" type="button" onClick={onConfirm}>Confirm and submit response</Button><Button className="consequence-back-action" size="lg" type="button" variant="outline" onClick={onBack}>Back</Button></div>
+    <div className="consequence-review-actions"><Button className="app-action app-action-primary consequence-primary-action" size="lg" type="button" onClick={onConfirm}>Confirm and submit response</Button><Button className="app-action app-action-tertiary consequence-back-action" size="lg" type="button" variant="ghost" onClick={onBack}>Back</Button></div>
   </section>;
 }
 
@@ -52,6 +52,6 @@ export function DemandResponseSubmitted({ headingRef, onViewCase, rectification,
     <span className="submission-result-icon" aria-hidden="true"><Check /></span>
     <ReviewHeader eyebrow="Submitted" id="response-submitted-title" title="Response submitted" description="Income Tax review is pending. The outstanding demand has not been marked as resolved." headingRef={headingRef} />
     <dl className="consequence-review-facts"><Fact label="Demand response" value={response.reference} /><Fact label="Related rectification" value={rectification.reference} /><Fact label="Status" value="Waiting for Income Tax review" /></dl>
-    <Button className="consequence-primary-action submission-view-case" onClick={onViewCase} size="lg" type="button">View case status</Button>
+    <Button className="app-action app-action-secondary submission-view-case" onClick={onViewCase} size="lg" type="button">View case status</Button>
   </section>;
 }

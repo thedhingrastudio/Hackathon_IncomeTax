@@ -25,7 +25,7 @@ export default function AssistanceHome({ taxpayerName, demand, onUnderstand, onV
         <div><dt><Check aria-hidden="true" />Correction submitted</dt><dd>{taxCase.rectificationReference}</dd></div>
         <div><dt><Check aria-hidden="true" />Demand response submitted</dt><dd>{taxCase.demandResponseReference}</dd></div>
       </dl>
-      <Button className="assistance-view-case" onClick={onViewCase} size="lg" type="button">View case</Button>
+      <Button className="app-action app-action-secondary assistance-view-case" onClick={onViewCase} size="lg" type="button">View case status</Button>
     </div>;
   }
 

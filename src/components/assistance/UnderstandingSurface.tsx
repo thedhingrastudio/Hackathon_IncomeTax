@@ -31,7 +31,7 @@ export default function UnderstandingSurface({ understanding, headingRef, onFix 
         <p>Your payment exists in Income Tax records, but it wasn&apos;t included when your return was processed.</p>
         <p>That is why {formatIndianCurrency(understanding.evidence.demand.amount, currency)} is appearing as an outstanding demand.</p>
       </div>
-      <Button className="understanding-primary-action" onClick={onFix} size="lg" type="button">{resolved.primaryAction.label}<ArrowRight aria-hidden="true" /></Button>
+      <Button className="app-action app-action-primary understanding-primary-action" onClick={onFix} size="lg" type="button">{resolved.primaryAction.label}<ArrowRight aria-hidden="true" /></Button>
       <SourceTrace currency={currency} items={resolved.sourceTrace.items} />
     </section>
   );
