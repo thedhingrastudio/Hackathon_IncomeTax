@@ -186,6 +186,30 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   expect(JSON.parse(storedCase!).state).not.toBe("RESOLVED");
   await saveReviewScreenshot(page, testInfo, "demand-response-submitted");
 
+  await workspace.getByRole("button", { name: "View case status" }).click();
+  await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
+  await expect(workspace.getByText("Nothing you need to do right now.", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Outstanding demand · ₹18,420", { exact: true })).toBeVisible();
+  const timeline = workspace.getByRole("list", { name: "Case progress" });
+  for (const label of ["Payment found", "Problem identified", "Tax-credit correction submitted", "Demand response submitted", "Income Tax review", "Resolved"]) await expect(timeline.getByText(label, { exact: true })).toBeVisible();
+  await expect(timeline.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
+  await expect(timeline.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
+  await expect(timeline.getByRole("listitem").filter({ hasText: "Income Tax review" })).toHaveAttribute("aria-current", "step");
+  await expect(timeline.getByRole("listitem").filter({ hasText: "Resolved" })).toHaveClass(/is-pending/);
+  await expect(workspace.getByLabel("Ask about this case")).toHaveAttribute("placeholder", "Ask about this case…");
+  await expect(workspace.getByRole("link", { name: "View full case" })).toBeVisible();
+  await assertNoHorizontalOverflow(page);
+  await saveReviewScreenshot(page, testInfo, "assistance-tracking");
+
+  await workspace.getByRole("button", { name: "Close assistance" }).click();
+  await openButton.click();
+  await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
+  await workspace.getByRole("link", { name: "View full case" }).click();
+  await expect(page).toHaveURL(/\/case\/CASE-DEMO-18420$/);
+  await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "full-case-page-with-assistance-tracking");
+
   await page.reload();
   await expect(openButton).toHaveAttribute("aria-expanded", "false");
   await openButton.click();
@@ -197,9 +221,14 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("Action required", { exact: true })).toHaveCount(0);
   await expect(workspace.getByRole("button", { name: "Understand this" })).toHaveCount(0);
   await expect(workspace.getByLabel("Ask about your taxes")).toBeVisible();
-  await workspace.getByRole("link", { name: "View case" }).click();
-  await expect(page).toHaveURL(/\/case\/CASE-DEMO-18420$/);
-  await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "assistance-home-after-submission");
+  await workspace.getByRole("button", { name: "View case" }).click();
+  await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
+  await expect(workspace.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
+  storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
+  expect(JSON.parse(storedCase!)).toMatchObject({ state: "WAITING_FOR_REVIEW" });
+  await saveReviewScreenshot(page, testInfo, "assistance-tracking-after-reload");
 
   await workspace.getByRole("button", { name: "Close assistance" }).click();
   await expect(workspace).toBeHidden();

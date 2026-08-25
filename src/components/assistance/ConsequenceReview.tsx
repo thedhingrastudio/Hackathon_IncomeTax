@@ -47,10 +47,11 @@ export function DemandResponseReview({ draft, headingRef, onBack, onConfirm }: {
   </section>;
 }
 
-export function DemandResponseSubmitted({ headingRef, rectification, response }: { headingRef: RefObject<HTMLHeadingElement | null>; rectification: RectificationSubmission; response: AssistedDemandResponseSubmission }) {
+export function DemandResponseSubmitted({ headingRef, onViewCase, rectification, response }: { headingRef: RefObject<HTMLHeadingElement | null>; onViewCase: () => void; rectification: RectificationSubmission; response: AssistedDemandResponseSubmission }) {
   return <section aria-labelledby="response-submitted-title" className="consequence-review submission-result">
     <span className="submission-result-icon" aria-hidden="true"><Check /></span>
     <ReviewHeader eyebrow="Submitted" id="response-submitted-title" title="Response submitted" description="Income Tax review is pending. The outstanding demand has not been marked as resolved." headingRef={headingRef} />
     <dl className="consequence-review-facts"><Fact label="Demand response" value={response.reference} /><Fact label="Related rectification" value={rectification.reference} /><Fact label="Status" value="Waiting for Income Tax review" /></dl>
+    <Button className="consequence-primary-action submission-view-case" onClick={onViewCase} size="lg" type="button">View case status</Button>
   </section>;
 }

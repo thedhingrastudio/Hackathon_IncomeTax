@@ -1,13 +1,12 @@
-import Link from "next/link";
 import { Check } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { formatIndianCurrency } from "@/lib/format-tax";
 import { useTaxDemandCase } from "@/lib/storage/case-storage";
 import type { OutstandingDemand } from "@/types/tax";
 import AttentionItem from "./AttentionItem";
 import ImportantDates from "./ImportantDates";
 
-export default function AssistanceHome({ taxpayerName, demand, onUnderstand }: { taxpayerName: string; demand: OutstandingDemand; onUnderstand: () => void }) {
+export default function AssistanceHome({ taxpayerName, demand, onUnderstand, onViewCase }: { taxpayerName: string; demand: OutstandingDemand; onUnderstand: () => void; onViewCase: () => void }) {
   const firstName = taxpayerName.split(" ")[0];
   const taxCase = useTaxDemandCase();
 
@@ -26,7 +25,7 @@ export default function AssistanceHome({ taxpayerName, demand, onUnderstand }: {
         <div><dt><Check aria-hidden="true" />Correction submitted</dt><dd>{taxCase.rectificationReference}</dd></div>
         <div><dt><Check aria-hidden="true" />Demand response submitted</dt><dd>{taxCase.demandResponseReference}</dd></div>
       </dl>
-      <Link className={buttonVariants({ className: "assistance-view-case", size: "lg" })} href={`/case/${taxCase.caseId}`}>View case</Link>
+      <Button className="assistance-view-case" onClick={onViewCase} size="lg" type="button">View case</Button>
     </div>;
   }
 

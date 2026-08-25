@@ -378,6 +378,25 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .assistance-case-submissions dt svg { width: 1rem; color: var(--workspace-accent); }
 .assistance-case-submissions dd { margin: .35rem 0 0 1.5rem; color: var(--workspace-muted); font-size: .875rem; }
 .assistance-view-case { width: fit-content; min-height: 44px; padding-inline: 1.15rem; text-decoration: none; }
+.submission-view-case { width: fit-content; min-height: 44px; padding-inline: 1.15rem; background: var(--workspace-ink); color: var(--workspace-surface-strong); }
+.assistance-tracking { display: grid; width: min(100% - 3rem, 680px); gap: 2rem; margin-inline: auto; padding-block: 2.75rem 3rem; color: var(--workspace-ink); }
+.assistance-tracking-header { padding-bottom: 1.5rem; border-bottom: 1px solid var(--workspace-border); }
+.assistance-tracking-header h2 { max-width: 580px; margin-bottom: .65rem; font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 540; letter-spacing: -.045em; line-height: 1.08; }
+.assistance-tracking-header > p:last-child { margin-bottom: 0; color: var(--workspace-muted); font-size: 1.1rem; font-weight: 650; }
+.assistance-timeline { position: relative; display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.assistance-timeline::before { position: absolute; top: 1rem; bottom: 1rem; left: .7rem; width: 1px; background: var(--workspace-border); content: ""; }
+.assistance-timeline li { position: relative; display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); gap: .85rem; min-height: 58px; padding-bottom: 1rem; }
+.assistance-timeline-marker { z-index: 1; display: grid; width: 1.45rem; height: 1.45rem; place-items: center; border: 1px solid var(--workspace-border); border-radius: 50%; background: var(--workspace-surface); color: var(--workspace-muted); }
+.assistance-timeline-marker svg { width: .8rem; }
+.assistance-timeline li > div { display: flex; min-width: 0; flex-direction: column; gap: .2rem; padding-top: .1rem; }
+.assistance-timeline li > div > span:not(.sr-only) { color: var(--workspace-muted); font-size: .875rem; overflow-wrap: anywhere; }
+.assistance-timeline .is-complete .assistance-timeline-marker { border-color: var(--workspace-accent); color: var(--workspace-accent); }
+.assistance-timeline .is-current .assistance-timeline-marker { border: 4px solid color-mix(in oklch, var(--workspace-accent) 22%, var(--workspace-surface)); background: var(--workspace-accent); color: var(--workspace-accent); }
+.assistance-timeline .is-current strong::after { margin-left: .5rem; color: var(--workspace-muted); font-size: .75rem; font-weight: 650; content: "Current step"; }
+.assistance-timeline .is-pending { color: var(--workspace-muted); }
+.assistance-next-step { padding-top: 1.5rem; border-top: 1px solid var(--workspace-border); }
+.assistance-next-step h3 { margin-bottom: .75rem; font-size: 1.2rem; }
+.assistance-next-step p { max-width: 570px; margin-bottom: .55rem; color: var(--workspace-muted); }
 .submission-result-icon { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: color-mix(in oklch, var(--workspace-accent) 12%, transparent); color: var(--workspace-accent); }
 .submission-result-icon svg { width: 1.3rem; }
 

@@ -14,8 +14,9 @@ import UnderstandingSurface from "./UnderstandingSurface";
 import ActionWorkspace from "./ActionWorkspace";
 import { DemandResponseReview, DemandResponseSubmitted, RectificationReview } from "./ConsequenceReview";
 import type { AssistedDemandResponseDraft, AssistedDemandResponseSubmission, RectificationDraft, RectificationSubmission } from "@/lib/workflows";
+import TrackingSurface from "./TrackingSurface";
 
-export type AssistanceSurface = "home" | "checking" | "understanding" | "action" | "rectification_review" | "demand_response_review" | "demand_response_submitted";
+export type AssistanceSurface = "home" | "checking" | "understanding" | "action" | "rectification_review" | "demand_response_review" | "demand_response_submitted" | "tracking";
 
 export default function AssistanceWorkspace({
   closeButtonRef,
@@ -28,6 +29,7 @@ export default function AssistanceWorkspace({
   onConfirmRectification,
   onReviewResponse,
   onUnderstand,
+  onViewCase,
   surface,
   taxpayerName,
   understanding,
@@ -46,6 +48,7 @@ export default function AssistanceWorkspace({
   onConfirmRectification: () => void;
   onReviewResponse: () => void;
   onUnderstand: () => void;
+  onViewCase: () => void;
   surface: AssistanceSurface;
   taxpayerName: string;
   understanding: DemandUnderstanding | null;
@@ -65,9 +68,11 @@ export default function AssistanceWorkspace({
     : surface === "demand_response_review" && responseDraft
       ? <DemandResponseReview draft={responseDraft} headingRef={surfaceHeadingRef} onBack={onBackToAction} onConfirm={onConfirmDemandResponse} />
       : surface === "demand_response_submitted" && rectificationSubmission && responseSubmission
-        ? <DemandResponseSubmitted headingRef={surfaceHeadingRef} rectification={rectificationSubmission} response={responseSubmission} />
+        ? <DemandResponseSubmitted headingRef={surfaceHeadingRef} onViewCase={onViewCase} rectification={rectificationSubmission} response={responseSubmission} />
+        : surface === "tracking"
+          ? <TrackingSurface headingRef={surfaceHeadingRef} />
         : surface === "home"
-    ? <AssistanceHome demand={demand} onUnderstand={onUnderstand} taxpayerName={taxpayerName} />
+    ? <AssistanceHome demand={demand} onUnderstand={onUnderstand} onViewCase={onViewCase} taxpayerName={taxpayerName} />
     : surface === "checking" && understanding
       ? <CheckingRecords evidence={understanding.evidence} headingRef={surfaceHeadingRef} />
       : understanding
@@ -84,7 +89,7 @@ export default function AssistanceWorkspace({
       </div>
       <Separator />
       <div className="assistance-workspace-scroll">{surface === "rectification_review" || surface === "demand_response_review" ? content : <BlurFade key={surface} duration={0.28}>{content}</BlurFade>}</div>
-      {consequenceMode ? null : <AssistanceComposer contextual={surface !== "home"} />}
+      {consequenceMode ? null : <AssistanceComposer caseContext={surface === "tracking"} contextual={surface !== "home"} />}
     </aside>
   );
 }
