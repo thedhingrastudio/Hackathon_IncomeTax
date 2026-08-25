@@ -101,13 +101,13 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
 
     const aiSwitch = menu.getByRole("switch");
     const stateLabel = menu.locator(".ai-preference__heading p");
-    const track = menu.locator(".ux4g-switch-track");
+    const track = menu.locator(".preference-switch__track");
     await expect(aiSwitch).not.toBeChecked();
     await expect(aiSwitch).toHaveAttribute("aria-checked", "false");
     await expect(stateLabel).toHaveText("Off");
     const inactiveTrackColor = await track.evaluate((element) => getComputedStyle(element).backgroundColor);
 
-    await menu.locator(".ux4g-switch-control").click();
+    await aiSwitch.click();
     await expect(aiSwitch).toBeChecked();
     await expect(aiSwitch).toHaveAttribute("aria-checked", "true");
     await expect(stateLabel).toHaveText("On");
@@ -143,7 +143,7 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
 
     const offMenu = await openMenu(page);
     const offSwitch = offMenu.menu.getByRole("switch");
-    await offMenu.menu.locator(".ux4g-switch-control").click();
+    await offMenu.menu.getByRole("switch").click();
     await expect(offSwitch).not.toBeChecked();
     await expect(offSwitch).toHaveAttribute("aria-checked", "false");
     await expect(offMenu.menu.locator(".ai-preference__heading p")).toHaveText("Off");
@@ -171,7 +171,7 @@ test("assisted corrective workflow requires both citizen confirmations", async (
   await page.reload();
 
   const { menu, menuButton } = await openMenu(page);
-  await menu.locator(".ux4g-switch-control").click();
+  await menu.getByRole("switch").click();
   await expect(menu.getByRole("switch")).toBeChecked();
   await menuButton.click();
   await page.getByRole("link", { name: "View demand" }).click();
@@ -211,7 +211,7 @@ test("assisted corrective workflow requires both citizen confirmations", async (
   await expect(page.getByText("DEMAND-RESP-DEMO-18420", { exact: true }).first()).toBeVisible();
   await page.reload();
   await expect(page.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
-  const caseMenu=await openMenu(page);await caseMenu.menu.locator(".ux4g-switch-control").click();await expect(caseMenu.menu.getByRole("switch")).not.toBeChecked();await caseMenu.menuButton.click();
+  const caseMenu=await openMenu(page);await caseMenu.menu.getByRole("switch").click();await expect(caseMenu.menu.getByRole("switch")).not.toBeChecked();await caseMenu.menuButton.click();
   await page.reload();
   await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
 
@@ -249,10 +249,10 @@ test.describe("desktop portal and conventional workflow layout", () => {
     expect(optionBoxes[1].y).toBeGreaterThan(optionBoxes[0].y);
     await attachScreenshot(page, testInfo, "desktop-response-step-1");
 
-    await page.locator(".response-option", { hasText: "I disagree with this demand" }).locator(".ux4g-radio-control").click();
+    await page.getByRole("radio", { name: /I disagree with this demand/ }).check();
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByRole("heading", { name: "Tell us why you disagree" })).toBeVisible();
-    await page.locator(".ux4g-radio", { hasText: "Tax payment / tax credit has not been considered" }).locator(".ux4g-radio-control").click();
+    await page.getByRole("radio", { name: "Tax payment / tax credit has not been considered" }).check();
     await attachScreenshot(page, testInfo, "desktop-response-step-2");
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByRole("heading", { name: "Review your response" })).toBeVisible();
@@ -280,9 +280,9 @@ test("mobile conventional response states fit the viewport", async ({ page }, te
   await page.goto("/pending-actions/demand/respond");
   await assertMobileShellLayout(page);
   await attachScreenshot(page, testInfo, "mobile-response-step-1");
-  await page.locator(".response-option", { hasText: "I disagree with this demand" }).locator(".ux4g-radio-control").click();
+  await page.getByRole("radio", { name: /I disagree with this demand/ }).check();
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.locator(".ux4g-radio", { hasText: "Tax payment / tax credit has not been considered" }).locator(".ux4g-radio-control").click();
+  await page.getByRole("radio", { name: "Tax payment / tax credit has not been considered" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await assertMobileShellLayout(page);
   await attachScreenshot(page, testInfo, "mobile-response-review");
