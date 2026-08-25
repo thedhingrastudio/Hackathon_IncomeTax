@@ -365,7 +365,19 @@ dd { margin: 0; font-weight: var(--ux4g-font-weight-semibold); }
 .government-request p:last-child { margin-bottom: 0; color: var(--workspace-muted); }
 .consequence-review-notice { padding: 1rem 1.15rem; border: 1px solid color-mix(in oklch, var(--workspace-warning) 45%, var(--workspace-border)); border-radius: .65rem; background: color-mix(in oklch, var(--workspace-warning) 6%, var(--workspace-surface-strong)); }
 .consequence-review-notice p { margin: .3rem 0 0; color: var(--workspace-muted); font-size: .875rem; }
-.consequence-review-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+.consequence-review-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.consequence-review-actions .consequence-primary-action { min-height: 44px; padding-inline: 1.15rem; background: var(--workspace-ink); color: var(--workspace-surface-strong); }
+.consequence-review-actions .consequence-back-action { min-height: 44px; border-color: transparent; background: transparent; color: var(--workspace-ink); }
+.assistance-case-review { gap: 1.75rem; }
+.assistance-case-current { padding-block: 1.25rem; border-block: 1px solid var(--workspace-border); }
+.assistance-case-current p { margin-bottom: .35rem; color: var(--workspace-muted); }
+.assistance-case-current strong { font-size: 1.15rem; }
+.assistance-case-submissions { display: grid; margin: 0; border-top: 1px solid var(--workspace-border); }
+.assistance-case-submissions > div { padding-block: 1rem; border-bottom: 1px solid var(--workspace-border); }
+.assistance-case-submissions dt { display: flex; align-items: center; gap: .5rem; font-weight: 650; }
+.assistance-case-submissions dt svg { width: 1rem; color: var(--workspace-accent); }
+.assistance-case-submissions dd { margin: .35rem 0 0 1.5rem; color: var(--workspace-muted); font-size: .875rem; }
+.assistance-view-case { width: fit-content; min-height: 44px; padding-inline: 1.15rem; text-decoration: none; }
 .submission-result-icon { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: color-mix(in oklch, var(--workspace-accent) 12%, transparent); color: var(--workspace-accent); }
 .submission-result-icon svg { width: 1.3rem; }
 

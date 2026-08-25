@@ -55,6 +55,7 @@ export default function AssistanceWorkspace({
   responseSubmission: AssistedDemandResponseSubmission | null;
 }) {
   const surfaceHeadingRef = useRef<HTMLHeadingElement>(null);
+  const consequenceMode = surface === "rectification_review" || surface === "demand_response_review" || surface === "demand_response_submitted";
   useEffect(() => {
     if (surface !== "home") surfaceHeadingRef.current?.focus();
   }, [surface]);
@@ -83,7 +84,7 @@ export default function AssistanceWorkspace({
       </div>
       <Separator />
       <div className="assistance-workspace-scroll">{surface === "rectification_review" || surface === "demand_response_review" ? content : <BlurFade key={surface} duration={0.28}>{content}</BlurFade>}</div>
-      <AssistanceComposer contextual={surface !== "home"} />
+      {consequenceMode ? null : <AssistanceComposer contextual={surface !== "home"} />}
     </aside>
   );
 }

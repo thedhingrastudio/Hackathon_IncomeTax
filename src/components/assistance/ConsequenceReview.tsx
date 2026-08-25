@@ -28,7 +28,7 @@ export function RectificationReview({ draft, headingRef, onBack, onConfirm }: { 
     </dl>
     <section className="government-request" aria-labelledby="government-request-title"><p className="assistance-kicker">Government request</p><h3 id="government-request-title">Correct tax-credit details</h3><p>Tax Credit Mismatch Correction</p></section>
     <ConsequenceNotice />
-    <div className="consequence-review-actions"><Button size="lg" type="button" onClick={onConfirm}>Confirm and submit correction</Button><Button size="lg" type="button" variant="outline" onClick={onBack}>Back</Button></div>
+    <div className="consequence-review-actions"><Button className="consequence-primary-action" size="lg" type="button" onClick={onConfirm}>Confirm and submit correction</Button><Button className="consequence-back-action" size="lg" type="button" variant="outline" onClick={onBack}>Back</Button></div>
   </section>;
 }
 
@@ -43,7 +43,7 @@ export function DemandResponseReview({ draft, headingRef, onBack, onConfirm }: {
       <Fact label="Assessment Year" value={formatAssessmentYear(draft.assessmentYear)} />
     </dl>
     <ConsequenceNotice />
-    <div className="consequence-review-actions"><Button size="lg" type="button" onClick={onConfirm}>Confirm and submit response</Button><Button size="lg" type="button" variant="outline" onClick={onBack}>Back</Button></div>
+    <div className="consequence-review-actions"><Button className="consequence-primary-action" size="lg" type="button" onClick={onConfirm}>Confirm and submit response</Button><Button className="consequence-back-action" size="lg" type="button" variant="outline" onClick={onBack}>Back</Button></div>
   </section>;
 }
 

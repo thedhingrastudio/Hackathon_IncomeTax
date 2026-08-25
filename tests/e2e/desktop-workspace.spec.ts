@@ -130,6 +130,10 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("You're asking Income Tax to include this payment in your processed return.", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Tax Credit Mismatch Correction", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
+  await expect(workspace.getByLabel("Ask about your taxes")).toHaveCount(0);
+  const correctionConfirmation = workspace.getByRole("button", { name: "Confirm and submit correction" });
+  await expect(correctionConfirmation).toBeVisible();
+  expect(await correctionConfirmation.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
   let storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
   expect(storedCase).not.toBeNull();
   expect(JSON.parse(storedCase!)).toMatchObject({ state: "RECTIFICATION_REVIEW" });
@@ -157,6 +161,10 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("Rectification / Revised Return filed at CPC", { exact: true })).toBeVisible();
   await expect(workspace.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
+  await expect(workspace.getByLabel("Ask about your taxes")).toHaveCount(0);
+  const responseConfirmation = workspace.getByRole("button", { name: "Confirm and submit response" });
+  await expect(responseConfirmation).toBeVisible();
+  expect(await responseConfirmation.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
   storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
   expect(JSON.parse(storedCase!)).toMatchObject({ state: "DEMAND_RESPONSE_REVIEW" });
   expect(JSON.parse(storedCase!)).not.toHaveProperty("demandResponseReference");
@@ -172,10 +180,26 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByRole("heading", { name: "Response submitted" })).toBeVisible();
   await expect(workspace.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
+  await expect(workspace.getByLabel("Ask about your taxes")).toHaveCount(0);
   storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
   expect(JSON.parse(storedCase!)).toMatchObject({ state: "WAITING_FOR_REVIEW", rectificationReference: "RECT-DEMO-01842", demandResponseReference: "DEMAND-RESP-DEMO-18420" });
   expect(JSON.parse(storedCase!).state).not.toBe("RESOLVED");
   await saveReviewScreenshot(page, testInfo, "demand-response-submitted");
+
+  await page.reload();
+  await expect(openButton).toHaveAttribute("aria-expanded", "false");
+  await openButton.click();
+  await expect(workspace.getByRole("heading", { name: "Your case is being reviewed" })).toBeVisible();
+  await expect(workspace.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Nothing you need to do right now.", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Action required", { exact: true })).toHaveCount(0);
+  await expect(workspace.getByRole("button", { name: "Understand this" })).toHaveCount(0);
+  await expect(workspace.getByLabel("Ask about your taxes")).toBeVisible();
+  await workspace.getByRole("link", { name: "View case" }).click();
+  await expect(page).toHaveURL(/\/case\/CASE-DEMO-18420$/);
+  await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
 
   await workspace.getByRole("button", { name: "Close assistance" }).click();
   await expect(workspace).toBeHidden();
