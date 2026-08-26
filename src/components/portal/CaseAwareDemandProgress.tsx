@@ -1,4 +1,17 @@
 "use client";
+
 import Link from "next/link";
 import { useTaxDemandCase } from "../../lib/storage/case-storage";
-export default function CaseAwareDemandProgress({fallbackHref,fallbackLabel}:{fallbackHref:string;fallbackLabel:string}){const item=useTaxDemandCase();return <><p>{item?.state==="WAITING_FOR_REVIEW"?"Case status: Waiting for Income Tax review":"Review this demand and choose how you want to respond."}</p><Link className="app-action app-action-primary" href={item?`/case/${item.caseId}`:fallbackHref}>{item?"View case":fallbackLabel}</Link></>}
+import StatusJourney from "./StatusJourney";
+
+export default function CaseAwareDemandProgress({ fallbackHref, fallbackLabel }: { fallbackHref: string; fallbackLabel: string }) {
+  const item = useTaxDemandCase();
+  const waiting = item?.state === "WAITING_FOR_REVIEW";
+  const resolved = item?.state === "RESOLVED";
+
+  return <div className="case-aware-demand-progress">
+    <p>{resolved ? "This case has been resolved." : waiting ? "Your actions are complete. Income Tax review is pending." : "Here is where this demand needs attention."}</p>
+    <StatusJourney compact />
+    <Link className="app-action app-action-primary" href={item ? `/case/${item.caseId}` : fallbackHref}>{item ? "View case progress" : fallbackLabel}</Link>
+  </div>;
+}
