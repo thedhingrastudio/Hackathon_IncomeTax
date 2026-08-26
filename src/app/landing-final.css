@@ -1,0 +1,82 @@
+/* Final landing hero polish. Loaded after globals.css and mobile-final.css. */
+
+.public-hero {
+  min-height: min(760px, calc(100vh - 76px));
+  display: flex;
+  align-items: center;
+}
+
+.public-hero .public-hero-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+.public-hero-copy {
+  width: min(100%, 820px);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.public-hero-copy .public-kicker {
+  margin-bottom: 1rem;
+}
+
+.public-hero-copy h1 {
+  max-width: 12ch;
+  margin: 0 auto 1.35rem;
+  font-size: clamp(3.4rem, 6.4vw, 6rem);
+  line-height: .96;
+  letter-spacing: -.06em;
+}
+
+.public-hero-copy > p:not(.public-kicker) {
+  max-width: 58ch;
+  margin: 0 auto 1.75rem;
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.public-hero-copy .public-actions {
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .public-hero {
+    min-height: auto;
+    padding-block: 3.5rem 4rem;
+  }
+
+  .public-hero .public-hero-grid {
+    display: block;
+  }
+
+  .public-hero-copy {
+    width: 100%;
+    text-align: center;
+  }
+
+  .public-hero-copy h1 {
+    max-width: 11ch;
+    margin-bottom: 1.1rem;
+    font-size: clamp(2.55rem, 12.2vw, 3.45rem);
+    line-height: .98;
+  }
+
+  .public-hero-copy > p:not(.public-kicker) {
+    max-width: 32ch;
+    margin-bottom: 1.5rem;
+    font-size: .98rem;
+    line-height: 1.5;
+  }
+
+  .public-hero-copy .public-actions {
+    display: grid;
+    justify-items: center;
+  }
+
+  .public-hero-copy .public-button-primary {
+    width: min(100%, 320px);
+  }
+}
