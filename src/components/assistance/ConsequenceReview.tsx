@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, Info } from "lucide-react";
 import type { RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { formatAssessmentYear, formatIndianCurrency, formatIndianDate } from "@/lib/format-tax";
@@ -8,8 +8,8 @@ function ReviewHeader({ eyebrow, id, title, description, headingRef }: { eyebrow
   return <header className="consequence-review-header"><p className="assistance-kicker">{eyebrow}</p><h2 id={id} ref={headingRef} tabIndex={-1}>{title}</h2><p>{description}</p></header>;
 }
 
-function Fact({ label, value }: { label: string; value: string }) {
-  return <div><dt>{label}</dt><dd>{value}</dd></div>;
+function Fact({ label, value, highlight = false, help }: { label: string; value: string; highlight?: boolean; help?: string }) {
+  return <div className={highlight ? "fact-highlight" : undefined}><dt><span className="fact-label-row">{label}{help ? <span className="fact-help" title={help} aria-label={help}><Info aria-hidden="true" /></span> : null}</span></dt><dd>{value}</dd></div>;
 }
 
 function ConsequenceNotice() {
@@ -24,7 +24,7 @@ export function RectificationReview({ draft, headingRef, onBack, onConfirm }: { 
       <Fact label="Assessment Year" value={formatAssessmentYear(draft.assessmentYear)} />
       <Fact label="Payment date" value={formatIndianDate(draft.paymentDate)} />
       <Fact label="Payment type" value="Self-Assessment Tax" />
-      <Fact label="Challan" value={draft.challanReference} />
+      <Fact label="Challan added" value={draft.challanReference} highlight help="This challan proves the ₹18,420 payment. It is being added because the processed return did not count that payment as tax credit." />
     </dl>
     <section className="government-request" aria-labelledby="government-request-title"><p className="assistance-kicker">Government request</p><h3 id="government-request-title">Correct tax-credit details</h3><p>Tax Credit Mismatch Correction</p></section>
     <ConsequenceNotice />
@@ -39,7 +39,7 @@ export function DemandResponseReview({ draft, headingRef, onBack, onConfirm }: {
       <Fact label="Response" value="I disagree with this demand" />
       <Fact label="Reason" value="Rectification / Revised Return filed at CPC" />
       <Fact label="Amount disputed" value={formatIndianCurrency(draft.disputedAmount, draft.currency)} />
-      <Fact label="Related rectification" value={draft.rectificationReference} />
+      <Fact label="Related rectification" value={draft.rectificationReference} highlight help="This response points to the tax-credit correction you already submitted, so Income Tax can review the demand together with the corrected payment record." />
       <Fact label="Assessment Year" value={formatAssessmentYear(draft.assessmentYear)} />
     </dl>
     <ConsequenceNotice />
@@ -51,7 +51,7 @@ export function DemandResponseSubmitted({ headingRef, onViewCase, rectification,
   return <section aria-labelledby="response-submitted-title" className="consequence-review submission-result">
     <span className="submission-result-icon" aria-hidden="true"><Check /></span>
     <ReviewHeader eyebrow="Submitted" id="response-submitted-title" title="Response submitted" description="Income Tax review is pending. The outstanding demand has not been marked as resolved." headingRef={headingRef} />
-    <dl className="consequence-review-facts"><Fact label="Demand response" value={response.reference} /><Fact label="Related rectification" value={rectification.reference} /><Fact label="Status" value="Waiting for Income Tax review" /></dl>
+    <dl className="consequence-review-facts"><Fact label="Demand response" value={response.reference} /><Fact label="Related rectification" value={rectification.reference} highlight /><Fact label="Status" value="Waiting for Income Tax review" /></dl>
     <Button className="app-action app-action-secondary submission-view-case" onClick={onViewCase} size="lg" type="button">View case status</Button>
   </section>;
 }
