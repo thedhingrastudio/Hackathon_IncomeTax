@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Check, CircleAlert, FileCheck2, ReceiptText, UserRound } from "lucide-react";
-import CaseAwareDemandProgress from "../../components/portal/CaseAwareDemandProgress";
+import { DashboardDemandCardContent } from "../../components/portal/CaseAwareDemandCards";
 import CaseStateLabel from "../../components/portal/CaseStateLabel";
 import { getOutstandingDemand, getProcessingResult, getTaxPayment, getTaxpayer, getTaxReturn } from "../../data/mock";
 import { formatAssessmentYear, formatIndianCurrency, formatIndianDate, formatIndianShortDate, formatRecordLabel } from "../../lib/format-tax";
@@ -23,12 +23,7 @@ export default function DashboardPage() {
 
     <div className="dashboard-priority-grid">
       <section className="tax-account-attention" aria-labelledby="attention-title">
-        <div className="tax-account-demand-card">
-          <p className="dashboard-section-label" id="attention-title">Needs your attention</p>
-          <div className="tax-account-demand-main"><p>Outstanding demand</p><strong>{formatIndianCurrency(demand.amount, demand.currency)}</strong><span>Response pending <span aria-hidden="true">·</span> AY {assessmentYear}</span></div>
-          <div className="tax-account-demand-action"><CaseAwareDemandProgress fallbackHref="/pending-actions/demand" fallbackLabel="Review outstanding demand" /></div>
-          <p className="tax-account-demand-reference"><span>Demand reference</span><strong>{demand.demandId}</strong></p>
-        </div>
+        <div className="tax-account-demand-card"><DashboardDemandCardContent demand={demand} /></div>
       </section>
 
       <aside className="taxpayer-account-card" aria-labelledby="taxpayer-account-title">
