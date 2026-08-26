@@ -1,25 +1,32 @@
 import Link from "next/link";
-import CaseAwareDemandProgress from "../components/portal/CaseAwareDemandProgress";
-import { getOutstandingDemand, getProcessingResult, getTaxPayment, getTaxReturn } from "../data/mock";
-import { formatAssessmentYear, formatIndianCurrency, formatIndianDate, formatRecordLabel } from "../lib/format-tax";
+import { ArrowRight, Landmark, ReceiptText, SearchCheck } from "lucide-react";
+import LandingAssistancePreview from "../components/landing/LandingAssistancePreview";
+import HeroProductMockup from "../components/landing/HeroProductMockup";
 
-const shortcuts = [["File or view return", "/returns"], ["Payments & Tax Records", "/payments"], ["Pending Actions", "/pending-actions"], ["Services", "/services"]] as const;
+const announcements = [
+  "Tax payments and AIS records may take time to appear after processing.",
+  "Review related tax records before responding to an outstanding demand.",
+  "September tax timelines may require attention for applicable taxpayers.",
+] as const;
 
-export default function Home() {
-  const demand = getOutstandingDemand();
-  const payment = getTaxPayment();
-  const taxReturn = getTaxReturn();
-  const processing = getProcessingResult();
-  const assessmentYear = formatAssessmentYear(demand.assessmentYear);
-  const [startYear] = demand.assessmentYear.split("-").map(Number);
-  const financialYear = `${startYear - 1}–${String(startYear).slice(-2)}`;
-  return <div className="professional-dashboard">
-    <header className="portal-page-intro"><p className="eyebrow">Account overview</p><h1>Dashboard</h1><p>FY {financialYear} <span aria-hidden="true">·</span> AY {assessmentYear}</p></header>
-    <div className="dashboard-workspace">
-      <section className="professional-section pending-action-panel" aria-labelledby="attention-title"><div className="professional-section__heading"><div><p className="eyebrow">Pending actions</p><h2 id="attention-title">Outstanding Demand</h2></div><span className="portal-status portal-status--warning"><span className="portal-status__icon" aria-hidden="true">!</span><strong>{formatRecordLabel(demand.status)}</strong></span></div><div className="pending-action-summary"><div><strong>{formatIndianCurrency(demand.amount, demand.currency)}</strong><span>AY {assessmentYear}</span></div><dl><div><dt>Status</dt><dd>Response pending</dd></div><div><dt>Demand reference</dt><dd>{demand.demandId}</dd></div></dl><CaseAwareDemandProgress fallbackHref="/pending-actions/demand" fallbackLabel="View demand" /></div></section>
-      <section className="professional-section" aria-labelledby="account-status-title"><div className="professional-section__heading"><div><p className="eyebrow">Tax year</p><h2 id="account-status-title">Account status</h2></div></div><dl className="status-overview"><div><dt>Return</dt><dd>{formatRecordLabel(taxReturn.filingStatus)}</dd></div><div><dt>Self-Assessment Tax</dt><dd>{formatIndianCurrency(payment.amount, payment.currency)} paid</dd></div><div><dt>Outstanding Demand</dt><dd>{formatIndianCurrency(demand.amount, demand.currency)}</dd></div></dl></section>
-      <section className="professional-section dashboard-activity" aria-labelledby="activity-title"><div className="professional-section__heading"><div><p className="eyebrow">Records</p><h2 id="activity-title">Recent activity</h2></div></div><ul className="activity-list"><li><time dateTime={processing.processedOn}>{formatIndianDate(processing.processedOn)}</time><span><strong>Return processed</strong><small>{processing.processingId}</small></span><span>{formatRecordLabel(processing.status)}</span></li><li><time dateTime={taxReturn.filedOn}>{formatIndianDate(taxReturn.filedOn)}</time><span><strong>Income Tax Return filed</strong><small>AY {assessmentYear}</small></span><span>{formatRecordLabel(taxReturn.filingStatus)}</span></li><li><time dateTime={payment.paymentDate}>{formatIndianDate(payment.paymentDate)}</time><span><strong>Self-Assessment Tax payment</strong><small>{payment.challanReference}</small></span><span>{formatIndianCurrency(payment.amount, payment.currency)}</span></li></ul></section>
-      <section className="professional-section dashboard-quick-access" aria-labelledby="quick-access-title"><div className="professional-section__heading"><div><p className="eyebrow">Services</p><h2 id="quick-access-title">Quick access</h2></div></div><nav aria-label="Quick access"><ul>{shortcuts.map(([label, href]) => <li key={href}><Link href={href}>{label}<span aria-hidden="true">→</span></Link></li>)}</ul></nav></section>
-    </div>
+export default function LandingPage() {
+  return <div className="public-site">
+    <header className="public-header"><div className="public-container public-header-inner"><Link className="public-brand" href="/"><span aria-hidden="true">IT</span><div><strong>Income Tax</strong><small>Citizen assistance prototype</small></div></Link><nav aria-label="Landing page"><a href="#announcements">Announcements</a><a href="#assistance">Assistance</a><a href="#capabilities">Citizen capabilities</a><Link className="public-login-link" href="/login">Login</Link></nav></div></header>
+
+    <main>
+      <section className="public-hero"><div className="public-container public-hero-grid"><HeroProductMockup />
+        <div className="public-hero-copy"><p className="public-kicker public-hero-desktop-copy">An experience for the citizen</p><p className="public-kicker public-hero-mobile-copy">Income Tax citizen experience</p><h1 className="public-hero-desktop-copy">A clearer way to understand your taxes.</h1><h1 className="public-hero-mobile-copy">A clearer way to understand your tax actions.</h1><p className="public-hero-desktop-copy">Review your tax records, understand outstanding actions, and see what to do next, without having to understand how the system is organised.</p><p className="public-hero-mobile-copy">See what needs attention and what to do next.</p><div className="public-actions"><Link className="public-button public-button-primary" href="/login">Login<ArrowRight aria-hidden="true" /></Link><a className="public-text-link hero-assistance-link" href="#assistance">See how Assistance works <ArrowRight aria-hidden="true" /></a></div></div>
+      </div></section>
+
+      <section className="public-section public-announcements" id="announcements"><div className="public-container"><header className="public-section-heading"><h2>Announcements</h2></header><div className="announcement-viewport" tabIndex={0} aria-label="Synthetic announcements; scroll horizontally to review"><div className="announcement-ticker">{announcements.map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}<div className="announcement-ticker-copy" aria-hidden="true">{announcements.map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</div></div></div></div></section>
+
+      <section className="public-section public-assistance-preview-section" id="assistance"><div className="public-container"><header className="public-section-heading public-preview-heading"><p className="public-kicker">From intent to outcome</p><h2>Tell us what you need to get done.</h2><p>You shouldn&apos;t have to know the right menu, form or government process. Start with your situation. Assistance checks the relevant records, explains what happened and prepares the next step for you to review.</p></header><LandingAssistancePreview /></div></section>
+
+      <section className="public-section" id="capabilities"><div className="public-container"><header className="public-section-heading"><h2>One account. Clearer tax actions.</h2></header><div className="citizen-capability-grid"><article><ReceiptText aria-hidden="true" /><h3>Your records</h3><ul><li>Return status</li><li>Tax payments</li><li>Form 26AS</li><li>Pending actions</li><li>Processing records</li></ul></article><article><SearchCheck aria-hidden="true" /><h3>When you need help</h3><ul><li>Understand a demand</li><li>Compare related records</li><li>Prepare the next action</li><li>Track the case afterwards</li></ul></article></div></div></section>
+
+      <section className="public-demo-cta"><div className="public-container public-demo-cta-inner"><span><Landmark aria-hidden="true" /></span><div><h2>See the redesigned citizen journey.</h2><p>Sign in to a synthetic taxpayer account and follow an outstanding demand from confusion to a clear next step.</p></div><div className="public-actions"><Link className="public-button public-button-primary" href="/login">Login<ArrowRight aria-hidden="true" /></Link><a className="public-button public-button-secondary" href="#assistance">How Assistance works</a></div></div></section>
+    </main>
+
+    <footer className="public-footer"><div className="public-container"><p>Income Tax citizen assistance prototype</p><p>Synthetic data · Not connected to live Income Tax systems</p></div></footer>
   </div>;
 }

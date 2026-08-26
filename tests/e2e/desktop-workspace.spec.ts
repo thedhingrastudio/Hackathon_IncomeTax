@@ -1,5 +1,9 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
+test.beforeEach(async ({ context }) => {
+  await context.addCookies([{ name: "income-tax-demo-session", value: "rohan-mehta-demo", url: "http://127.0.0.1:3100" }]);
+});
+
 function collectDiagnostics(page: Page) {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
@@ -26,7 +30,7 @@ async function assertNoHorizontalOverflow(page: Page) {
 
 test("desktop Assistance Home opens as a persistent split workspace", async ({ page }, testInfo) => {
   const diagnostics = collectDiagnostics(page);
-  await page.goto("/");
+  await page.goto("/dashboard");
   await page.evaluate(() => window.localStorage.clear());
   await page.reload();
 
@@ -47,20 +51,24 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(assistanceHandle).toHaveAttribute("aria-expanded", "true");
   await expect(page.locator(".desktop-workspace")).toHaveClass(/is-open/);
   await expect(workspace).toBeVisible();
-  await expect(workspace.getByRole("heading", { name: "Welcome, Rohan" })).toBeVisible();
+  await expect(workspace.getByTestId("assistance-home-assembly")).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "assistance-home-assembly");
+  await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  await expect(workspace.getByTestId("assistance-home-assembly")).toHaveCount(0);
   await expect(workspace.getByText("Outstanding Demand", { exact: true })).toBeVisible();
   await expect(workspace.getByText("₹18,420", { exact: true })).toBeVisible();
-  await expect(workspace.locator(".assistance-attention").getByText("AY 2026–27", { exact: true })).toBeVisible();
+  await expect(workspace.locator(".assistance-attention").getByText(/Response pending/)).toBeVisible();
   await expect(workspace.getByText("Action required", { exact: true })).toBeVisible();
-  await expect(workspace.getByLabel("August 2026 calendar. 28 August is a synthetic case reminder.")).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Upcoming" })).toBeVisible();
   await expect(workspace.getByText("Respond to outstanding demand", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Review case status", { exact: true })).toBeVisible();
-  await expect(workspace.getByText("Synthetic case reminders, not statutory deadlines.", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("These are synthetic case reminders, not statutory Income Tax deadlines.", { exact: true })).toBeAttached();
   await expect(workspace.getByLabel("Ask about your taxes")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Outstanding Demand" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Account status" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Recent activity" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Quick access" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Account at a glance" })).toBeAttached();
+  await expect(page.getByRole("heading", { name: "Your account" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recent tax activity" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tax services" })).toBeVisible();
   await expect(page.locator(".desktop-workspace")).toHaveClass(/is-open/);
   await expect(page.locator(".desktop-portal-links")).toBeHidden();
   await expect(page.getByRole("button", { name: /menu/i })).toBeVisible();
@@ -75,8 +83,21 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   expect(openWorkspace!.width / combinedWidth).toBeGreaterThan(0.50);
   expect(openWorkspace!.width / combinedWidth).toBeLessThan(0.56);
   await assertNoHorizontalOverflow(page);
+  const firstViewport = await page.evaluate(() => {
+    const scroll = document.querySelector(".assistance-workspace-scroll")!;
+    const upcoming = document.querySelector(".assistance-upcoming")!;
+    const composer = document.querySelector(".assistance-composer")!;
+    return { clientHeight: scroll.clientHeight, scrollHeight: scroll.scrollHeight, upcomingBottom: upcoming.getBoundingClientRect().bottom, composerTop: composer.getBoundingClientRect().top };
+  });
+  expect(firstViewport.scrollHeight).toBeLessThanOrEqual(firstViewport.clientHeight);
+  expect(firstViewport.upcomingBottom).toBeLessThan(firstViewport.composerTop);
   await saveReviewScreenshot(page, testInfo, "dashboard-assistance-open");
   await saveReviewScreenshot(page, testInfo, "assistance-home-before-demand");
+
+  await workspace.getByRole("button", { name: "Close assistance" }).click();
+  await openButton.click();
+  await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  await expect(workspace.getByTestId("assistance-home-assembly")).toHaveCount(0);
 
   await workspace.getByRole("button", { name: "Understand this demand" }).click();
   await expect(workspace.getByRole("heading", { name: "Checking why this is showing…" })).toBeVisible();
@@ -118,12 +139,15 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("Form 26AS", { exact: true })).toHaveCount(0);
   await expect(workspace.getByText("processing-demo-2026-27-001", { exact: true })).toHaveCount(0);
   const composer = workspace.getByLabel("Ask about your taxes");
-  const governmentProcess = workspace.getByText("Government process", { exact: true });
+  const governmentProcess = workspace.getByText("Official government process", { exact: true });
   await governmentProcess.scrollIntoViewIfNeeded();
   await expect(governmentProcess).toBeVisible();
   await expect(composer).toBeVisible();
   await governmentProcess.click();
-  await expect(workspace.getByText(/Response to Outstanding Demand/)).toBeVisible();
+  await expect(workspace.getByText("Hide process", { exact: true })).toBeVisible();
+  const governmentProcessDetails = workspace.locator(".government-process-reveal");
+  await expect(governmentProcessDetails.getByText("Tax Credit Mismatch Correction", { exact: true })).toBeVisible();
+  await expect(governmentProcessDetails.getByText("Submit response", { exact: true })).toBeVisible();
   await page.waitForTimeout(350);
   await saveReviewScreenshot(page, testInfo, "action-workspace-plan");
 
@@ -226,9 +250,12 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Action required", { exact: true })).toHaveCount(0);
   await expect(workspace.getByRole("button", { name: "Understand this demand" })).toHaveCount(0);
-  await expect(workspace.getByLabel("Ask about your taxes")).toBeVisible();
+  await expect(workspace.getByText("Respond to outstanding demand", { exact: true })).toHaveCount(0);
+  await expect(workspace.getByText("Review case status", { exact: true })).toBeVisible();
+  await expect(workspace.getByLabel("Ask about this case")).toBeVisible();
   await saveReviewScreenshot(page, testInfo, "assistance-home-after-submission");
-  await workspace.getByRole("button", { name: "View case status" }).click();
+  await saveReviewScreenshot(page, testInfo, "phase-2-h-waiting-contextual-questions");
+  await workspace.getByRole("button", { name: "View case" }).click();
   await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
   await expect(workspace.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
   await expect(workspace.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
@@ -259,13 +286,88 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   expect(diagnostics.failedRequests).toEqual([]);
 });
 
-test("workspace foundation has no horizontal overflow at 1150px", async ({ page }) => {
+test("Assistance Home remains usable with reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/dashboard");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+  await page.getByRole("button", { name: "Open assistance" }).click();
+  const workspace = page.getByRole("complementary", { name: "Assistance Workspace" });
+  await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  await expect(workspace.getByText("Respond to outstanding demand", { exact: true })).toBeVisible();
+  await expect(workspace.getByLabel("Ask about your taxes")).toBeVisible();
+});
+
+test("deterministic questions recompose Assistance into trusted account UI", async ({ page }, testInfo) => {
+  await page.goto("/dashboard");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+  await page.getByRole("button", { name: "Open assistance" }).click();
+  const workspace = page.getByRole("complementary", { name: "Assistance Workspace" });
+  await expect(workspace.getByRole("heading", { name: "You can ask" })).toBeVisible();
+  for (const question of ["Why do I owe ₹18,420?", "Did my payment go through?", "What should I do next?", "What dates should I remember?"]) await expect(workspace.getByRole("button", { name: question })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "phase-2-a-home-you-can-ask");
+
+  await workspace.getByRole("button", { name: "Why do I owe ₹18,420?" }).click();
+  await expect(workspace.locator(".assistance-response-assembly")).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Understanding your demand" })).toBeVisible();
+  await expect(workspace.locator("[data-chat-message]")).toHaveCount(0);
+  await saveReviewScreenshot(page, testInfo, "phase-2-b-explain-demand");
+  await workspace.getByRole("button", { name: "Back to overview" }).click();
+  await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+
+  const composer = workspace.getByLabel("Ask about your taxes");
+  await composer.fill("Did my payment go through?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByRole("heading", { name: /₹18,420/ })).toBeVisible();
+  await expect(workspace.getByText("Confirmed", { exact: true }).first()).toBeVisible();
+  await expect(workspace.getByText("MOCK-2481", { exact: true })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "phase-2-c-payment-status");
+
+  await composer.fill("Do I need to pay again?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByRole("heading", { name: "Review the mismatch first" })).toBeVisible();
+  await expect(workspace.getByText("Review the tax-credit mismatch before making another payment.", { exact: true })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "phase-2-d-pay-again");
+
+  await composer.fill("What dates should I remember?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByLabel(/August 2026 calendar/)).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "phase-2-e-dates");
+
+  await composer.fill("What happened to my return?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByRole("heading", { name: "Your return was processed" })).toBeVisible();
+  await expect(workspace.getByText("₹0", { exact: true })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "phase-2-f-return-status");
+
+  await composer.fill("What does my Form 26AS show?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByRole("heading", { name: "Self-Assessment Tax" })).toBeVisible();
+  await expect(workspace.getByText("Reflected", { exact: true })).toBeVisible();
+
+  await composer.fill("What records did you check?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByRole("heading", { name: "Records used for this explanation" })).toBeVisible();
+  await expect(workspace.getByText("Processed return", { exact: true })).toBeVisible();
+
+  await composer.fill("Can you plan my holiday?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByRole("heading", { name: "I can help with information available in this prototype account." })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "phase-2-g-scope-boundary");
+});
+
+test("workspace foundation has no horizontal overflow at 1150px", async ({ page }, testInfo) => {
   const diagnostics = collectDiagnostics(page);
   await page.setViewportSize({ width: 1150, height: 900 });
-  await page.goto("/");
+  await page.goto("/dashboard");
   await page.getByRole("button", { name: "Open assistance" }).click();
   await expect(page.getByRole("complementary", { name: "Assistance Workspace" })).toBeVisible();
-  await expect(page.getByRole("complementary", { name: "Assistance Workspace" }).getByRole("heading", { name: "Welcome, Rohan" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "Assistance Workspace" }).getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  const workspace = page.getByRole("complementary", { name: "Assistance Workspace" });
+  await workspace.getByRole("button", { name: "Did my payment go through?" }).click();
+  await expect(workspace.getByText("MOCK-2481", { exact: true })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "phase-2-narrow-question-flow");
   await assertNoHorizontalOverflow(page);
   expect(diagnostics.consoleErrors).toEqual([]);
   expect(diagnostics.pageErrors).toEqual([]);
@@ -293,4 +395,28 @@ test("professional demand workspace keeps manual services and related records av
   expect(diagnostics.consoleErrors).toEqual([]);
   expect(diagnostics.pageErrors).toEqual([]);
   expect(diagnostics.failedRequests).toEqual([]);
+});
+
+test("public landing and demo login lead into the protected dashboard", async ({ page, context }, testInfo) => {
+  await context.clearCookies();
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "A clearer way to understand your taxes." })).toBeVisible();
+  await expect(page.locator(".public-hero").getByRole("heading", { name: "Your payment was found." })).toBeVisible();
+  await expect(page.locator(".public-hero .hero-preview-highlight")).toHaveText("₹18,420 wasn't counted");
+  await expect(page.getByRole("heading", { name: "Tell us what you need to get done." })).toBeVisible();
+  await expect(page.locator(".journey-situation blockquote")).toContainText("I already paid ₹18,420.");
+  await expect(page.locator(".journey-situation blockquote")).toContainText("Why is there still a demand?");
+  await expect(page.locator(".intent-outcome-canvas").getByText("₹18,420 wasn't counted in the processed return.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Nothing is submitted automatically.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Income Tax review", { exact: true })).toBeVisible();
+  await saveReviewScreenshot(page, testInfo, "landing-intent-outcome-desktop");
+  await page.getByRole("link", { name: "Login", exact: true }).first().click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByText("rohan.mehta", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Use test account" }).click();
+  await expect(page.getByLabel("User ID")).toHaveValue("rohan.mehta");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole("heading", { name: "Your tax account" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Log out of demo" })).toBeVisible();
 });

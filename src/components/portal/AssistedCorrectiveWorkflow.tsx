@@ -117,7 +117,7 @@ function Completion({ rectification, response, headingRef }: { rectification: Re
   return <section className="workflow-panel corrective-workflow" aria-label="Assisted corrective workflow complete">
     <div className="portal-alert portal-alert--success response-success" role="status"><div><h1 ref={headingRef} tabIndex={-1}>Your requests have been submitted</h1><p>Income Tax still needs to review these requests.</p></div></div>
     <FactsCard title="Submitted requests"><ul className="submission-summary"><li><span aria-hidden="true">âœ“</span><div><strong>Tax credit correction</strong><span>{rectification.reference}</span></div></li><li><span aria-hidden="true">âœ“</span><div><strong>Demand response</strong><span>{response.reference}</span></div></li></ul><p className="supporting-text">The outstanding demand has not been marked as resolved.</p></FactsCard>
-    <div className="workflow-actions"><Link className="app-action app-action-primary" href="/case/CASE-DEMO-18420">View case status</Link><Link className="app-action app-action-secondary" href="/">Back to Dashboard</Link></div>
+    <div className="workflow-actions"><Link className="app-action app-action-primary" href="/case/CASE-DEMO-18420">View case status</Link><Link className="app-action app-action-secondary" href="/dashboard">Back to Dashboard</Link></div>
   </section>;
 }
 

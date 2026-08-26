@@ -1,49 +1,43 @@
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatIndianCurrency } from "@/lib/format-tax";
 import { useTaxDemandCase } from "@/lib/storage/case-storage";
 import type { OutstandingDemand } from "@/types/tax";
 import AttentionItem from "./AttentionItem";
-import ImportantDates from "./ImportantDates";
+import UpcomingReminders from "./UpcomingReminders";
 
-export default function AssistanceHome({ taxpayerName, demand, onUnderstand, onViewCase }: { taxpayerName: string; demand: OutstandingDemand; onUnderstand: () => void; onViewCase: () => void }) {
-  const firstName = taxpayerName.split(" ")[0];
+export default function AssistanceHome({ demand, onUnderstand, onViewCase }: { taxpayerName: string; demand: OutstandingDemand; onUnderstand: () => void; onViewCase: () => void }) {
   const taxCase = useTaxDemandCase();
+  const waitingForReview = taxCase?.state === "WAITING_FOR_REVIEW" && Boolean(taxCase.rectificationReference && taxCase.demandResponseReference);
 
-  if (taxCase?.state === "WAITING_FOR_REVIEW" && taxCase.rectificationReference && taxCase.demandResponseReference) {
+  if (waitingForReview && taxCase?.rectificationReference && taxCase.demandResponseReference) {
     return <div className="assistance-home assistance-case-review">
       <header className="assistance-home-header">
-        <p className="assistance-kicker">Case status</p>
+        <p className="assistance-kicker">Assistance</p>
         <h2>Your case is being reviewed</h2>
-        <p>Outstanding demand · {formatIndianCurrency(taxCase.demandAmount, taxCase.currency)}</p>
+        <p>Nothing you need to do right now.</p>
       </header>
       <section className="assistance-case-current" aria-labelledby="assistance-case-current-title">
         <p id="assistance-case-current-title">Waiting for Income Tax review</p>
-        <strong>Nothing you need to do right now.</strong>
+        <dl className="assistance-case-submissions">
+          <div><dt><Check aria-hidden="true" />Tax-credit correction submitted</dt><dd>{taxCase.rectificationReference}</dd></div>
+          <div><dt><Check aria-hidden="true" />Demand response submitted</dt><dd>{taxCase.demandResponseReference}</dd></div>
+        </dl>
+        <Button className="assistance-inline-action assistance-view-case" onClick={onViewCase} type="button" variant="link">View case <ArrowRight aria-hidden="true" /></Button>
       </section>
-      <dl className="assistance-case-submissions">
-        <div><dt><Check aria-hidden="true" />Correction submitted</dt><dd>{taxCase.rectificationReference}</dd></div>
-        <div><dt><Check aria-hidden="true" />Demand response submitted</dt><dd>{taxCase.demandResponseReference}</dd></div>
-      </dl>
-      <Button className="app-action app-action-secondary assistance-view-case" onClick={onViewCase} size="lg" type="button">View case status</Button>
+      <UpcomingReminders waitingForReview />
     </div>;
   }
 
-  return (
-    <div className="assistance-home">
-      <header className="assistance-home-header">
-        <p className="assistance-kicker">Your Income Tax context</p>
-        <h2>Welcome, {firstName}</h2>
-        <p>See what needs attention and ask for help without leaving the portal.</p>
-      </header>
-      <section className="assistance-attention" aria-labelledby="assistance-attention-title">
-        <div className="assistance-section-heading">
-          <h3 id="assistance-attention-title">Things that need your attention</h3>
-          <span>1 item</span>
-        </div>
-        <AttentionItem demand={demand} onUnderstand={onUnderstand} />
-      </section>
-      <ImportantDates />
-    </div>
-  );
+  return <div className="assistance-home">
+    <header className="assistance-home-header">
+      <p className="assistance-kicker">Assistance</p>
+      <h2>1 item needs your attention</h2>
+      <p>Review what needs attention or ask about your Income Tax account.</p>
+    </header>
+    <section className="assistance-attention" aria-labelledby="assistance-attention-title">
+      <h3 className="visually-hidden" id="assistance-attention-title">Outstanding demand requiring attention</h3>
+      <AttentionItem demand={demand} onUnderstand={onUnderstand} />
+    </section>
+    <UpcomingReminders />
+  </div>;
 }

@@ -1,5 +1,9 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
+test.beforeEach(async ({ context }) => {
+  await context.addCookies([{ name: "income-tax-demo-session", value: "rohan-mehta-demo", url: "http://127.0.0.1:3100" }]);
+});
+
 type BrowserDiagnostics = {
   consoleErrors: string[];
   pageErrors: string[];
@@ -66,7 +70,9 @@ async function openMenu(page: Page) {
 }
 
 async function attachScreenshot(page: Page, testInfo: TestInfo, name: string) {
-  await testInfo.attach(name, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
+  const path = testInfo.outputPath(`${name}.png`);
+  await page.screenshot({ fullPage: true, path });
+  await testInfo.attach(name, { path, contentType: "image/png" });
 }
 
 async function assertDesktopShellLayout(page: Page) {
@@ -88,11 +94,28 @@ async function assertMobileShellLayout(page: Page) {
   expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
 }
 
-test("mobile menu and assisted demand journey remain interactive and persistent", async ({ page }) => {
+test("mobile menu and assisted demand journey remain interactive and persistent", async ({ page }, testInfo) => {
   const diagnostics = monitorBrowser(page);
-  await page.goto("/");
+  await page.goto("/dashboard");
     await page.evaluate(() => window.localStorage.clear());
     await page.reload();
+    await attachScreenshot(page, testInfo, "mobile-dashboard-assist-closed");
+
+    const mobileAssist = page.getByRole("button", { name: "Open assistance" });
+    await expect(mobileAssist).toBeVisible();
+    await mobileAssist.click();
+    const mobileWorkspace = page.getByRole("complementary", { name: "Assistance Workspace" });
+    await expect(mobileWorkspace).toBeVisible();
+    await expect(mobileWorkspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+    const mobileBounds = await mobileWorkspace.boundingBox();
+    expect(mobileBounds).not.toBeNull();
+    expect(Math.round(mobileBounds!.width)).toBe(390);
+    expect(Math.round(mobileBounds!.height)).toBe(844);
+    await attachScreenshot(page, testInfo, "mobile-dashboard-assistance-open");
+    await mobileWorkspace.getByRole("button", { name: "Close assistance" }).click();
+    await expect(mobileWorkspace).toBeHidden();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(mobileAssist).toBeFocused();
 
     const { menu, menuButton } = await openMenu(page);
     for (const label of ["Dashboard", "Returns", "Payments & Tax Records", "Pending Actions", "Services", "Help", "AI Assistance"]) {
@@ -118,7 +141,7 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
     await expect(menuButton).toHaveAttribute("aria-expanded", "false");
     await expect(menu).toBeHidden();
 
-    await page.getByRole("link", { name: "View demand" }).click();
+    await page.getByRole("link", { name: "Review outstanding demand" }).click();
     await expect(page).toHaveURL(/\/pending-actions\/demand$/);
     await expect(page.getByRole("heading", { name: "Not sure why this is showing?" })).toBeVisible();
     const contextualHelp = page.getByRole("link", { name: "Help me understand this" });
@@ -166,7 +189,7 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
 
 test("assisted corrective workflow requires both citizen confirmations", async ({ page }) => {
   const diagnostics = monitorBrowser(page);
-  await page.goto("/");
+  await page.goto("/dashboard");
   await page.evaluate(() => window.localStorage.clear());
   await page.reload();
 
@@ -174,7 +197,7 @@ test("assisted corrective workflow requires both citizen confirmations", async (
   await menu.getByRole("switch").click();
   await expect(menu.getByRole("switch")).toBeChecked();
   await menuButton.click();
-  await page.getByRole("link", { name: "View demand" }).click();
+  await page.getByRole("link", { name: "Review outstanding demand" }).click();
   await page.getByRole("link", { name: "Help me understand this" }).click();
   await expect(page.getByText("Here's how we'll fix this", { exact: true })).toBeVisible();
 
@@ -228,7 +251,7 @@ test.describe("desktop portal and conventional workflow layout", () => {
 
   test("shared shell and every conventional response state retain application styling", async ({ page }, testInfo) => {
     const diagnostics = monitorBrowser(page);
-    await page.goto("/");
+    await page.goto("/dashboard");
     await assertDesktopShellLayout(page);
     await attachScreenshot(page, testInfo, "desktop-dashboard");
 
@@ -290,4 +313,84 @@ test("mobile conventional response states fit the viewport", async ({ page }, te
   await expect(page.getByRole("heading", { name: "Response submitted" })).toBeVisible();
   await assertMobileShellLayout(page);
   await attachScreenshot(page, testInfo, "mobile-response-submitted");
+});
+
+test("landing intent-to-outcome story stacks clearly on mobile", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "A clearer way to understand your tax actions." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "A clearer way to understand your taxes." })).toBeHidden();
+  await expect(page.locator(".public-hero .hero-mobile-mismatch")).toHaveText("₹18,420 wasn't counted");
+  await expect(page.getByRole("heading", { name: "Tell us what you need to get done." })).toBeVisible();
+  const story = page.locator(".intent-outcome-canvas");
+  for (const heading of ["Your payment was found.", "Two next steps are prepared for you.", "Income Tax reviews submitted requests"]) await expect(story.getByRole("heading", { name: heading })).toBeVisible();
+  await expect(story.getByText("₹18,420 wasn't counted in the processed return.", { exact: true })).toBeVisible();
+  await expect(story.getByText("Nothing is submitted automatically.", { exact: true })).toBeVisible();
+  const dimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
+  expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
+  const hero = page.locator(".public-hero");
+  await expect(hero.getByRole("link", { name: "Login" })).toBeVisible();
+  await expect(hero.getByRole("link", { name: /See how Assistance works/ })).toBeVisible();
+  const heroBox = await hero.boundingBox();
+  const previewBox = await(hero.locator(".hero-assistance-preview")).boundingBox();
+  expect(heroBox).not.toBeNull();
+  expect(previewBox).not.toBeNull();
+  expect(previewBox!.width).toBeLessThanOrEqual(330);
+  expect(previewBox!.height).toBeLessThan(260);
+  await attachScreenshot(page, testInfo, "landing-intent-outcome-mobile");
+});
+
+test("mobile login provides functional validation, credentials, and password visibility", async ({ page, context }, testInfo) => {
+  await context.clearCookies();
+  await page.goto("/login");
+  await expect(page.getByRole("heading", { name: "Sign in to your tax account" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Review your account with clarity." })).toBeHidden();
+  await expect(page.getByText("Test account", { exact: true })).toBeVisible();
+  await expect(page.getByText("Rohan Mehta", { exact: true })).toBeVisible();
+  const userId = page.getByLabel("User ID");
+  const password = page.locator("#password");
+  await attachScreenshot(page, testInfo, "mobile-login-empty");
+
+  await userId.fill("rohan.mehta");
+  await password.fill("incorrect");
+  await password.press("Enter");
+  const loginError = page.locator(".login-error");
+  await expect(loginError).toHaveText("User ID or password is incorrect.");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(userId).toHaveValue("rohan.mehta");
+  await attachScreenshot(page, testInfo, "mobile-login-invalid");
+
+  await password.fill("correcting");
+  await expect(loginError).toBeHidden();
+
+  await page.getByRole("button", { name: "Use test account" }).click();
+  await expect(userId).toHaveValue("rohan.mehta");
+  await expect(password).toHaveValue("Demo@123");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(loginError).toBeHidden();
+  await attachScreenshot(page, testInfo, "mobile-login-test-account");
+
+  const showPassword = page.getByRole("button", { name: "Show password" });
+  await expect(password).toHaveAttribute("type", "password");
+  await expect(showPassword).toHaveAttribute("aria-pressed", "false");
+  await showPassword.click();
+  const hidePassword = page.getByRole("button", { name: "Hide password" });
+  await expect(password).toHaveAttribute("type", "text");
+  await expect(password).toHaveValue("Demo@123");
+  await expect(hidePassword).toHaveAttribute("aria-pressed", "true");
+  await hidePassword.click();
+  await expect(password).toHaveAttribute("type", "password");
+  await expect(password).toHaveValue("Demo@123");
+
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+});
+
+test("mobile foundation has no overflow across supported widths", async ({ page }) => {
+  for (const width of [360, 390, 430, 768]) {
+    await page.setViewportSize({ width, height: width === 768 ? 900 : 844 });
+    await page.goto("/dashboard");
+    await expect(page.getByRole("button", { name: "Open assistance" })).toBeVisible();
+    const dimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
+    expect(dimensions.content, `${width}px content width`).toBeLessThanOrEqual(dimensions.viewport);
+  }
 });

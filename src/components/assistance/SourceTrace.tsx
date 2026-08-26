@@ -8,9 +8,9 @@ import type { UnderstandingBindingValue } from "@/lib/ai/understanding-surface";
 
 type SourceItem = { label: string; value: UnderstandingBindingValue; status?: UnderstandingBindingValue };
 
-export default function SourceTrace({ currency, items }: { currency: CurrencyCode; items: SourceItem[] }) {
+export default function SourceTrace({ currency, defaultOpen = false, items }: { currency: CurrencyCode; defaultOpen?: boolean; items: SourceItem[] }) {
   return (
-    <Collapsible>
+    <Collapsible defaultOpen={defaultOpen}>
       <section className="source-trace" aria-labelledby="source-trace-title">
         <CollapsibleTrigger className="source-trace-trigger">
           <span id="source-trace-title">Why we think this</span><ChevronDown aria-hidden="true" />

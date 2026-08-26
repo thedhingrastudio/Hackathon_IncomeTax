@@ -306,6 +306,21 @@ The prototype must be:
 
 Use plain language to improve comprehension without removing professionally useful government terminology. Prefer progressive disclosure or dual labels where both citizen clarity and official terminology are needed.
 
+## Content Design Contract
+
+**CALM. DIRECT. HUMAN. SPECIFIC.**
+
+1. Say what happened before explaining the system.
+2. Start with the citizen's goal, problem, status or outcome.
+3. Use citizen language first. Add government terminology second where the actual process requires it, for example **Correct your tax credit** followed by **Tax Credit Mismatch Correction**.
+4. One message gets one explanation. Do not repeat the same fact across a heading, description and helper copy.
+5. Prefer short, concrete statements to explanatory paragraphs.
+6. Buttons describe the action or result, such as **Review demand**, **Understand this demand**, **Correct tax credit**, **Review response** or **View case**. Avoid vague labels such as **Proceed**, **Continue** or **Open** when a clearer result-oriented label exists.
+7. Remove instructional copy when the interface already makes the action obvious.
+8. Avoid AI-sounding language such as “Based on my analysis”, “I have determined” or “As an AI”. Prefer direct language such as “Your payment was found” or “Here's what needs to happen next.”
+9. Preserve required professional and government terminology, legal meaning, authoritative statuses, references, values, Assessment Years and submission consequences.
+10. Keep the conventional portal professional. It must not sound simplistic or amateur.
+
 ---
 
 ## Low-Bandwidth Principle
