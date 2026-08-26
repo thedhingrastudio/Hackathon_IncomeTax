@@ -5,6 +5,7 @@ import { getForm26AS, getOutstandingDemand, getProcessingResult, getTaxPayment, 
 import { createDemandUnderstanding } from "../lib/ai";
 import "./globals.css";
 import "./mobile-final.css";
+import "./landing-final.css";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
