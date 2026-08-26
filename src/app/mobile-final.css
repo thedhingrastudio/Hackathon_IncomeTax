@@ -1,0 +1,166 @@
+/* Final mobile repair layer.
+   Keep this file small and loaded after globals.css so late mobile fixes do not
+   have to compete with older responsive rules in the legacy stylesheet. */
+
+@media (max-width: 640px) {
+  .login-page,
+  .login-page * {
+    box-sizing: border-box;
+  }
+
+  .login-page {
+    display: block !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    background: var(--public-surface, #fcfbf8) !important;
+    color: var(--public-ink, #1f1e1a);
+    font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  }
+
+  .login-shell {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    grid-template-columns: none !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--public-surface, #fcfbf8) !important;
+    box-shadow: none !important;
+  }
+
+  .login-context {
+    display: block !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .login-brand {
+    display: flex !important;
+    min-height: 88px !important;
+    align-items: center !important;
+    gap: .8rem !important;
+    padding: 1rem 1.25rem !important;
+    border-bottom: 1px solid var(--public-border, #d7d4cc) !important;
+    background: var(--public-surface, #fcfbf8) !important;
+  }
+
+  .login-brand > span:first-child {
+    flex: 0 0 auto;
+  }
+
+  .login-brand strong,
+  .login-brand small {
+    display: block !important;
+  }
+
+  .login-marketing,
+  .login-back {
+    display: none !important;
+  }
+
+  .login-panel {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 2.25rem 1.25rem 3rem !important;
+  }
+
+  .login-panel header {
+    margin: 0 0 1.5rem !important;
+  }
+
+  .login-panel .public-kicker {
+    display: none !important;
+  }
+
+  .login-panel h2 {
+    max-width: 12ch;
+    margin: 0 !important;
+    font-size: clamp(2rem, 9vw, 2.65rem) !important;
+    line-height: 1.04 !important;
+    letter-spacing: -.035em !important;
+  }
+
+  .demo-login-form {
+    display: grid !important;
+    width: 100% !important;
+    gap: 1rem !important;
+  }
+
+  .login-field,
+  .password-control {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .login-field label {
+    display: block;
+    margin-bottom: .45rem;
+    font-weight: 650;
+  }
+
+  .login-field input,
+  .password-control input {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 52px !important;
+  }
+
+  .password-control {
+    position: relative;
+  }
+
+  .password-control input {
+    padding-right: 3.25rem !important;
+  }
+
+  .password-control button {
+    position: absolute !important;
+    top: 50% !important;
+    right: .6rem !important;
+    display: grid !important;
+    width: 44px !important;
+    height: 44px !important;
+    place-items: center !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .login-submit {
+    width: 100% !important;
+    min-height: 52px !important;
+    justify-content: center !important;
+  }
+
+  .login-error {
+    margin: -.15rem 0 0 !important;
+    color: #9a3d27 !important;
+    font-size: .9rem !important;
+    font-weight: 620 !important;
+  }
+
+  .demo-credentials {
+    margin-top: .5rem !important;
+    padding: 1rem !important;
+    border: 1px solid var(--public-border, #d7d4cc) !important;
+    border-radius: .7rem !important;
+    background: var(--public-surface-subtle, #f7f5f1) !important;
+  }
+
+  .demo-credentials dl {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: .8rem !important;
+  }
+
+  .demo-credentials button {
+    min-height: 44px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: var(--public-sage, #557663) !important;
+    text-decoration: underline !important;
+    text-underline-offset: .18em !important;
+  }
+}
