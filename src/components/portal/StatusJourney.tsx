@@ -14,22 +14,22 @@ function buildSteps(state?: string): Step[] {
 
   const steps: Step[] = [
     { label: "Payment found", tone: "complete", detail: "₹18,420 confirmed", help: "The Self-Assessment Tax payment exists in your Income Tax records." },
-    { label: "Return processed", tone: "complete", detail: "Tax credit recognised: ₹0", help: "The processed return completed, but it did not include the payment as tax credit." },
+    { label: "Return processed", tone: "complete", detail: "₹0 of this payment counted", help: "Your return was processed, but this payment was not included in the tax credit used for the return." },
   ];
 
   if (!rectificationDone) {
-    steps.push({ label: "Tax credit needs correction", tone: "action", detail: "Your payment was not counted", help: "The payment exists, but the processed return recognised ₹0. A Tax Credit Mismatch Correction is needed." });
+    steps.push({ label: "Payment not counted", tone: "action", detail: "Correction needed", help: "The payment exists, but your processed return counted ₹0. The government process used to correct this is Tax Credit Mismatch Correction." });
     steps.push({ label: "Respond to demand", tone: "future", detail: "After the correction" });
   } else {
-    steps.push({ label: "Tax credit correction submitted", tone: "complete", detail: "RECT-DEMO-01842", help: "The payment challan was added through Tax Credit Mismatch Correction." });
-    if (!responseDone) steps.push({ label: "Respond to demand", tone: "action", detail: "Your response is required", help: "The correction is submitted. The outstanding demand still needs your response." });
+    steps.push({ label: "Correction submitted", tone: "complete", detail: "RECT-DEMO-01842", help: "Your payment challan was added through Tax Credit Mismatch Correction." });
+    if (!responseDone) steps.push({ label: "Respond to demand", tone: "action", detail: "Your response is needed", help: "The correction is submitted. You still need to respond to the outstanding demand." });
     else steps.push({ label: "Demand response submitted", tone: "complete", detail: "DEMAND-RESP-DEMO-18420" });
   }
 
   if (responseDone) {
     steps.push(resolved
       ? { label: "Income Tax review", tone: "complete", detail: "Reviewed" }
-      : { label: "Income Tax review", tone: waiting ? "waiting" : "waiting", detail: "Waiting for review", help: "You have completed the required actions. Income Tax now needs to review the submitted correction and response." });
+      : { label: "Income Tax review", tone: waiting ? "waiting" : "waiting", detail: "Waiting for review", help: "You have completed the required actions. Income Tax now needs to review the correction and response." });
     steps.push(resolved ? { label: "Resolved", tone: "complete" } : { label: "Resolved", tone: "future", detail: "Not reached yet" });
   }
 
