@@ -216,16 +216,21 @@
     pointer-events: none !important;
   }
 
+  /* Flex is intentionally used here instead of Grid. Mobile Safari was
+     collapsing the scroll row and placing the composer immediately below the
+     header. The simple column keeps the body and composer in deterministic
+     positions across iOS viewport changes. */
   .desktop-workspace.is-open > .assistance-workspace {
     position: fixed !important;
     inset: 0 !important;
     z-index: 90 !important;
-    display: grid !important;
+    display: flex !important;
     width: 100vw !important;
     max-width: none !important;
     height: 100dvh !important;
     min-height: 100dvh !important;
-    grid-template-rows: auto 1px minmax(0, 1fr) auto !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
     border: 0 !important;
     border-radius: 0 !important;
     background: var(--product-surface, #fff) !important;
@@ -233,23 +238,87 @@
   }
 
   .assistance-workspace-bar {
+    flex: 0 0 auto !important;
     min-height: 64px !important;
     padding: .65rem 1rem !important;
     background: var(--product-surface, #fff) !important;
   }
 
+  .assistance-workspace > [data-slot="separator"],
+  .assistance-workspace > [role="separator"] {
+    flex: 0 0 auto !important;
+  }
+
   .assistance-workspace-scroll {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
     min-height: 0 !important;
+    overflow-x: hidden !important;
     overflow-y: auto !important;
     overscroll-behavior: contain !important;
-    padding: 1rem !important;
+    padding: 1rem 1rem 1.5rem !important;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .assistance-workspace-scroll > * {
+    max-width: 100% !important;
+  }
+
+  .assistance-home,
+  .assistance-checking,
+  .understanding-surface,
+  .assistance-unavailable,
+  .action-workspace-surface,
+  .consequence-review,
+  .assistance-tracking {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+  }
+
+  .assistance-home {
+    display: grid !important;
+    gap: 1.25rem !important;
+    padding: .35rem 0 .75rem !important;
+  }
+
+  .assistance-home-header h2 {
+    font-size: clamp(1.65rem, 7vw, 2rem) !important;
+  }
+
+  .assistance-attention-content {
+    grid-template-columns: 1fr !important;
+    padding: 1.1rem !important;
+  }
+
+  .assistance-status {
+    justify-self: start !important;
+  }
+
+  .assistance-home .reminder-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
   }
 
   .assistance-workspace .assistance-composer {
     position: relative !important;
     inset: auto !important;
+    z-index: 2 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin: 0 !important;
     padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid var(--product-border, #d9ddd8) !important;
     background: var(--product-surface, #fff) !important;
+  }
+
+  .assistance-composer-suggestions {
+    overflow: hidden !important;
+  }
+
+  .assistance-composer-suggestions > div {
+    overflow-x: auto !important;
   }
 }
