@@ -1,0 +1,324 @@
+/* Final mobile repair layer.
+   Keep this file small and loaded after globals.css so late mobile fixes do not
+   have to compete with older responsive rules in the legacy stylesheet. */
+
+@media (max-width: 640px) {
+  .login-page,
+  .login-page * {
+    box-sizing: border-box;
+  }
+
+  .login-page {
+    display: block !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    background: var(--public-surface, #fcfbf8) !important;
+    color: var(--public-ink, #1f1e1a);
+    font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  }
+
+  .login-shell {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    grid-template-columns: none !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--public-surface, #fcfbf8) !important;
+    box-shadow: none !important;
+  }
+
+  .login-context {
+    display: block !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .login-brand {
+    display: flex !important;
+    min-height: 88px !important;
+    align-items: center !important;
+    gap: .8rem !important;
+    padding: 1rem 1.25rem !important;
+    border-bottom: 1px solid var(--public-border, #d7d4cc) !important;
+    background: var(--public-surface, #fcfbf8) !important;
+  }
+
+  .login-brand > span:first-child {
+    flex: 0 0 auto;
+  }
+
+  .login-brand strong,
+  .login-brand small {
+    display: block !important;
+  }
+
+  .login-marketing,
+  .login-back {
+    display: none !important;
+  }
+
+  .login-panel {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 2.25rem 1.25rem 3rem !important;
+  }
+
+  .login-panel header {
+    margin: 0 0 1.5rem !important;
+  }
+
+  .login-panel .public-kicker {
+    display: none !important;
+  }
+
+  .login-panel h2 {
+    max-width: 12ch;
+    margin: 0 !important;
+    font-size: clamp(2rem, 9vw, 2.65rem) !important;
+    line-height: 1.04 !important;
+    letter-spacing: -.035em !important;
+  }
+
+  .demo-login-form {
+    display: grid !important;
+    width: 100% !important;
+    gap: 1rem !important;
+  }
+
+  .login-field,
+  .password-control {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .login-field label {
+    display: block;
+    margin-bottom: .45rem;
+    font-weight: 650;
+  }
+
+  .login-field input,
+  .password-control input {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 52px !important;
+  }
+
+  .password-control {
+    position: relative;
+  }
+
+  .password-control input {
+    padding-right: 3.25rem !important;
+  }
+
+  .password-control button {
+    position: absolute !important;
+    top: 50% !important;
+    right: .6rem !important;
+    display: grid !important;
+    width: 44px !important;
+    height: 44px !important;
+    place-items: center !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .login-submit {
+    width: 100% !important;
+    min-height: 52px !important;
+    justify-content: center !important;
+  }
+
+  .login-error {
+    margin: -.15rem 0 0 !important;
+    color: #9a3d27 !important;
+    font-size: .9rem !important;
+    font-weight: 620 !important;
+  }
+
+  .demo-credentials {
+    margin-top: .5rem !important;
+    padding: 1rem !important;
+    border: 1px solid var(--public-border, #d7d4cc) !important;
+    border-radius: .7rem !important;
+    background: var(--public-surface-subtle, #f7f5f1) !important;
+  }
+
+  .demo-credentials dl {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: .8rem !important;
+  }
+
+  .demo-credentials button {
+    min-height: 44px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: var(--public-sage, #557663) !important;
+    text-decoration: underline !important;
+    text-underline-offset: .18em !important;
+  }
+
+  /* Mobile Assistance is a direct, separate experience—not a menu preference. */
+  .assistance-handle-anchor {
+    position: fixed !important;
+    z-index: 70 !important;
+    right: .75rem !important;
+    top: 52% !important;
+    display: block !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .desktop-workspace.is-open .assistance-handle-anchor {
+    display: none !important;
+  }
+
+  .assistance-handle {
+    display: inline-flex !important;
+    min-width: 48px !important;
+    min-height: 108px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .4rem !important;
+    padding: .65rem .55rem !important;
+    border: 1px solid var(--product-border, #d9ddd8) !important;
+    border-radius: .7rem 0 0 .7rem !important;
+    background: color-mix(in srgb, white 96%, #e7efe9) !important;
+    color: var(--public-sage, #557663) !important;
+    box-shadow: 0 12px 28px rgb(31 30 26 / 12%) !important;
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+  }
+
+  .assistance-handle svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  .desktop-workspace.is-open {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 80 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    background: var(--product-surface, #fff) !important;
+  }
+
+  .desktop-workspace.is-open > .portal-workspace {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Flex is intentionally used here instead of Grid. Mobile Safari was
+     collapsing the scroll row and placing the composer immediately below the
+     header. The simple column keeps the body and composer in deterministic
+     positions across iOS viewport changes. */
+  .desktop-workspace.is-open > .assistance-workspace {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 90 !important;
+    display: flex !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--product-surface, #fff) !important;
+    box-shadow: none !important;
+  }
+
+  .assistance-workspace-bar {
+    flex: 0 0 auto !important;
+    min-height: 64px !important;
+    padding: .65rem 1rem !important;
+    background: var(--product-surface, #fff) !important;
+  }
+
+  .assistance-workspace > [data-slot="separator"],
+  .assistance-workspace > [role="separator"] {
+    flex: 0 0 auto !important;
+  }
+
+  .assistance-workspace-scroll {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    padding: 1rem 1rem 1.5rem !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .assistance-workspace-scroll > * {
+    max-width: 100% !important;
+  }
+
+  .assistance-home,
+  .assistance-checking,
+  .understanding-surface,
+  .assistance-unavailable,
+  .action-workspace-surface,
+  .consequence-review,
+  .assistance-tracking {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+  }
+
+  .assistance-home {
+    display: grid !important;
+    gap: 1.25rem !important;
+    padding: .35rem 0 .75rem !important;
+  }
+
+  .assistance-home-header h2 {
+    font-size: clamp(1.65rem, 7vw, 2rem) !important;
+  }
+
+  .assistance-attention-content {
+    grid-template-columns: 1fr !important;
+    padding: 1.1rem !important;
+  }
+
+  .assistance-status {
+    justify-self: start !important;
+  }
+
+  .assistance-home .reminder-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .assistance-workspace .assistance-composer {
+    position: relative !important;
+    inset: auto !important;
+    z-index: 2 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid var(--product-border, #d9ddd8) !important;
+    background: var(--product-surface, #fff) !important;
+  }
+
+  .assistance-composer-suggestions {
+    overflow: hidden !important;
+  }
+
+  .assistance-composer-suggestions > div {
+    overflow-x: auto !important;
+  }
+}

@@ -57,10 +57,10 @@ function EnabledAssistedDemandExperience({ records, provider }: { records: Recon
     <GenerativeUIRenderer blocks={result.response.blocks} onWorkflowAction={(action) => {
       if (action === "tax_credit_rectification") router.push("/pending-actions/demand/assist/rectification");
     }} />
-    <div className="workflow-actions"><Link className="ux4g-btn ux4g-btn-outline-primary ux4g-btn-md" href="/pending-actions/demand">Back to demand</Link></div>
+    <div className="workflow-actions"><Link className="app-action app-action-secondary" href="/pending-actions/demand">Back to demand</Link></div>
   </section>;
 }
 
 function Fallback({ title, body, showResponse = false }: { title: string; body: string; showResponse?: boolean }) {
-  return <section className="ux4g-alert ux4g-alert-info assisted-fallback" aria-labelledby="assisted-fallback-title"><div><h2 id="assisted-fallback-title">{title}</h2><p>{body}</p><div className="workflow-actions"><Link className="ux4g-btn ux4g-btn-outline-primary ux4g-btn-md" href="/pending-actions/demand">Back to demand</Link>{showResponse ? <Link className="ux4g-btn ux4g-btn-primary ux4g-btn-md" href="/pending-actions/demand/respond">Submit response</Link> : null}</div></div></section>;
+  return <section className="portal-alert portal-alert--info assisted-fallback" aria-labelledby="assisted-fallback-title"><div><h2 id="assisted-fallback-title">{title}</h2><p>{body}</p><div className="workflow-actions"><Link className="app-action app-action-secondary" href="/pending-actions/demand">Back to demand</Link>{showResponse ? <Link className="app-action app-action-primary" href="/pending-actions/demand/respond">Submit response</Link> : null}</div></div></section>;
 }

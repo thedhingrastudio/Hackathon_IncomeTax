@@ -5,6 +5,7 @@ import processingResultRecord from "./processing-result.json";
 import returnRecord from "./return.json";
 import taxpayerRecord from "./taxpayer.json";
 import type { Form26ASRecord, OutstandingDemand, ProcessingResult, TaxPayment, TaxReturn, Taxpayer } from "../../types/tax";
+import { syntheticCaseReminders } from "./case-reminders";
 
 const records = {
   taxpayer: taxpayerRecord as Taxpayer,
@@ -21,3 +22,4 @@ export function getTaxPayment() { return records.payment; }
 export function getForm26AS() { return records.form26as; }
 export function getProcessingResult() { return records.processingResult; }
 export function getOutstandingDemand() { return records.outstandingDemand; }
+export function getSyntheticCaseReminders() { return syntheticCaseReminders; }

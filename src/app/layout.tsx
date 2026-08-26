@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import UX4GRuntime from "../components/ux4g/UX4GRuntime";
 import PortalShell from "../components/portal/PortalShell";
-import { getTaxpayer } from "../data/mock";
+import { getForm26AS, getOutstandingDemand, getProcessingResult, getTaxPayment, getTaxpayer, getTaxReturn } from "../data/mock";
+import { createDemandUnderstanding } from "../lib/ai";
 import "./globals.css";
+import "./mobile-final.css";
+import "./landing-final.css";
+import localFont from "next/font/local";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+const geist = localFont({
+  src: "../../node_modules/next/dist/next-devtools/server/font/geist-latin.woff2",
+  variable: "--font-sans",
+  weight: "100 900",
+});
 
 export const metadata: Metadata = {
   title: "Income Tax Assistance Prototype",
@@ -17,13 +27,22 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   const taxpayer = getTaxpayer();
+  const demand = getOutstandingDemand();
+  const understanding = createDemandUnderstanding({
+    taxReturn: getTaxReturn(),
+    payment: getTaxPayment(),
+    form26as: getForm26AS(),
+    processingResult: getProcessingResult(),
+    outstandingDemand: demand,
+  });
 
   return (
-    <html lang="en" data-theme="light">
-      <body>
-        <UX4GRuntime />
-        <PortalShell taxpayerName={taxpayer.name}>{children}</PortalShell>
-      </body>
+    <html lang="en" data-theme="light" className={`font-sans ${geist.variable}`}>
+<body>
+  <TooltipProvider>
+    <PortalShell demand={demand} taxpayerId={taxpayer.taxpayerId} taxpayerName={taxpayer.name} understanding={understanding}>{children}</PortalShell>
+  </TooltipProvider>
+</body>
     </html>
   );
 }

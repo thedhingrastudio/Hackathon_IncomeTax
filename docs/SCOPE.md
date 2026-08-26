@@ -128,7 +128,7 @@ This flow may be simplified but must remain recognisably conventional.
 
 The prototype must support:
 
-Dashboard or Outstanding Demand
+Conventional portal or Outstanding Demand context
 
 → Ask for help
 
@@ -223,11 +223,9 @@ State should eventually persist across page reloads.
 
 ---
 
-## UX4G
+## Presentation System
 
-Use UX4G as the primary government design-system foundation.
-
-Custom components may be created where the generative interface needs patterns that UX4G does not provide.
+The target presentation foundation is shadcn/ui and Base UI structural primitives, selectively used Magic UI, and project-owned product styling. Some legacy presentation components remain to be migrated in separately authorised implementation work.
 
 ---
 
@@ -241,11 +239,13 @@ The prototype must work on:
 
 The experience should remain usable on smaller mobile screens.
 
+The desktop Assistance Workspace is specified first. Mobile assistance interaction will be designed separately and must not be implemented by merely compressing the desktop split-screen layout.
+
 ---
 
 ## Accessibility
 
-The prototype should follow UX4G accessibility guidance and target WCAG 2.1 AA.
+The prototype should target WCAG 2.1 AA independent of presentation-library choice.
 
 ---
 

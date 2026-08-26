@@ -1,5 +1,9 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
+test.beforeEach(async ({ context }) => {
+  await context.addCookies([{ name: "income-tax-demo-session", value: "rohan-mehta-demo", url: "http://127.0.0.1:3100" }]);
+});
+
 type BrowserDiagnostics = {
   consoleErrors: string[];
   pageErrors: string[];
@@ -66,7 +70,9 @@ async function openMenu(page: Page) {
 }
 
 async function attachScreenshot(page: Page, testInfo: TestInfo, name: string) {
-  await testInfo.attach(name, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
+  const path = testInfo.outputPath(`${name}.png`);
+  await page.screenshot({ fullPage: true, path });
+  await testInfo.attach(name, { path, contentType: "image/png" });
 }
 
 async function assertDesktopShellLayout(page: Page) {
@@ -88,11 +94,36 @@ async function assertMobileShellLayout(page: Page) {
   expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
 }
 
-test("mobile menu and assisted demand journey remain interactive and persistent", async ({ page }) => {
+test("mobile menu and assisted demand journey remain interactive and persistent", async ({ page }, testInfo) => {
   const diagnostics = monitorBrowser(page);
-  await page.goto("/");
+  await page.goto("/dashboard");
     await page.evaluate(() => window.localStorage.clear());
     await page.reload();
+    await attachScreenshot(page, testInfo, "mobile-dashboard-assist-closed");
+
+    const mobileAssist = page.getByRole("button", { name: "Open assistance" });
+    await expect(mobileAssist).toBeVisible();
+    await mobileAssist.click();
+    const mobileWorkspace = page.getByRole("complementary", { name: "Assistance Workspace" });
+    await expect(mobileWorkspace).toBeVisible();
+    const assembly = mobileWorkspace.getByTestId("assistance-home-assembly");
+    await expect(assembly).toBeVisible();
+    await attachScreenshot(page, testInfo, "mobile-assistance-assembly");
+    await expect(mobileWorkspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+    await expect(mobileWorkspace.getByText("₹18,420", { exact: true })).toBeVisible();
+    await expect(mobileWorkspace.getByRole("heading", { name: "Upcoming" })).toBeVisible();
+    await expect(mobileWorkspace.getByText("Respond to outstanding demand", { exact: true })).toBeVisible();
+    await expect(mobileWorkspace.getByText("Review case status", { exact: true })).toBeVisible();
+    await expect(mobileWorkspace.getByPlaceholder("Ask about your taxes…")).toBeVisible();
+    const mobileBounds = await mobileWorkspace.boundingBox();
+    expect(mobileBounds).not.toBeNull();
+    expect(Math.round(mobileBounds!.width)).toBe(390);
+    expect(Math.round(mobileBounds!.height)).toBe(844);
+    await attachScreenshot(page, testInfo, "mobile-dashboard-assistance-open");
+    await mobileWorkspace.getByRole("button", { name: "Close assistance" }).click();
+    await expect(mobileWorkspace).toBeHidden();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(mobileAssist).toBeFocused();
 
     const { menu, menuButton } = await openMenu(page);
     for (const label of ["Dashboard", "Returns", "Payments & Tax Records", "Pending Actions", "Services", "Help", "AI Assistance"]) {
@@ -101,13 +132,13 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
 
     const aiSwitch = menu.getByRole("switch");
     const stateLabel = menu.locator(".ai-preference__heading p");
-    const track = menu.locator(".ux4g-switch-track");
+    const track = menu.locator(".preference-switch__track");
     await expect(aiSwitch).not.toBeChecked();
     await expect(aiSwitch).toHaveAttribute("aria-checked", "false");
     await expect(stateLabel).toHaveText("Off");
     const inactiveTrackColor = await track.evaluate((element) => getComputedStyle(element).backgroundColor);
 
-    await menu.locator(".ux4g-switch-control").click();
+    await aiSwitch.click();
     await expect(aiSwitch).toBeChecked();
     await expect(aiSwitch).toHaveAttribute("aria-checked", "true");
     await expect(stateLabel).toHaveText("On");
@@ -118,7 +149,7 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
     await expect(menuButton).toHaveAttribute("aria-expanded", "false");
     await expect(menu).toBeHidden();
 
-    await page.getByRole("link", { name: "View demand" }).click();
+    await page.getByRole("link", { name: "Review outstanding demand" }).click();
     await expect(page).toHaveURL(/\/pending-actions\/demand$/);
     await expect(page.getByRole("heading", { name: "Not sure why this is showing?" })).toBeVisible();
     const contextualHelp = page.getByRole("link", { name: "Help me understand this" });
@@ -143,7 +174,7 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
 
     const offMenu = await openMenu(page);
     const offSwitch = offMenu.menu.getByRole("switch");
-    await offMenu.menu.locator(".ux4g-switch-control").click();
+    await offMenu.menu.getByRole("switch").click();
     await expect(offSwitch).not.toBeChecked();
     await expect(offSwitch).toHaveAttribute("aria-checked", "false");
     await expect(offMenu.menu.locator(".ai-preference__heading p")).toHaveText("Off");
@@ -164,56 +195,74 @@ test("mobile menu and assisted demand journey remain interactive and persistent"
     expect(diagnostics.nextRequests, "failed Next.js client asset requests").toEqual([]);
 });
 
-test("assisted corrective workflow requires both citizen confirmations", async ({ page }) => {
+test("purpose-built mobile Assistance completes the corrective journey through consequence gates", async ({ page }, testInfo) => {
   const diagnostics = monitorBrowser(page);
-  await page.goto("/");
+  await page.goto("/dashboard");
   await page.evaluate(() => window.localStorage.clear());
   await page.reload();
+  await page.getByRole("button", { name: "Open assistance" }).click();
+  const workspace = page.getByRole("complementary", { name: "Assistance Workspace" });
+  await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  await attachScreenshot(page, testInfo, "mobile-assistance-home");
+  await workspace.getByRole("button", { name: "Understand this demand" }).click();
+  await expect(workspace.getByRole("heading", { name: /Checking why this is showing/ })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Your payment was found." })).toBeVisible();
+  await expect(workspace.getByText("₹18,420", { exact: true }).first()).toBeVisible();
+  await expect(workspace.getByText("₹0", { exact: true }).first()).toBeVisible();
+  await page.waitForTimeout(350);
+  await attachScreenshot(page, testInfo, "mobile-assistance-understanding");
+  await workspace.getByRole("button", { name: "Why we think this" }).click();
+  await expect(workspace.getByText("These connected Income Tax records support the explanation.")).toBeVisible();
+  await expect(workspace.getByText("Form 26AS", { exact: true })).toBeVisible();
+  await page.waitForTimeout(200);
+  await attachScreenshot(page, testInfo, "mobile-assistance-records-expanded");
 
-  const { menu, menuButton } = await openMenu(page);
-  await menu.locator(".ux4g-switch-control").click();
-  await expect(menu.getByRole("switch")).toBeChecked();
-  await menuButton.click();
-  await page.getByRole("link", { name: "View demand" }).click();
-  await page.getByRole("link", { name: "Help me understand this" }).click();
-  await expect(page.getByText("Here's how we'll fix this", { exact: true })).toBeVisible();
-
-  await page.getByRole("button", { name: "Review correction" }).click();
-  await expect(page).toHaveURL(/\/pending-actions\/demand\/assist\/rectification$/);
-  await expect(page.getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
+  await workspace.getByRole("button", { name: "Fix this" }).click();
+  await expect(workspace.getByRole("heading", { name: "What happens next" })).toBeVisible();
+  await expect(workspace.getByText("Two steps, in this order.", { exact: true })).toBeVisible();
+  await page.waitForTimeout(350);
+  await attachScreenshot(page, testInfo, "mobile-assistance-action-workspace");
+  await workspace.getByRole("button", { name: "Review correction" }).click();
+  await expect(workspace.getByRole("heading", { name: "Review correction" })).toBeVisible();
   await expect(page.getByText("MOCK-2481", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Correction submitted" })).toBeHidden();
+  await expect(workspace.locator(".assistance-composer")).toBeHidden();
+  await attachScreenshot(page, testInfo, "mobile-assistance-review-correction");
 
-  await page.getByRole("button", { name: "Confirm and submit correction" }).click();
-  await expect(page.getByRole("heading", { name: "Correction submitted" })).toBeVisible();
+  await workspace.getByRole("button", { name: "Confirm and submit correction" }).click();
   await expect(page.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Review demand response" }).click();
+  await expect(workspace.getByRole("button", { name: "Review response" })).toBeVisible();
+  await workspace.getByRole("button", { name: "Review response" }).click();
 
-  await expect(page.getByRole("heading", { name: "Respond to the outstanding demand" })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Review demand response" })).toBeVisible();
   await expect(page.getByText("I disagree with this demand", { exact: true })).toBeVisible();
-  await expect(page.getByText("Tax payment / tax credit has not been considered", { exact: true })).toBeVisible();
   await expect(page.getByText("Nothing has been submitted yet.", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Your requests have been submitted" })).toBeHidden();
+  await expect(workspace.locator(".assistance-composer")).toBeHidden();
+  await attachScreenshot(page, testInfo, "mobile-assistance-review-demand-response");
 
-  await page.getByRole("button", { name: "Confirm and submit response" }).click();
-  await expect(page.getByRole("heading", { name: "Your requests have been submitted" })).toBeVisible();
+  await workspace.getByRole("button", { name: "Confirm and submit response" }).click();
+  await expect(workspace.getByRole("heading", { name: "Response submitted" })).toBeVisible();
   await expect(page.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
   await expect(page.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
-  await expect(page.getByText("Income Tax still needs to review these requests.", { exact: true })).toBeVisible();
-  await expect(page.getByText("The outstanding demand has not been marked as resolved.", { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "View case status" }).click();
-  await expect(page).toHaveURL(/\/case\/CASE-DEMO-18420$/);
-  await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
+  await expect(page.getByText(/The outstanding demand has not been marked as resolved\./)).toBeVisible();
+  await workspace.getByRole("button", { name: "View case status" }).click();
+  await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
   await expect(page.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
-  await expect(page.getByText("Nothing right now.", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Nothing you need to do right now.", { exact: true })).toBeVisible();
   await expect(page.getByText("RECT-DEMO-01842", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("DEMAND-RESP-DEMO-18420", { exact: true }).first()).toBeVisible();
-  await page.reload();
-  await expect(page.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
-  const caseMenu=await openMenu(page);await caseMenu.menu.locator(".ux4g-switch-control").click();await expect(caseMenu.menu.getByRole("switch")).not.toBeChecked();await caseMenu.menuButton.click();
-  await page.reload();
-  await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
+  await expect(workspace.getByPlaceholder("Ask about this case…")).toBeVisible();
+  await attachScreenshot(page, testInfo, "mobile-assistance-tracking");
+  await workspace.getByPlaceholder("Ask about this case…").fill("What happens next?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
+  await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
+  await expect(workspace.getByText("Nothing you need to do right now.", { exact: true })).toBeVisible();
+  const routeBeforeClose = page.url();
+  await workspace.getByRole("button", { name: "Close assistance" }).click();
+  await expect(page).toHaveURL(routeBeforeClose);
+  await page.getByRole("button", { name: "Open assistance" }).click();
+  await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
+  await expect(workspace.getByPlaceholder("Ask about this case…")).toBeVisible();
 
   const hydrationErrors = diagnostics.consoleErrors.filter((message) => /hydration|hydrated|server rendered html/i.test(message));
   expect(hydrationErrors, "React hydration errors").toEqual([]);
@@ -228,7 +277,7 @@ test.describe("desktop portal and conventional workflow layout", () => {
 
   test("shared shell and every conventional response state retain application styling", async ({ page }, testInfo) => {
     const diagnostics = monitorBrowser(page);
-    await page.goto("/");
+    await page.goto("/dashboard");
     await assertDesktopShellLayout(page);
     await attachScreenshot(page, testInfo, "desktop-dashboard");
 
@@ -249,10 +298,10 @@ test.describe("desktop portal and conventional workflow layout", () => {
     expect(optionBoxes[1].y).toBeGreaterThan(optionBoxes[0].y);
     await attachScreenshot(page, testInfo, "desktop-response-step-1");
 
-    await page.locator(".response-option", { hasText: "I disagree with this demand" }).locator(".ux4g-radio-control").click();
+    await page.getByRole("radio", { name: /I disagree with this demand/ }).check();
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByRole("heading", { name: "Tell us why you disagree" })).toBeVisible();
-    await page.locator(".ux4g-radio", { hasText: "Tax payment / tax credit has not been considered" }).locator(".ux4g-radio-control").click();
+    await page.getByRole("radio", { name: "Tax payment / tax credit has not been considered" }).check();
     await attachScreenshot(page, testInfo, "desktop-response-step-2");
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByRole("heading", { name: "Review your response" })).toBeVisible();
@@ -280,9 +329,9 @@ test("mobile conventional response states fit the viewport", async ({ page }, te
   await page.goto("/pending-actions/demand/respond");
   await assertMobileShellLayout(page);
   await attachScreenshot(page, testInfo, "mobile-response-step-1");
-  await page.locator(".response-option", { hasText: "I disagree with this demand" }).locator(".ux4g-radio-control").click();
+  await page.getByRole("radio", { name: /I disagree with this demand/ }).check();
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.locator(".ux4g-radio", { hasText: "Tax payment / tax credit has not been considered" }).locator(".ux4g-radio-control").click();
+  await page.getByRole("radio", { name: "Tax payment / tax credit has not been considered" }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await assertMobileShellLayout(page);
   await attachScreenshot(page, testInfo, "mobile-response-review");
@@ -290,4 +339,99 @@ test("mobile conventional response states fit the viewport", async ({ page }, te
   await expect(page.getByRole("heading", { name: "Response submitted" })).toBeVisible();
   await assertMobileShellLayout(page);
   await attachScreenshot(page, testInfo, "mobile-response-submitted");
+});
+
+test("landing intent-to-outcome story stacks clearly on mobile", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "A clearer way to understand your tax actions." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "A clearer way to understand your taxes." })).toBeHidden();
+  await expect(page.locator(".public-hero .hero-mobile-mismatch")).toHaveText("₹18,420 wasn't counted");
+  await expect(page.getByRole("heading", { name: "Tell us what you need to get done." })).toBeVisible();
+  const story = page.locator(".intent-outcome-canvas");
+  for (const heading of ["Your payment was found.", "Two next steps are prepared for you.", "Income Tax reviews submitted requests"]) await expect(story.getByRole("heading", { name: heading })).toBeVisible();
+  await expect(story.getByText("₹18,420 wasn't counted in the processed return.", { exact: true })).toBeVisible();
+  await expect(story.getByText("Nothing is submitted automatically.", { exact: true })).toBeVisible();
+  const dimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
+  expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
+  const hero = page.locator(".public-hero");
+  await expect(hero.getByRole("link", { name: "Login" })).toBeVisible();
+  await expect(hero.getByRole("link", { name: /See how Assistance works/ })).toBeVisible();
+  const heroBox = await hero.boundingBox();
+  const previewBox = await(hero.locator(".hero-assistance-preview")).boundingBox();
+  expect(heroBox).not.toBeNull();
+  expect(previewBox).not.toBeNull();
+  expect(previewBox!.width).toBeLessThanOrEqual(330);
+  expect(previewBox!.height).toBeLessThan(260);
+  await attachScreenshot(page, testInfo, "landing-intent-outcome-mobile");
+});
+
+test("mobile login provides functional validation, credentials, and password visibility", async ({ page, context }, testInfo) => {
+  const diagnostics = monitorBrowser(page);
+  await context.clearCookies();
+  await page.goto("/login");
+  await expect(page.getByRole("heading", { name: "Sign in to your tax account" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Review your account with clarity." })).toBeHidden();
+  await expect(page.getByText("Test account", { exact: true })).toBeVisible();
+  await expect(page.getByText("Rohan Mehta", { exact: true })).toBeVisible();
+  const userId = page.getByLabel("User ID");
+  const password = page.locator("#password");
+  await attachScreenshot(page, testInfo, "mobile-login-empty");
+
+  await userId.fill("rohan.mehta");
+  await password.fill("incorrect");
+  await password.press("Enter");
+  const loginError = page.locator(".login-error");
+  await expect(loginError).toHaveText("User ID or password is incorrect.");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(userId).toHaveValue("rohan.mehta");
+  await attachScreenshot(page, testInfo, "mobile-login-invalid");
+
+  await password.fill("correcting");
+  await expect(loginError).toBeHidden();
+
+  const useTestAccount = page.getByRole("button", { name: "Use test account" });
+  await expect(useTestAccount).toBeVisible();
+  expect(await useTestAccount.evaluate((button) => {
+    const box = button.getBoundingClientRect();
+    return document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)?.closest("button") === button;
+  }), "Use test account receives touch hit testing").toBe(true);
+  await useTestAccount.tap();
+  await expect(userId).toHaveValue("rohan.mehta");
+  await expect(password).toHaveValue("Demo@123");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(loginError).toBeHidden();
+  await attachScreenshot(page, testInfo, "mobile-login-test-account");
+
+  const showPassword = page.getByRole("button", { name: "Show password" });
+  await expect(password).toHaveAttribute("type", "password");
+  await expect(showPassword).toHaveAttribute("aria-pressed", "false");
+  await showPassword.tap();
+  const hidePassword = page.getByRole("button", { name: "Hide password" });
+  await expect(password).toHaveAttribute("type", "text");
+  await expect(password).toHaveValue("Demo@123");
+  await expect(hidePassword).toHaveAttribute("aria-pressed", "true");
+  await hidePassword.tap();
+  await expect(password).toHaveAttribute("type", "password");
+  await expect(password).toHaveValue("Demo@123");
+
+  await page.getByRole("button", { name: "Sign in" }).tap();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  expect((await context.cookies()).some((cookie) => cookie.name === "income-tax-demo-session"), "mobile session cookie").toBe(true);
+  const hydrationErrors = diagnostics.consoleErrors.filter((message) => /hydration|hydrated|server rendered html/i.test(message));
+  const unexpectedConsoleErrors = diagnostics.consoleErrors.filter((message) => !/status of 401 \(Unauthorized\)/i.test(message));
+  expect(hydrationErrors).toEqual([]);
+  expect(unexpectedConsoleErrors).toEqual([]);
+  expect(diagnostics.pageErrors).toEqual([]);
+  expect(diagnostics.failedRequests).toEqual([]);
+  expect(diagnostics.nextRequests).toEqual([]);
+});
+
+test("mobile foundation has no overflow across supported widths", async ({ page }) => {
+  for (const width of [360, 390, 430, 768]) {
+    await page.setViewportSize({ width, height: width === 768 ? 900 : 844 });
+    await page.goto("/dashboard");
+    await expect(page.getByRole("button", { name: "Open assistance" })).toBeVisible();
+    const dimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
+    expect(dimensions.content, `${width}px content width`).toBeLessThanOrEqual(dimensions.viewport);
+  }
 });

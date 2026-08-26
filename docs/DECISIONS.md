@@ -58,7 +58,8 @@ AI is an assistance layer, not a mandatory intermediary.
 
 ## DEC-004 — Contextual AI Is the Primary Demo Entry Point
 
-**Status:** Accepted
+**Status:** Superseded
+**Superseded by:** DEC-016
 **Date:** 23 August 2026
 
 The primary AI-assisted demo begins from the Outstanding Demand page with:
@@ -88,14 +89,15 @@ A permanent chat transcript is not the primary interaction model.
 
 ---
 
-## DEC-006 — UX4G Is the Design-System Foundation
+## DEC-006 — Use a Government Design-System Foundation
 
-**Status:** Accepted
+**Status:** Superseded
+**Superseded by:** DEC-015
 **Date:** 23 August 2026
 
-The application will use UX4G as the government UI foundation.
+The application will use an established government design-system foundation.
 
-Custom AI-native components may be created when UX4G does not provide the required interaction.
+Custom assistance components may be created when that foundation does not provide the required interaction.
 
 The final interface should feel like a credible evolution of an Indian government service rather than a generic AI startup.
 
@@ -225,6 +227,95 @@ Codex should not autonomously redefine:
 * core UX philosophy.
 
 Each increment should be reviewed before continuing.
+
+---
+
+## DEC-015 — Project-Owned Presentation Foundation
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+The product uses shadcn/ui and Base UI primitives, selective meaningful motion, and project-owned tokens instead of constraining the interaction model to a pre-existing government component system.
+
+The interaction model comes before the component library. The product must continue to feel like a credible and trustworthy public service.
+
+**Reason:**
+
+The product requires a flexible adaptive workspace and a visual language governed by its own interaction model rather than by a pre-existing component system.
+
+This decision does not change deterministic reconciliation, data authority, workflow semantics, consequence gates, persistent case state or the conventional non-AI journey.
+
+**Migration note:**
+
+Some legacy presentation components remain to be migrated. This decision defines the target and does not claim that migration is complete.
+
+---
+
+## DEC-016 — Assistance Is a Persistent Contextual Workspace
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+AI assistance lives in a quiet, closed-by-default right drawer. When intentionally invoked on desktop, it opens into an approximate 47% portal / 53% assistance workspace while preserving the current government page on the left.
+
+The government side reflects the system's structure. The assistance side reflects the citizen's situation. The assisted journey progresses through states of one persistent workspace rather than unrelated AI pages.
+
+The desktop model does not define mobile. Mobile assistance must be designed separately and must not merely shrink the desktop split-screen layout.
+
+---
+
+## DEC-017 — Conversation Controls the Interface
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+Natural language is a persistent control/input for the Assistance Workspace. Responses primarily change the graphical representation above the composer rather than accumulating as a chat transcript.
+
+Conversation may select context, request an explanation, reveal evidence or suggest an approved next action. It is not the primary rendered interface.
+
+---
+
+## DEC-018 — Generative UI Uses Representations and Data Bindings
+
+**Status:** Accepted
+**Date:** 24 August 2026
+
+**Decision:**
+
+The model chooses from approved representations, surfaces and layouts and may generate supporting copy. Authoritative facts are referenced through validated `dataRef` bindings and supplied by deterministic application state. Interactive operations use an Approved Action Registry and validated `actionId` values.
+
+The model cannot generate arbitrary HTML, React, CSS, animation code, authoritative facts or government actions.
+
+---
+
+## DEC-019 — Separate Professional Portal Utility From Assistance Interpretation
+
+**Status:** Accepted
+**Date:** 25 August 2026
+
+**Decision:**
+
+The conventional portal remains a capable hands-on tax workspace for ordinary taxpayers who choose not to use AI, experienced taxpayers, Chartered Accountants and other professional users. Improving clarity must not remove official terminology where professionally useful, direct service access, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows or detailed disclosures. Human-readable and official or professional terms should be paired through dual labels where useful.
+
+The Assistance Workspace must not reproduce information merely because it is already present in the portal. It may repeat verified information only when needed to interpret or compare records, prioritize what matters, explain a condition, establish evidence or provenance, or recommend or enable an approved action. Necessary values may therefore recur in Comparison, SourceTrace, explanation and consequential-review representations.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
+
+**Reason:**
+
+The two experiences should divide responsibility rather than duplicate content or make the non-AI path artificially weak. The portal supports authoritative work; Assistance adds interpretation and orchestration across verified records.
 
 ---
 

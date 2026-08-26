@@ -3,6 +3,9 @@
   "name": "Rohan Mehta",
   "pan": "DEMOX0000D",
   "panMasked": "DEMOX****D",
+  "accountType": "individual",
+  "profileStatus": "up_to_date",
+  "lastSignIn": "2026-08-26",
   "preferredLanguage": "en",
   "prototypeData": true
 }

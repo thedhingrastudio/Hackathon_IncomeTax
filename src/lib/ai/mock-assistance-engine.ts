@@ -1,6 +1,7 @@
 import { formatIndianCurrency, formatIndianDate } from "../format-tax.ts";
 import type { AssistanceResponse } from "../../types/generative-ui";
 import type { AssistanceEngine, AssistanceEngineInput } from "./types.ts";
+import type { ActionSurfaceSpecification, UnderstandingSurfaceSpecification } from "../../types/generative-ui-v2.ts";
 
 const workflowContent = {
   tax_credit_rectification: {
@@ -14,6 +15,48 @@ const workflowContent = {
 };
 
 export class MockAssistanceEngine implements AssistanceEngine {
+  generateActionSurface(): unknown {
+    const surface: ActionSurfaceSpecification = {
+      surface: "action",
+      blocks: [
+        { type: "checklist", variant: "readiness", items: [{ label: "Payment identified", amountRef: "evidence.payment.amount", dateRef: "evidence.payment.date", typeRef: "evidence.payment.type", readinessRef: "workflow.tax_credit_rectification.ready" }] },
+        { type: "action_plan", steps: [{ workflow: "tax_credit_rectification", label: "Correct your tax credit" }, { workflow: "respond_to_demand", label: "Respond to the demand", dependencyRef: "workflow.respond_to_demand.dependency" }] },
+      ],
+      primaryAction: { actionId: "review_rectification", label: "Review correction" },
+    };
+    return surface;
+  }
+
+  generateUnderstandingSurface(): unknown {
+    const surface: UnderstandingSurfaceSpecification = {
+      surface: "understanding",
+      blocks: [
+        {
+          type: "comparison",
+          variant: "financial_mismatch",
+          items: [
+            { label: "You paid", valueRef: "evidence.payment.amount", statusRef: "evidence.payment.status" },
+            { label: "Return recognised", valueRef: "evidence.processedReturn.recognisedTax" },
+          ],
+          differenceRef: "reconciliation.difference",
+        },
+        { type: "explanation", factSetRef: "diagnosis.primary" },
+        {
+          type: "source_trace",
+          collapsed: true,
+          items: [
+            { label: "Payment", valueRef: "evidence.payment.amount", statusRef: "evidence.payment.status" },
+            { label: "Form 26AS", valueRef: "evidence.form26as.amount", statusRef: "evidence.form26as.status" },
+            { label: "Processed return", valueRef: "evidence.processedReturn.recognisedTax" },
+            { label: "Outstanding demand", valueRef: "evidence.demand.amount", statusRef: "evidence.demand.status" },
+          ],
+        },
+      ],
+      primaryAction: { actionId: "start_corrective_plan", label: "Fix this" },
+    };
+    return surface;
+  }
+
   generate({ intent, evidence, approvedWorkflowPlan }: AssistanceEngineInput): unknown {
     const paymentAmount = formatIndianCurrency(evidence.payment.amount, evidence.currency);
     const demandAmount = formatIndianCurrency(evidence.demand.amount, evidence.currency);

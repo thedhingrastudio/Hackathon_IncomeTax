@@ -30,9 +30,9 @@ const groups: ServiceGroup[] = [
 
 export default function ServicesPage() {
   return <><PageHeading eyebrow="Online services" title="Services" description="Find Income Tax services grouped around the task you need to complete." />
-    <div className="service-catalogue">{groups.map((group) => <section className="ux4g-card ux4g-card-outline ux4g-card-vertical service-group" key={group.title} aria-labelledby={`service-${group.title.replaceAll(" ", "-").toLowerCase()}`}>
-      <div className="ux4g-card-header"><div><h2 id={`service-${group.title.replaceAll(" ", "-").toLowerCase()}`}>{group.title}</h2><p>{group.description}</p></div></div>
-      <div className="ux4g-card-body"><ul className="service-list">{group.items.map((item) => <li key={item.name}><div>{item.href ? <Link className="ux4g-text-link-md" href={item.href}>{item.name}</Link> : <span className="service-name">{item.name}</span>}{item.external ? <span className="external-service">External service</span> : null}</div></li>)}</ul></div>
+    <div className="service-catalogue">{groups.map((group) => <section className="portal-surface service-group" key={group.title} aria-labelledby={`service-${group.title.replaceAll(" ", "-").toLowerCase()}`}>
+      <div className="portal-surface__header"><div><h2 id={`service-${group.title.replaceAll(" ", "-").toLowerCase()}`}>{group.title}</h2><p>{group.description}</p></div></div>
+      <div className="portal-surface__body"><ul className="service-list">{group.items.map((item) => <li key={item.name}><div>{item.href ? <Link className="portal-tertiary-link" href={item.href}>{item.name}</Link> : <span className="service-name">{item.name}</span>}{item.external ? <span className="external-service">External service</span> : null}</div></li>)}</ul></div>
     </section>)}</div>
   </>;
 }

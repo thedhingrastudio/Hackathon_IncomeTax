@@ -20,32 +20,17 @@ All taxpayer, financial, government, payment, return and identity information in
 
 ## Product Principle
 
-The citizen should understand their problem and desired outcome.
-
-They should not have to understand the internal machinery of the government portal in order to resolve it.
+The citizen should understand their problem and desired outcome without first understanding the internal machinery of the government portal.
 
 The core interaction philosophy is:
 
 Intent → Context → Diagnosis → Generated Interface → Citizen Decision → Government Workflow → Status
 
-Use:
+Use **conversational intelligence, graphical interaction**.
 
-**Conversational intelligence, graphical interaction.**
+**Conversation controls the interface. It does not become the interface.**
 
-Do not create a chatbot-first product.
-
-Natural language is an input mechanism.
-
-The primary output should be clear graphical user interface components such as:
-
-- comparisons
-- evidence
-- summaries
-- action plans
-- forms
-- progress states
-- confirmations
-- timelines
+AI is neither the website nor the default interface. Natural language is a persistent control for an optional Assistance Workspace, not the start of a permanent transcript. The primary output should be graphical representations such as comparisons, evidence, explanations, action plans, forms, confirmations and timelines.
 
 ---
 
@@ -65,20 +50,45 @@ This path should remain understandable and functional without AI.
 
 ### AI-Assisted Experience
 
-When AI assistance is enabled, the citizen may:
+AI is represented by a quiet, persistent drawer handle while the conventional portal occupies the full workspace. When the citizen intentionally invokes assistance, a persistent right-side Assistance Workspace opens while the current government page remains visible and contextual on the left.
 
-- ask for help from the dashboard;
-- use natural language;
-- request contextual help from an Outstanding Demand page;
+Within this workspace, the citizen may:
+
+- see priorities, deadlines and contextual explanations;
+- use natural language to control the workspace;
+- request help from a supported portal context;
 - allow the system to compare relevant synthetic records;
-- receive a plain-language diagnosis;
-- receive a generated corrective workflow;
+- receive a plain-language diagnosis and graphical representation;
+- receive an approved corrective workflow;
 - review all information;
-- explicitly confirm final actions.
+- explicitly confirm final actions;
+- track the resulting case.
 
 AI assistance must remain optional.
 
 Turning AI assistance off must not prevent use of the underlying government service.
+
+The government side reflects the system's structure. The assistance side reflects the citizen's situation.
+
+### No Echo Rule
+
+The Assistance Workspace must not reproduce information merely because it is already available in the conventional portal. Information belongs in Assistance only when it is needed to interpret verified records, compare records, prioritize what matters, explain a condition, establish evidence or provenance, or recommend or enable an approved action.
+
+> The portal presents the government record.
+> Assistance interprets relationships across records.
+
+An authoritative value may be repeated when it is necessary for a Comparison, SourceTrace, explanation or consequential review. Do not repeat a portal fact without adding one of these assistance functions.
+
+### Professional Utility Rule
+
+The conventional portal is not a deliberately inferior or beginner-only experience. It must remain a capable hands-on tax workspace for ordinary taxpayers who decline AI assistance, experienced taxpayers, Chartered Accountants and other professional users.
+
+Improving clarity must not remove official tax terminology where professionally useful, direct service access, exact statuses, government references, records, tables, forms, schedules, filters, manual workflows or detailed disclosures. Prefer dual labels where useful: a human-readable label followed by the official or professional term.
+
+> Organize the machinery; do not hide it.
+
+> The portal is for doing.
+> Assistance is for understanding and orchestrating.
 
 ---
 
@@ -137,7 +147,7 @@ AI may:
 - explain discrepancies;
 - recommend a workflow from an approved set;
 - generate plain-language explanations;
-- determine which approved UI blocks should be presented;
+- determine which approved representation is most useful;
 - prepare information for citizen review.
 
 AI must NOT:
@@ -159,36 +169,35 @@ All financial calculations and record comparisons must come from deterministic c
 
 ## Generative UI
 
-Do not allow an LLM to generate arbitrary HTML, JavaScript, React, URLs or application code for rendering.
+Do not allow an LLM to generate arbitrary HTML, JavaScript, React, CSS, URLs or application code for rendering.
 
-Generative UI must work through a trusted structured schema.
-
-Example flow:
+Generative UI V2 works through a trusted surface specification:
 
 AI / Mock Assistance Engine
 
-→ structured UI blocks
+→ validated surface specification
 
-→ schema validation
+→ trusted representation registry
 
-→ trusted React component mapping
+→ deterministic `dataRef` binding resolution
 
-→ rendered interface
+→ rendered Assistance Workspace
 
-Approved initial UI block families include:
+The approved representation grammar is:
 
-- notice
-- source_check
-- amount_comparison
-- diagnosis
-- evidence
-- action_plan
-- review
-- timeline
+- Attention
+- DeadlineCalendar
+- Comparison
+- Explanation
+- SourceTrace
+- Checklist
+- Decision
+- ActionPlan
+- Timeline
 
-The AI may choose and populate approved components.
+These are representations, not nine generic cards. Surface types are constrained to `home`, `understanding`, `decision`, `action`, `review` and `status`. Layout choices are constrained to approved enums.
 
-It may not invent new executable components at runtime.
+The AI may choose approved representations, layouts, progressive disclosure and supporting `copy`. Authoritative values must be supplied through validated `dataRef` bindings. Actions must use application-approved `actionId` values. The AI may not invent executable components, arbitrary layout values or authoritative facts at runtime.
 
 ---
 
@@ -252,38 +261,33 @@ Trusted UI components used by the adaptive experience.
 
 Normal government portal interface components.
 
-### `src/components/ux4g`
+### Target presentation components
 
-UX4G integration and reusable wrappers.
+Future presentation responsibilities include base UI primitives, the Assistance Workspace shell, the Generative Surface Renderer, a Trusted Representation Registry, a Data Binding Resolver and an Approved Action Registry.
 
 ---
 
-## Design System
+## Target Presentation System
 
-Use UX4G as the government design-system foundation.
+- shadcn/ui and Base UI provide structural and accessible interaction primitives.
+- Project-owned tokens define the product's visual identity, including typography, spacing, colour, surfaces and interaction grammar.
+- Motion must be restrained and used only when it explains a meaningful relationship or state change.
+- The interface should feel credible for a public service through hierarchy, accessibility, language, clarity and interaction quality, not by imitating an existing government design system.
+- Do not automatically choose a government design system because this is a government-service prototype.
+- Do not allow a component library to override the interaction model.
+- The conventional portal must support dense professional utility.
+- The Assistance Workspace must support interpretation and orchestration.
+- Preserve the No Echo Rule.
 
-Before implementing or materially changing UI, inspect the UX4G design instructions available under:
-
-`.agents/skills/ux4g-design/`
-
-Prefer official UX4G:
-
-- design tokens;
-- components;
-- accessibility patterns;
-- spacing conventions;
-- navigation conventions;
-- responsive behavior.
-
-Custom components are allowed when UX4G does not provide the interaction required for the AI-native experience.
-
-Custom components should visually belong to the same overall system.
+The interaction model comes before the component library. The application must remain a credible, trustworthy public service rather than a generic startup dashboard.
 
 Do not turn the interface into a generic startup dashboard.
 
 Do not use excessive gradients, sparkles, AI imagery, robot avatars or persistent chatbot bubbles.
 
 The intelligence should be visible through adaptation and clarity rather than decorative AI branding.
+
+The desktop Assistance Workspace is specified first. Do not implement mobile by simply shrinking the desktop split-screen model. Mobile assistance interaction will be specified separately.
 
 ---
 
@@ -300,9 +304,22 @@ The prototype must be:
 - usable with larger text;
 - designed around clear plain-language labels.
 
-Avoid exposing government terminology when plain language can communicate the same idea.
+Use plain language to improve comprehension without removing professionally useful government terminology. Prefer progressive disclosure or dual labels where both citizen clarity and official terminology are needed.
 
-Government terminology may be revealed progressively when useful.
+## Content Design Contract
+
+**CALM. DIRECT. HUMAN. SPECIFIC.**
+
+1. Say what happened before explaining the system.
+2. Start with the citizen's goal, problem, status or outcome.
+3. Use citizen language first. Add government terminology second where the actual process requires it, for example **Correct your tax credit** followed by **Tax Credit Mismatch Correction**.
+4. One message gets one explanation. Do not repeat the same fact across a heading, description and helper copy.
+5. Prefer short, concrete statements to explanatory paragraphs.
+6. Buttons describe the action or result, such as **Review demand**, **Understand this demand**, **Correct tax credit**, **Review response** or **View case**. Avoid vague labels such as **Proceed**, **Continue** or **Open** when a clearer result-oriented label exists.
+7. Remove instructional copy when the interface already makes the action obvious.
+8. Avoid AI-sounding language such as “Based on my analysis”, “I have determined” or “As an AI”. Prefer direct language such as “Your payment was found” or “Here's what needs to happen next.”
+9. Preserve required professional and government terminology, legal meaning, authoritative statuses, references, values, Assessment Years and submission consequences.
+10. Keep the conventional portal professional. It must not sound simplistic or amateur.
 
 ---
 
@@ -343,7 +360,7 @@ Before making changes:
 
 1. Read this file.
 2. Read the relevant documents in `/docs`.
-3. Read the UX4G skill when performing UI work.
+3. Read the current target design and interaction documents when performing UI work.
 4. Stay inside the requested increment.
 5. Do not begin later increments without being asked.
 
@@ -356,3 +373,13 @@ Before completing an implementation task:
 5. Report any limitations or remaining issues.
 
 Do not automatically commit changes unless explicitly instructed.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

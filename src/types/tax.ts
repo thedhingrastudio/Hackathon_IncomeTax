@@ -16,6 +16,9 @@ export interface Taxpayer extends SyntheticRecord {
   name: string;
   pan: string;
   panMasked: string;
+  accountType: "individual";
+  profileStatus: "up_to_date";
+  lastSignIn: string;
   preferredLanguage: "en";
 }
 

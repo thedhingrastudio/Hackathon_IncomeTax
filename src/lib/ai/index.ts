@@ -1,4 +1,6 @@
 export { createDemandAssistance } from "./create-demand-assistance";
+export { createDemandUnderstanding } from "./create-demand-understanding";
+export type { DemandUnderstanding } from "./create-demand-understanding";
 export type { DemandAssistanceResult } from "./create-demand-assistance";
 export { MockAssistanceEngine } from "./mock-assistance-engine";
 export { getAssistanceEngine, isAssistanceProvider } from "./provider";
