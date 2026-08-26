@@ -14,9 +14,9 @@ export default function UnderstandingSurface({ understanding, headingRef, onFix 
   return (
     <section className="understanding-surface" aria-labelledby="understanding-title">
       <header className="understanding-header">
-        <p className="assistance-kicker">Outstanding demand</p>
-        <h2 id="understanding-title" ref={headingRef} tabIndex={-1}>Understanding your demand</h2>
-        <p>We found why this is showing.</p>
+        <p className="assistance-kicker"><span className="assistance-desktop-copy">Outstanding demand</span><span className="assistance-mobile-copy">Understanding your demand</span></p>
+        <h2 id="understanding-title" ref={headingRef} tabIndex={-1}><span className="assistance-desktop-copy">Understanding your demand</span><span className="assistance-mobile-copy">Your payment was found.</span></h2>
+        <p className="assistance-desktop-copy">We found why this is showing.</p>
       </header>
       <div className="understanding-comparison" aria-label="Tax payment comparison">
         <div aria-label={`${paid.label}: ${formatIndianCurrency(Number(paid.value), currency)}, ${formatRecordLabel(String(paid.status))}`}>
@@ -25,11 +25,11 @@ export default function UnderstandingSurface({ understanding, headingRef, onFix 
         <div aria-label={`${recognised.label}: ${formatIndianCurrency(Number(recognised.value), currency)}`}>
           <span>{recognised.label}</span><strong>{formatIndianCurrency(Number(recognised.value), currency)}</strong><small>Self-Assessment Tax</small>
         </div>
-        <p className="understanding-difference"><strong>{formatIndianCurrency(Number(resolved.comparison.difference), currency)}</strong><span>not counted</span></p>
+        <p className="understanding-difference"><strong>{formatIndianCurrency(Number(resolved.comparison.difference), currency)}</strong><span><span className="assistance-desktop-copy">not counted</span><span className="assistance-mobile-copy">wasn&apos;t counted</span></span></p>
       </div>
       <div className="understanding-explanation">
         <p>Your payment exists in Income Tax records, but it wasn&apos;t included when your return was processed.</p>
-        <p>That is why {formatIndianCurrency(understanding.evidence.demand.amount, currency)} is appearing as an outstanding demand.</p>
+        <p className="understanding-detail">That is why {formatIndianCurrency(understanding.evidence.demand.amount, currency)} is appearing as an outstanding demand.</p>
       </div>
       <Button className="app-action app-action-primary understanding-primary-action" onClick={onFix} size="lg" type="button">{resolved.primaryAction.label}<ArrowRight aria-hidden="true" /></Button>
       <SourceTrace currency={currency} items={resolved.sourceTrace.items} />

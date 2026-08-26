@@ -304,11 +304,17 @@ test("deterministic questions recompose Assistance into trusted account UI", asy
   await page.reload();
   await page.getByRole("button", { name: "Open assistance" }).click();
   const workspace = page.getByRole("complementary", { name: "Assistance Workspace" });
-  await expect(workspace.getByRole("heading", { name: "You can ask" })).toBeVisible();
-  for (const question of ["Why do I owe ₹18,420?", "Did my payment go through?", "What should I do next?", "What dates should I remember?"]) await expect(workspace.getByRole("button", { name: question })).toBeVisible();
+  await expect(workspace.getByLabel("Try asking")).toBeVisible();
+  for (const question of ["What needs my attention?", "Did my payment go through?", "What happens next?"]) await expect(workspace.getByRole("button", { name: question })).toBeVisible();
   await saveReviewScreenshot(page, testInfo, "phase-2-a-home-you-can-ask");
 
-  await workspace.getByRole("button", { name: "Why do I owe ₹18,420?" }).click();
+  await workspace.getByRole("button", { name: "What needs my attention?" }).click();
+  await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  await expect(workspace.getByText("Respond to outstanding demand", { exact: true })).toBeVisible();
+
+  const composer = workspace.getByLabel("Ask about your taxes");
+  await composer.fill("Why do I still have a demand?");
+  await workspace.getByRole("button", { name: "Send question" }).click();
   await expect(workspace.locator(".assistance-response-assembly")).toBeVisible();
   await expect(workspace.getByRole("heading", { name: "Understanding your demand" })).toBeVisible();
   await expect(workspace.locator("[data-chat-message]")).toHaveCount(0);
@@ -316,7 +322,6 @@ test("deterministic questions recompose Assistance into trusted account UI", asy
   await workspace.getByRole("button", { name: "Back to overview" }).click();
   await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
 
-  const composer = workspace.getByLabel("Ask about your taxes");
   await composer.fill("Did my payment go through?");
   await workspace.getByRole("button", { name: "Send question" }).click();
   await expect(workspace.getByRole("heading", { name: /₹18,420/ })).toBeVisible();
@@ -353,8 +358,13 @@ test("deterministic questions recompose Assistance into trusted account UI", asy
 
   await composer.fill("Can you plan my holiday?");
   await workspace.getByRole("button", { name: "Send question" }).click();
-  await expect(workspace.getByRole("heading", { name: "I can help with information available in this prototype account." })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "I can help with your tax records, outstanding demand, payments, return status and case progress." })).toBeVisible();
+  for (const question of ["What needs my attention?", "Did my payment go through?", "What happens next?"]) await expect(workspace.getByRole("button", { name: question }).first()).toBeVisible();
   await saveReviewScreenshot(page, testInfo, "phase-2-g-scope-boundary");
+
+  await workspace.getByRole("button", { name: "What happens next?" }).first().click();
+  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  await expect(workspace.getByText("Two government steps are required, in this order.", { exact: true })).toBeVisible();
 });
 
 test("workspace foundation has no horizontal overflow at 1150px", async ({ page }, testInfo) => {

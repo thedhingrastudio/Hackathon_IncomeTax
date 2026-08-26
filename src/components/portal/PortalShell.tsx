@@ -87,6 +87,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
 
   function showQuestionIntent(intent: AssistanceQuestionIntent) {
     const taxCase = getStoredCase();
+    if (intent === "attention") { setAssistanceSurface("home"); return; }
     if (intent === "explain_demand") { router.push("/pending-actions/demand"); setAssistanceSurface("understanding"); return; }
     if (intent === "payment_status") { setAssistanceSurface("payment"); return; }
     if (intent === "dates") { setAssistanceSurface("dates"); return; }

@@ -56,7 +56,7 @@ export default function AssistanceWorkspace({ closeButtonRef, demand, id, onAsk,
 
   let questionSet: QuestionSet | null = null;
   if (!reconfiguring && !consequenceMode && !assemblingHome) {
-    if (surface === "home") questionSet = waiting ? "tracking" : "home";
+    if (surface === "home" && waiting) questionSet = "tracking";
     else if (surface === "understanding") questionSet = "understanding";
     else if (surface === "action") questionSet = "action";
     else if (surface === "tracking") questionSet = "tracking";

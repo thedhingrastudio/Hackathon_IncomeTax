@@ -32,7 +32,7 @@ export default function AssistanceHome({ demand, onUnderstand, onViewCase }: { t
     <header className="assistance-home-header">
       <p className="assistance-kicker">Assistance</p>
       <h2>1 item needs your attention</h2>
-      <p>Review what needs attention or ask about your Income Tax account.</p>
+      <p className="assistance-home-intro">Review what needs attention or ask about your Income Tax account.</p>
     </header>
     <section className="assistance-attention" aria-labelledby="assistance-attention-title">
       <h3 className="visually-hidden" id="assistance-attention-title">Outstanding demand requiring attention</h3>

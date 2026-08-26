@@ -5,9 +5,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const suggestedQuestions = ["What needs my attention?", "Did my payment go through?", "What happens next?"] as const;
+
 export default function AssistanceComposer({ caseContext = false, contextual = false, onAsk }: { caseContext?: boolean; contextual?: boolean; onAsk: (question: string) => void }) {
   const [question, setQuestion] = useState("");
   return <form className="assistance-composer" onSubmit={(event) => { event.preventDefault(); const next = question.trim(); if (!next) return; onAsk(next); setQuestion(""); }}>
+    <div className="assistance-composer-suggestions" aria-label="Try asking"><span>Try asking</span><div>{suggestedQuestions.map((suggestion) => <button key={suggestion} onClick={() => { setQuestion(""); onAsk(suggestion); }} type="button">{suggestion}</button>)}</div></div>
     <label htmlFor="assistance-question">{caseContext ? "Ask about this case" : "Ask about your taxes"}</label>
     <div className="assistance-composer-row">
       <Input id="assistance-question" name="question" onChange={(event) => setQuestion(event.target.value)} placeholder={caseContext ? "Ask about this case…" : contextual ? "Ask a follow-up…" : "Ask about your taxes…"} type="text" value={question} />
