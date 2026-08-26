@@ -163,4 +163,93 @@
     text-decoration: underline !important;
     text-underline-offset: .18em !important;
   }
+
+  /* Mobile Assistance is a direct, separate experience—not a menu preference. */
+  .assistance-handle-anchor {
+    position: fixed !important;
+    z-index: 70 !important;
+    right: .75rem !important;
+    top: 52% !important;
+    display: block !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .desktop-workspace.is-open .assistance-handle-anchor {
+    display: none !important;
+  }
+
+  .assistance-handle {
+    display: inline-flex !important;
+    min-width: 48px !important;
+    min-height: 108px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .4rem !important;
+    padding: .65rem .55rem !important;
+    border: 1px solid var(--product-border, #d9ddd8) !important;
+    border-radius: .7rem 0 0 .7rem !important;
+    background: color-mix(in srgb, white 96%, #e7efe9) !important;
+    color: var(--public-sage, #557663) !important;
+    box-shadow: 0 12px 28px rgb(31 30 26 / 12%) !important;
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+  }
+
+  .assistance-handle svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  .desktop-workspace.is-open {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 80 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    background: var(--product-surface, #fff) !important;
+  }
+
+  .desktop-workspace.is-open > .portal-workspace {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .desktop-workspace.is-open > .assistance-workspace {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 90 !important;
+    display: grid !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    grid-template-rows: auto 1px minmax(0, 1fr) auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--product-surface, #fff) !important;
+    box-shadow: none !important;
+  }
+
+  .assistance-workspace-bar {
+    min-height: 64px !important;
+    padding: .65rem 1rem !important;
+    background: var(--product-surface, #fff) !important;
+  }
+
+  .assistance-workspace-scroll {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    padding: 1rem !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .assistance-workspace .assistance-composer {
+    position: relative !important;
+    inset: auto !important;
+    padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom)) !important;
+    background: var(--product-surface, #fff) !important;
+  }
 }
