@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Landmark, ReceiptText, SearchCheck } from "lucide-react";
 import LandingAssistancePreview from "../components/landing/LandingAssistancePreview";
-import HeroProductMockup from "../components/landing/HeroProductMockup";
 
 const announcements = [
   "Tax payments and AIS records may take time to appear after processing.",
@@ -14,8 +13,8 @@ export default function LandingPage() {
     <header className="public-header"><div className="public-container public-header-inner"><Link className="public-brand" href="/"><span aria-hidden="true">IT</span><div><strong>Income Tax</strong><small>Citizen assistance prototype</small></div></Link><nav aria-label="Landing page"><a href="#announcements">Announcements</a><a href="#assistance">Assistance</a><a href="#capabilities">Citizen capabilities</a><Link className="public-login-link" href="/login">Login</Link></nav></div></header>
 
     <main>
-      <section className="public-hero"><div className="public-container public-hero-grid"><HeroProductMockup />
-        <div className="public-hero-copy"><p className="public-kicker public-hero-desktop-copy">An experience for the citizen</p><p className="public-kicker public-hero-mobile-copy">Income Tax citizen experience</p><h1 className="public-hero-desktop-copy">A clearer way to understand your taxes.</h1><h1 className="public-hero-mobile-copy">A clearer way to understand your tax actions.</h1><p className="public-hero-desktop-copy">Review your tax records, understand outstanding actions, and see what to do next, without having to understand how the system is organised.</p><p className="public-hero-mobile-copy">See what needs attention and what to do next.</p><div className="public-actions"><Link className="public-button public-button-primary" href="/login">Login<ArrowRight aria-hidden="true" /></Link><a className="public-text-link hero-assistance-link" href="#assistance">See how Assistance works <ArrowRight aria-hidden="true" /></a></div></div>
+      <section className="public-hero"><div className="public-container public-hero-grid">
+        <div className="public-hero-copy"><p className="public-kicker">Income Tax, made clearer</p><h1>Understand your taxes. Know what to do next.</h1><p>See what needs attention, why it happened, and what to do next. Assistance connects the relevant records and prepares the next step for you to review.</p><div className="public-actions"><Link className="public-button public-button-primary" href="/login">Login<ArrowRight aria-hidden="true" /></Link><a className="public-text-link hero-assistance-link" href="#assistance">See how Assistance works <ArrowRight aria-hidden="true" /></a></div></div>
       </div></section>
 
       <section className="public-section public-announcements" id="announcements"><div className="public-container"><header className="public-section-heading"><h2>Announcements</h2></header><div className="announcement-viewport" tabIndex={0} aria-label="Synthetic announcements; scroll horizontally to review"><div className="announcement-ticker">{announcements.map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}<div className="announcement-ticker-copy" aria-hidden="true">{announcements.map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></article>)}</div></div></div></div></section>
