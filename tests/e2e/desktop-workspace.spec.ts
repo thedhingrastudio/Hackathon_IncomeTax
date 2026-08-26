@@ -119,6 +119,12 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(workspace.getByText("These connected Income Tax records support the explanation.", { exact: true })).toBeHidden();
   await saveReviewScreenshot(page, testInfo, "understanding-surface");
 
+  await workspace.getByRole("button", { name: "Go back" }).click();
+  await expect(workspace.getByRole("heading", { name: "1 item needs your attention" })).toBeVisible();
+  await expect(workspace.getByRole("button", { name: "Go back" })).toHaveCount(0);
+  await workspace.getByRole("button", { name: "Understand this demand" }).click();
+  await expect(workspace.getByRole("heading", { name: "Understanding your demand" })).toBeVisible();
+
   await sourceTrigger.click();
   await expect(sourceTrigger).toHaveAttribute("aria-expanded", "true");
   const sourceTrace = workspace.locator(".source-trace-content");
@@ -127,15 +133,15 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
 
   await workspace.getByRole("button", { name: "Fix this" }).click();
   await expect(page).toHaveURL(/\/pending-actions\/demand$/);
-  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
-  await expect(workspace.getByRole("heading", { name: "Correct your tax credit" })).toBeVisible();
-  await expect(workspace.getByText("Payment identified", { exact: true })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Here's what to do next" })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Add the missing payment to your return" })).toBeVisible();
+  await expect(workspace.getByText("Payment to add", { exact: true })).toBeVisible();
   await expect(workspace.getByText("₹18,420", { exact: true })).toBeVisible();
   await expect(workspace.getByText("15 July 2026 · Self-Assessment Tax", { exact: true })).toBeVisible();
-  await expect(workspace.getByText("Everything required is ready.", { exact: true })).toBeVisible();
-  await expect(workspace.getByRole("heading", { name: "Respond to the demand" })).toBeVisible();
-  await expect(workspace.getByText("Starts after Step 1", { exact: true })).toBeVisible();
-  await expect(workspace.getByText("Corrective plan", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Ready to review.", { exact: true })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Respond to the outstanding demand" })).toBeVisible();
+  await expect(workspace.getByText("Next after Step 1", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Next steps", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Form 26AS", { exact: true })).toHaveCount(0);
   await expect(workspace.getByText("processing-demo-2026-27-001", { exact: true })).toHaveCount(0);
   const composer = workspace.getByLabel("Ask about your taxes");
@@ -150,6 +156,11 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await expect(governmentProcessDetails.getByText("Submit response", { exact: true })).toBeVisible();
   await page.waitForTimeout(350);
   await saveReviewScreenshot(page, testInfo, "action-workspace-plan");
+
+  await workspace.getByRole("button", { name: "Go back" }).click();
+  await expect(workspace.getByRole("heading", { name: "Understanding your demand" })).toBeVisible();
+  await workspace.getByRole("button", { name: "Fix this" }).click();
+  await expect(workspace.getByRole("heading", { name: "Here's what to do next" })).toBeVisible();
 
   await workspace.getByRole("button", { name: "Review correction" }).click();
   await expect(page).toHaveURL(/\/pending-actions\/demand$/);
@@ -167,20 +178,26 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   expect(JSON.parse(storedCase!)).not.toHaveProperty("rectificationReference");
   await saveReviewScreenshot(page, testInfo, "rectification-review");
 
-  await workspace.getByRole("button", { name: "Back" }).click();
-  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  await workspace.getByRole("button", { name: "Go back" }).click();
+  await expect(workspace.getByRole("heading", { name: "Here's what to do next" })).toBeVisible();
   storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
   expect(JSON.parse(storedCase!)).not.toHaveProperty("rectificationReference");
   await workspace.getByRole("button", { name: "Review correction" }).click();
 
   await workspace.getByRole("button", { name: "Confirm and submit correction" }).click();
-  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "One step left" })).toBeVisible();
   await expect(workspace.getByText("RECT-DEMO-01842", { exact: true })).toBeVisible();
-  await expect(workspace.getByText("Ready for review", { exact: true })).toBeVisible();
+  await expect(workspace.getByText("Ready to review", { exact: true })).toBeVisible();
   await expect(workspace.getByRole("button", { name: "Review response" })).toBeVisible();
   storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
   expect(JSON.parse(storedCase!)).toMatchObject({ state: "RECTIFICATION_SUBMITTED", rectificationReference: "RECT-DEMO-01842" });
   await saveReviewScreenshot(page, testInfo, "action-workspace-after-rectification");
+
+  await workspace.getByRole("button", { name: "Go back" }).click();
+  await expect(workspace.getByRole("heading", { name: "Understanding your demand" })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Review correction" })).toHaveCount(0);
+  await workspace.getByRole("button", { name: "Fix this" }).click();
+  await expect(workspace.getByRole("heading", { name: "One step left" })).toBeVisible();
 
   await workspace.getByRole("button", { name: "Review response" }).click();
   await expect(workspace.getByRole("heading", { name: "Review demand response" })).toBeVisible();
@@ -197,14 +214,15 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   expect(JSON.parse(storedCase!)).not.toHaveProperty("demandResponseReference");
   await saveReviewScreenshot(page, testInfo, "demand-response-review");
 
-  await workspace.getByRole("button", { name: "Back" }).click();
-  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
+  await workspace.getByRole("button", { name: "Go back" }).click();
+  await expect(workspace.getByRole("heading", { name: "One step left" })).toBeVisible();
   storedCase = await page.evaluate(() => window.localStorage.getItem("income-tax-demo-case:v1"));
   expect(JSON.parse(storedCase!)).not.toHaveProperty("demandResponseReference");
   await workspace.getByRole("button", { name: "Review response" }).click();
 
   await workspace.getByRole("button", { name: "Confirm and submit response" }).click();
   await expect(workspace.getByRole("heading", { name: "Response submitted" })).toBeVisible();
+  await expect(workspace.getByRole("button", { name: "Go back" })).toHaveCount(0);
   await expect(workspace.getByText("DEMAND-RESP-DEMO-18420", { exact: true })).toBeVisible();
   await expect(workspace.getByText("Waiting for Income Tax review", { exact: true })).toBeVisible();
   await expect(workspace.getByLabel("Ask about your taxes")).toHaveCount(0);
@@ -237,6 +255,10 @@ test("desktop Assistance Home opens as a persistent split workspace", async ({ p
   await workspace.getByRole("link", { name: "View full case" }).click();
   await expect(page).toHaveURL(/\/case\/CASE-DEMO-18420$/);
   await expect(page.getByRole("heading", { name: "Outstanding Demand case" })).toBeVisible();
+  const portalCaseProgress = page.locator(".case-tracker").getByRole("list", { name: "Case progress" });
+  await expect(portalCaseProgress.getByText("Issue found", { exact: true })).toBeVisible();
+  await expect(portalCaseProgress.getByText("Processed return did not include the payment", { exact: true })).toBeVisible();
+  await expect(portalCaseProgress.getByText("Return processed", { exact: true })).toHaveCount(0);
   await expect(workspace.getByRole("heading", { name: "Waiting for Income Tax review" })).toBeVisible();
   await saveReviewScreenshot(page, testInfo, "full-case-page-with-assistance-tracking");
 
@@ -363,8 +385,8 @@ test("deterministic questions recompose Assistance into trusted account UI", asy
   await saveReviewScreenshot(page, testInfo, "phase-2-g-scope-boundary");
 
   await workspace.getByRole("button", { name: "What happens next?" }).first().click();
-  await expect(workspace.getByRole("heading", { name: "Here's what needs to happen" })).toBeVisible();
-  await expect(workspace.getByText("Two government steps are required, in this order.", { exact: true })).toBeVisible();
+  await expect(workspace.getByRole("heading", { name: "Here's what to do next" })).toBeVisible();
+  await expect(workspace.getByText("Two steps are needed. You'll review each one before anything is submitted.", { exact: true })).toBeVisible();
 });
 
 test("workspace foundation has no horizontal overflow at 1150px", async ({ page }, testInfo) => {

@@ -1,10 +1,25 @@
 "use client";
 
 import { Check, CircleAlert, CircleDot, Info } from "lucide-react";
+import { getForm26AS, getOutstandingDemand, getProcessingResult, getTaxPayment } from "../../data/mock";
+import { formatIndianCurrency, formatRecordLabel } from "../../lib/format-tax";
 import { useTaxDemandCase } from "../../lib/storage/case-storage";
 
 type Tone = "complete" | "action" | "waiting" | "future";
 type Step = { label: string; tone: Tone; detail?: string; help?: string };
+
+function buildLifecycleSteps(rectificationReference?: string, demandResponseReference?: string, state?: string): Step[] {
+  const waiting = state === "WAITING_FOR_REVIEW";
+  const resolved = state === "RESOLVED";
+  return [
+    { label: "Payment found", tone: "complete" },
+    { label: "Issue found", tone: "complete", detail: "Processed return did not include the payment" },
+    { label: "Correction submitted", tone: rectificationReference ? "complete" : "future", detail: rectificationReference },
+    { label: "Demand response submitted", tone: demandResponseReference ? "complete" : "future", detail: demandResponseReference },
+    { label: "Income Tax review", tone: resolved ? "complete" : waiting ? "waiting" : "future", detail: waiting ? "Waiting for review" : resolved ? "Reviewed" : undefined },
+    { label: "Resolved", tone: resolved ? "complete" : "future", detail: resolved ? undefined : "Not reached yet" },
+  ];
+}
 
 function buildSteps(state?: string): Step[] {
   const rectificationDone = ["RECTIFICATION_SUBMITTED", "DEMAND_RESPONSE_REVIEW", "DEMAND_RESPONSE_SUBMITTED", "WAITING_FOR_REVIEW", "RESOLVED"].includes(state ?? "");
@@ -12,19 +27,28 @@ function buildSteps(state?: string): Step[] {
   const waiting = state === "WAITING_FOR_REVIEW";
   const resolved = state === "RESOLVED";
 
-  const steps: Step[] = [
-    { label: "Payment found", tone: "complete", detail: "₹18,420 confirmed", help: "The Self-Assessment Tax payment exists in your Income Tax records." },
-    { label: "Return processed", tone: "complete", detail: "₹0 of this payment counted", help: "Your return was processed, but this payment was not included in the tax credit used for the return." },
+  const payment = getTaxPayment();
+  const form26as = getForm26AS();
+  const form26asEntry = form26as.entries[0];
+  const processing = getProcessingResult();
+  const demand = getOutstandingDemand();
+
+  if (!rectificationDone) return [
+    { label: "Payment", tone: "complete", detail: `${formatIndianCurrency(payment.amount, payment.currency)} · ${formatRecordLabel(payment.status)}`, help: "The Self-Assessment Tax payment exists and is confirmed." },
+    { label: "Form 26AS", tone: "complete", detail: `${formatIndianCurrency(form26asEntry.amount, form26asEntry.currency)} · ${formatRecordLabel(form26asEntry.status)}`, help: "Form 26AS reflects the payment, confirming that the tax record exists." },
+    { label: "Processed return", tone: "action", detail: `${formatIndianCurrency(processing.selfAssessmentTaxRecognised, processing.currency)} · Mismatch`, help: "The processed return recognised ₹0 of this Self-Assessment Tax payment." },
+    { label: "Outstanding demand", tone: "action", detail: `${formatIndianCurrency(demand.amount, demand.currency)} · Action required`, help: "Because the processed return did not count the payment, the same amount appears as an outstanding demand." },
   ];
 
-  if (!rectificationDone) {
-    steps.push({ label: "Payment not counted", tone: "action", detail: "Correction needed", help: "The payment exists, but your processed return counted ₹0. The government process used to correct this is Tax Credit Mismatch Correction." });
-    steps.push({ label: "Respond to demand", tone: "future", detail: "After the correction" });
-  } else {
-    steps.push({ label: "Correction submitted", tone: "complete", detail: "RECT-DEMO-01842", help: "Your payment challan was added through Tax Credit Mismatch Correction." });
-    if (!responseDone) steps.push({ label: "Respond to demand", tone: "action", detail: "Your response is needed", help: "The correction is submitted. You still need to respond to the outstanding demand." });
-    else steps.push({ label: "Demand response submitted", tone: "complete", detail: "DEMAND-RESP-DEMO-18420" });
-  }
+  const steps: Step[] = [
+    { label: "Payment", tone: "complete", detail: `${formatIndianCurrency(payment.amount, payment.currency)} · ${formatRecordLabel(payment.status)}`, help: "The Self-Assessment Tax payment exists and is confirmed." },
+    { label: "Form 26AS", tone: "complete", detail: `${formatIndianCurrency(form26asEntry.amount, form26asEntry.currency)} · ${formatRecordLabel(form26asEntry.status)}`, help: "Form 26AS reflects the payment, confirming that the tax record exists." },
+    { label: "Processed return", tone: "action", detail: `${formatIndianCurrency(processing.selfAssessmentTaxRecognised, processing.currency)} · Mismatch`, help: "The processed return recognised ₹0 of this Self-Assessment Tax payment." },
+  ];
+
+  steps.push({ label: "Correction submitted", tone: "complete", detail: "RECT-DEMO-01842", help: "Your payment challan was added through Tax Credit Mismatch Correction." });
+  if (!responseDone) steps.push({ label: "Outstanding demand", tone: "action", detail: `${formatIndianCurrency(demand.amount, demand.currency)} · Action required`, help: "The correction is submitted. You still need to respond to the outstanding demand." });
+  else steps.push({ label: "Demand response submitted", tone: "complete", detail: "DEMAND-RESP-DEMO-18420" });
 
   if (responseDone) {
     steps.push(resolved
@@ -42,10 +66,10 @@ function StepIcon({ tone }: { tone: Tone }) {
   return <CircleDot aria-hidden="true" />;
 }
 
-export default function StatusJourney({ compact = false }: { compact?: boolean }) {
+export default function StatusJourney({ compact = false, horizontal = false, lifecycle = false }: { compact?: boolean; horizontal?: boolean; lifecycle?: boolean }) {
   const item = useTaxDemandCase();
-  const steps = buildSteps(item?.state);
-  return <ol className={`status-journey${compact ? " status-journey--compact" : ""}`} aria-label="Case progress">
+  const steps = lifecycle ? buildLifecycleSteps(item?.rectificationReference, item?.demandResponseReference, item?.state) : buildSteps(item?.state);
+  return <ol className={`status-journey${compact ? " status-journey--compact" : ""}${horizontal ? " status-journey--horizontal" : ""}`} aria-label="Case progress">
     {steps.map((step) => <li className={`status-journey__step status-journey__step--${step.tone}`} key={step.label}>
       <span className="status-journey__marker"><StepIcon tone={step.tone} /></span>
       <span className="status-journey__copy"><strong>{step.label}</strong>{step.detail ? <small>{step.detail}</small> : null}</span>
