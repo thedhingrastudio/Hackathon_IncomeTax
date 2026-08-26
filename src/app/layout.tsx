@@ -6,6 +6,7 @@ import { createDemandUnderstanding } from "../lib/ai";
 import "./globals.css";
 import "./mobile-final.css";
 import "./landing-final.css";
+import "./status-semantics.css";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
 

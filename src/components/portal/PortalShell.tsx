@@ -35,6 +35,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   const [rectificationSubmission, setRectificationSubmission] = useState<RectificationSubmission | null>(null);
   const [responseDraft, setResponseDraft] = useState<AssistedDemandResponseDraft | null>(null);
   const [responseSubmission, setResponseSubmission] = useState<AssistedDemandResponseSubmission | null>(null);
+  const [assistanceHistory, setAssistanceHistory] = useState<AssistanceSurface[]>([]);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const assistanceHandleRef = useRef<HTMLButtonElement>(null);
   const assistanceCloseRef = useRef<HTMLButtonElement>(null);
@@ -76,34 +77,53 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     window.setTimeout(() => assistanceHandleRef.current?.focus(), 0);
   }
 
+  function showAssistanceSurface(next: AssistanceSurface, mode: "push" | "replace" | "reset" = "push") {
+    if (mode === "reset") setAssistanceHistory([]);
+    else if (mode === "push" && next !== assistanceSurface) setAssistanceHistory((history) => [...history, assistanceSurface]);
+    setAssistanceSurface(next);
+  }
+
+  function goBackInAssistance() {
+    if (checkingTimerRef.current) clearTimeout(checkingTimerRef.current);
+    if (questionTimerRef.current) clearTimeout(questionTimerRef.current);
+    setReconfiguring(false);
+    setAssistanceHistory((history) => {
+      const previous = history.at(-1);
+      if (!previous) return history;
+      setAssistanceSurface(previous);
+      if (previous === "home") setQuestionMode(false);
+      return history.slice(0, -1);
+    });
+  }
+
   function understandDemand() {
     setQuestionMode(false);
     router.push("/pending-actions/demand");
-    if (!understanding) { setAssistanceSurface("understanding"); return; }
-    setAssistanceSurface("checking");
+    if (!understanding) { showAssistanceSurface("understanding"); return; }
+    showAssistanceSurface("checking");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    checkingTimerRef.current = setTimeout(() => setAssistanceSurface("understanding"), reducedMotion ? 0 : 1050);
+    checkingTimerRef.current = setTimeout(() => showAssistanceSurface("understanding", "replace"), reducedMotion ? 0 : 1050);
   }
 
   function showQuestionIntent(intent: AssistanceQuestionIntent) {
     const taxCase = getStoredCase();
-    if (intent === "attention") { setAssistanceSurface("home"); return; }
-    if (intent === "explain_demand") { router.push("/pending-actions/demand"); setAssistanceSurface("understanding"); return; }
-    if (intent === "payment_status") { setAssistanceSurface("payment"); return; }
-    if (intent === "dates") { setAssistanceSurface("dates"); return; }
-    if (intent === "form_26as") { setAssistanceSurface("form_26as"); return; }
-    if (intent === "return_status") { setAssistanceSurface("return_status"); return; }
-    if (intent === "source_trace") { setAssistanceSurface("evidence"); return; }
-    if (intent === "pay_again") { setAssistanceSurface("pay_again"); return; }
+    if (intent === "attention") { setQuestionMode(false); showAssistanceSurface("home", "reset"); return; }
+    if (intent === "explain_demand") { router.push("/pending-actions/demand"); showAssistanceSurface("understanding"); return; }
+    if (intent === "payment_status") { showAssistanceSurface("payment"); return; }
+    if (intent === "dates") { showAssistanceSurface("dates"); return; }
+    if (intent === "form_26as") { showAssistanceSurface("form_26as"); return; }
+    if (intent === "return_status") { showAssistanceSurface("return_status"); return; }
+    if (intent === "source_trace") { showAssistanceSurface("evidence"); return; }
+    if (intent === "pay_again") { showAssistanceSurface("pay_again"); return; }
     if (intent === "case_status") {
-      setAssistanceSurface(taxCase?.state === "WAITING_FOR_REVIEW" ? "tracking" : taxCase ? "action" : "no_case");
+      showAssistanceSurface(taxCase?.state === "WAITING_FOR_REVIEW" ? "tracking" : taxCase ? "action" : "no_case");
       return;
     }
     if (intent === "next_action") {
-      setAssistanceSurface(taxCase?.state === "WAITING_FOR_REVIEW" ? "tracking" : "action");
+      showAssistanceSurface(taxCase?.state === "WAITING_FOR_REVIEW" ? "tracking" : "action");
       return;
     }
-    setAssistanceSurface("unsupported");
+    showAssistanceSurface("unsupported");
   }
 
   function askAssistance(question: string) {
@@ -118,12 +138,12 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     if (questionTimerRef.current) clearTimeout(questionTimerRef.current);
     setReconfiguring(false);
     setQuestionMode(false);
-    setAssistanceSurface("home");
+    showAssistanceSurface("home", "reset");
   }
 
   function showCorrectivePlan() {
     if (!understanding || understanding.specification.primaryAction.actionId !== "start_corrective_plan") return;
-    setAssistanceSurface("action");
+    showAssistanceSurface("action");
   }
 
   function reviewRectification() {
@@ -134,7 +154,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     if (taxCase.state === "PLAN_READY") taxCase = transitionCase(taxCase, "RECTIFICATION_REVIEW") ?? taxCase;
     saveCase(taxCase);
     setRectificationDraft(prepared.data);
-    setAssistanceSurface("rectification_review");
+    showAssistanceSurface("rectification_review");
   }
 
   function confirmRectification() {
@@ -147,6 +167,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     if (!recorded) return;
     saveCase(recorded);
     setRectificationSubmission(submitted.data);
+    setAssistanceHistory((history) => history.filter((surface, index) => surface !== "rectification_review" && !(surface === "action" && index === history.length - 1)));
     setAssistanceSurface("action");
   }
 
@@ -167,7 +188,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     saveCase(reviewing);
     setRectificationSubmission(submittedCorrection);
     setResponseDraft(prepared.data);
-    setAssistanceSurface("demand_response_review");
+    showAssistanceSurface("demand_response_review");
   }
 
   function confirmDemandResponse() {
@@ -180,6 +201,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     if (!recorded) return;
     saveCase(recorded);
     setResponseSubmission(submitted.data);
+    setAssistanceHistory([]);
     setAssistanceSurface("demand_response_submitted");
   }
 
@@ -203,6 +225,6 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   </div>
   </div>
   <div className="assistance-handle-anchor"><AssistanceDrawerHandle controls={assistanceId} expanded={assistanceOpen} handleRef={assistanceHandleRef} onOpen={openAssistance} /></div>
-  {assistanceOpen ? <AssistanceWorkspace assembleHome={!homeAssembled} closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onAsk={askAssistance} onBackToAction={() => setAssistanceSurface("action")} onClose={closeAssistance} onConfirmDemandResponse={confirmDemandResponse} onConfirmRectification={confirmRectification} onFix={assistanceSurface === "action" ? reviewRectification : showCorrectivePlan} onHomeAssembled={markHomeAssembled} onOverview={returnToOverview} onQuestionNextAction={() => showQuestionIntent("next_action")} onReviewResponse={reviewDemandResponse} onUnderstand={understandDemand} onViewCase={() => setAssistanceSurface("tracking")} questionMode={questionMode} reconfiguring={reconfiguring} rectificationDraft={rectificationDraft} rectificationSubmission={rectificationSubmission} responseDraft={responseDraft} responseSubmission={responseSubmission} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
+  {assistanceOpen ? <AssistanceWorkspace assembleHome={!homeAssembled} canGoBack={assistanceSurface !== "home" && assistanceHistory.length > 0} closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onAsk={askAssistance} onBack={goBackInAssistance} onBackToAction={goBackInAssistance} onClose={closeAssistance} onConfirmDemandResponse={confirmDemandResponse} onConfirmRectification={confirmRectification} onFix={assistanceSurface === "action" ? reviewRectification : showCorrectivePlan} onHomeAssembled={markHomeAssembled} onOverview={returnToOverview} onQuestionNextAction={() => showQuestionIntent("next_action")} onReviewResponse={reviewDemandResponse} onUnderstand={understandDemand} onViewCase={() => showAssistanceSurface("tracking")} questionMode={questionMode} reconfiguring={reconfiguring} rectificationDraft={rectificationDraft} rectificationSubmission={rectificationSubmission} responseDraft={responseDraft} responseSubmission={responseSubmission} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
   </div>;
 }

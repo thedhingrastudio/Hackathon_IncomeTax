@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { CircleAlert } from "lucide-react";
 import DemandAssistanceEntry from "../../../components/portal/DemandAssistanceEntry";
+import CaseStateLabel from "../../../components/portal/CaseStateLabel";
 import { getForm26AS, getOutstandingDemand, getProcessingResult, getTaxPayment } from "../../../data/mock";
 import { formatAssessmentYear, formatIndianCurrency, formatIndianDate, formatRecordLabel } from "../../../lib/format-tax";
 
@@ -13,7 +13,7 @@ export default function DemandDetailPage() {
   return <div className="professional-demand">
     <Link className="back-link portal-tertiary-link is-back" href="/pending-actions">← Pending Actions</Link>
     <header className="demand-title"><p>AY {formatAssessmentYear(demand.assessmentYear)}</p><h1>Outstanding Demand</h1></header>
-    <section className="demand-focal-summary" aria-label="Outstanding demand summary"><div><strong>{formatIndianCurrency(demand.amount, demand.currency)}</strong><span>Response pending</span><p>Income Tax records show an outstanding amount requiring your response.</p></div><span className="attention-state"><CircleAlert aria-hidden="true" />{formatRecordLabel(demand.status)}</span></section>
+    <section className="demand-focal-summary" aria-label="Outstanding demand summary"><div><strong>{formatIndianCurrency(demand.amount, demand.currency)}</strong><span>Response pending</span><p>Income Tax records show an outstanding amount linked to this case.</p></div><CaseStateLabel /></section>
     <section className="demand-standard-surface" aria-labelledby="demand-details-title"><div className="demand-surface-heading"><p>Government record</p><h2 id="demand-details-title">Demand details</h2></div><dl className="compact-details"><div><dt>Assessment Year</dt><dd>{formatAssessmentYear(demand.assessmentYear)}</dd></div><div><dt>Outstanding amount</dt><dd>{formatIndianCurrency(demand.amount, demand.currency)}</dd></div><div><dt>Demand status</dt><dd>Response pending</dd></div><div><dt>Created on</dt><dd>{formatIndianDate(demand.createdOn)}</dd></div><div><dt>Demand reference</dt><dd>{demand.demandId}</dd></div><div><dt>Processing reference</dt><dd>{demand.processingId}</dd></div></dl></section>
     <section className="demand-standard-surface" aria-labelledby="related-records-title"><div className="demand-surface-heading"><h2 id="related-records-title">Related tax records</h2></div><div className="related-record-table" role="table" aria-label="Records related to this outstanding demand">
       <div className="related-record-table__head" role="row"><span role="columnheader">Record</span><span role="columnheader">Date / reference</span><span role="columnheader">Amount</span><span role="columnheader">Status</span><span role="columnheader"><span className="visually-hidden">Action</span></span></div>
