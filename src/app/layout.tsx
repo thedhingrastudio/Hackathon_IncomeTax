@@ -4,6 +4,7 @@ import PortalShell from "../components/portal/PortalShell";
 import { getForm26AS, getOutstandingDemand, getProcessingResult, getTaxPayment, getTaxpayer, getTaxReturn } from "../data/mock";
 import { createDemandUnderstanding } from "../lib/ai";
 import "./globals.css";
+import "./mobile-final.css";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
