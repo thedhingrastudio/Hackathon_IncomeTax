@@ -10,7 +10,7 @@ export default function CaseAwareDemandProgress({ fallbackHref, fallbackLabel }:
   const resolved = item?.state === "RESOLVED";
 
   return <div className="case-aware-demand-progress">
-    <p>{resolved ? "This case has been resolved." : waiting ? "Your actions are complete. Income Tax review is pending." : "Here is where this demand needs attention."}</p>
+    <p>{resolved ? "Resolved" : waiting ? "Waiting for Income Tax review" : "What happened"}</p>
     <StatusJourney compact />
     <Link className="app-action app-action-primary" href={item ? `/case/${item.caseId}` : fallbackHref}>{item ? "View case progress" : fallbackLabel}</Link>
   </div>;
