@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check, CircleAlert, FileCheck2, ReceiptText, UserRound } from "lucide-react";
 import CaseAwareDemandProgress from "../../components/portal/CaseAwareDemandProgress";
+import CaseStateLabel from "../../components/portal/CaseStateLabel";
 import { getOutstandingDemand, getProcessingResult, getTaxPayment, getTaxpayer, getTaxReturn } from "../../data/mock";
 import { formatAssessmentYear, formatIndianCurrency, formatIndianDate, formatIndianShortDate, formatRecordLabel } from "../../lib/format-tax";
 
@@ -25,7 +26,7 @@ export default function DashboardPage() {
         <div className="tax-account-demand-card">
           <p className="dashboard-section-label" id="attention-title">Needs your attention</p>
           <div className="tax-account-demand-main"><p>Outstanding demand</p><strong>{formatIndianCurrency(demand.amount, demand.currency)}</strong><span>Response pending <span aria-hidden="true">·</span> AY {assessmentYear}</span></div>
-          <div className="tax-account-demand-action"><span className="attention-state"><CircleAlert aria-hidden="true" />{formatRecordLabel(demand.status)}</span><CaseAwareDemandProgress fallbackHref="/pending-actions/demand" fallbackLabel="Review outstanding demand" /></div>
+          <div className="tax-account-demand-action"><CaseAwareDemandProgress fallbackHref="/pending-actions/demand" fallbackLabel="Review outstanding demand" /></div>
           <p className="tax-account-demand-reference"><span>Demand reference</span><strong>{demand.demandId}</strong></p>
         </div>
       </section>
@@ -43,7 +44,7 @@ export default function DashboardPage() {
       <div className="account-summary-surface"><dl>
         <div><span className="summary-icon summary-icon--sage"><FileCheck2 aria-hidden="true" /></span><dt>Return</dt><dd><strong>Processed</strong><span>{formatIndianDate(processing.processedOn)}</span></dd></div>
         <div><span className="summary-icon summary-icon--sage"><ReceiptText aria-hidden="true" /></span><dt>Taxes paid</dt><dd><strong>{formatIndianCurrency(payment.amount, payment.currency)}</strong><span>{formatRecordLabel(payment.status)}</span></dd></div>
-        <div><span className="summary-icon summary-icon--amber"><CircleAlert aria-hidden="true" /></span><dt>Pending actions</dt><dd><strong>1</strong><span>Needs attention</span></dd></div>
+        <div><span className="summary-icon summary-icon--amber"><CircleAlert aria-hidden="true" /></span><dt>Case status</dt><dd><CaseStateLabel compact /></dd></div>
       </dl></div>
     </section>
 
