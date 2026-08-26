@@ -24,7 +24,6 @@ import { routeAssistanceQuestion, type AssistanceQuestionIntent } from "../../li
 import AssistanceDrawerHandle from "../assistance/AssistanceDrawerHandle";
 import AssistanceWorkspace, { type AssistanceSurface } from "../assistance/AssistanceWorkspace";
 import DemoLogout from "../auth/DemoLogout";
-import { AIAssistanceControl } from "./AIAssistancePreference";
 const navigation = [["Dashboard", "/dashboard"], ["Returns", "/returns"], ["Payments & Tax Records", "/payments"], ["Pending Actions", "/pending-actions"], ["Services", "/services"], ["Help", "/help"]] as const;
 const assistanceId = "assistance-workspace";
 export default function PortalShell({ children, taxpayerId, taxpayerName, demand, understanding }: { children: ReactNode; taxpayerId: string; taxpayerName: string; demand: OutstandingDemand; understanding: DemandUnderstanding | null }) {
@@ -68,6 +67,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
 
   function openAssistance() {
     setAssistanceOpen(true);
+    setOpen(false);
     window.setTimeout(() => assistanceCloseRef.current?.focus(), 0);
   }
 
@@ -195,7 +195,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
         <button ref={menuButtonRef} className="portal-menu-button menu-button" type="button" aria-expanded={open} aria-controls="mobile-primary-menu" onClick={() => setOpen((current) => !current)}><Menu aria-hidden="true" /> Menu</button>
         <ul className="portal-links desktop-portal-links">{navigation.map(([label, href]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href}>{label}</Link></li>; })}</ul>
         <div className="taxpayer-summary"><span aria-hidden="true">{taxpayerInitials}</span><div><strong>{taxpayerName}</strong><small>Individual taxpayer</small></div><DemoLogout /></div>
-        <div className={`mobile-navigation ${open ? "is-open" : ""}`} id="mobile-primary-menu" hidden={!open}><ul className="mobile-navigation__links">{navigation.map(([label, href]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href} onClick={() => setOpen(false)}>{label}</Link></li>; })}</ul><AIAssistanceControl idPrefix="mobile-ai-preference" compact /></div>
+        <div className={`mobile-navigation ${open ? "is-open" : ""}`} id="mobile-primary-menu" hidden={!open}><ul className="mobile-navigation__links">{navigation.map(([label, href]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href} onClick={() => setOpen(false)}>{label}</Link></li>; })}</ul></div>
       </div></nav>
     </header>
     <main className="portal-container main-content" id="main-content" tabIndex={-1}>{children}</main>
