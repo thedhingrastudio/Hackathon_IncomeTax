@@ -7,6 +7,7 @@ import "./globals.css";
 import "./mobile-final.css";
 import "./landing-final.css";
 import "./status-semantics.css";
+import "./revised-ui.css";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -17,9 +18,9 @@ const geist = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Income Tax Assistance Prototype",
+  title: "Civic Interface — Generative public services",
   description:
-    "Hackathon proof of concept for an AI-assisted Income Tax experience using synthetic data.",
+    "A generative interface layer for clearer, citizen-controlled public services.",
 };
 
 export default function RootLayout({

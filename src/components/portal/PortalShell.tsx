@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { CircleHelp, FileText, Grid3X3, Home, Menu, ReceiptText, TriangleAlert } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { OutstandingDemand } from "../../types/tax";
@@ -24,7 +24,8 @@ import { routeAssistanceQuestion, type AssistanceQuestionIntent } from "../../li
 import AssistanceDrawerHandle from "../assistance/AssistanceDrawerHandle";
 import AssistanceWorkspace, { type AssistanceSurface } from "../assistance/AssistanceWorkspace";
 import DemoLogout from "../auth/DemoLogout";
-const navigation = [["Dashboard", "/dashboard"], ["Returns", "/returns"], ["Payments & Tax Records", "/payments"], ["Pending Actions", "/pending-actions"], ["Services", "/services"], ["Help", "/help"]] as const;
+import { DitherAvatar } from "../dither-kit/avatar";
+const navigation = [["Dashboard", "/dashboard", Home], ["Returns", "/returns", FileText], ["Payments", "/payments", ReceiptText], ["Pending Actions", "/pending-actions", TriangleAlert], ["Services", "/services", Grid3X3], ["Help", "/help", CircleHelp]] as const;
 const assistanceId = "assistance-workspace";
 export default function PortalShell({ children, taxpayerId, taxpayerName, demand, understanding }: { children: ReactNode; taxpayerId: string; taxpayerName: string; demand: OutstandingDemand; understanding: DemandUnderstanding | null }) {
   const pathname = usePathname(); const router = useRouter(); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(false); const [assistanceSurface, setAssistanceSurface] = useState<AssistanceSurface>("home");
@@ -41,7 +42,6 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   const assistanceCloseRef = useRef<HTMLButtonElement>(null);
   const checkingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const questionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const taxpayerInitials = taxpayerName.split(" ").map((part) => part[0]).join("");
   const markHomeAssembled = useCallback(() => setHomeAssembled(true), []);
 
   useEffect(() => {
@@ -207,21 +207,19 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
 
   if (pathname === "/" || pathname === "/login") return <>{children}</>;
 
-  return <div className={`desktop-workspace ${assistanceOpen ? "is-open" : "is-closed"}`}>
-  <div className="portal-workspace">
-  <div className="site-shell">
+  return <div className={`desktop-workspace revised-workspace ${assistanceOpen ? "is-open" : "is-closed"}`}>
+  <div className="portal-workspace revised-portal-workspace">
+  <div className="site-shell revised-app-shell">
     <a className="skip-link" href="#main-content">Skip to main content</a>
-    <header><div className="government-masthead"><div className="portal-container government-masthead__inner"><span>भारत सरकार</span><span aria-hidden="true">|</span><span>Government of India</span></div></div>
-      <nav className="portal-navbar" aria-label="Primary navigation"><div className="portal-navbar__inner portal-container">
-        <Link className="service-identity" href="/dashboard" aria-label="Income Tax e-Filing home"><span className="service-emblem" aria-hidden="true">IT</span><span><strong>Income Tax</strong><small>e-Filing portal</small></span></Link>
-        <button ref={menuButtonRef} className="portal-menu-button menu-button" type="button" aria-expanded={open} aria-controls="mobile-primary-menu" onClick={() => setOpen((current) => !current)}><Menu aria-hidden="true" /> Menu</button>
-        <ul className="portal-links desktop-portal-links">{navigation.map(([label, href]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href}>{label}</Link></li>; })}</ul>
-        <div className="taxpayer-summary"><span aria-hidden="true">{taxpayerInitials}</span><div><strong>{taxpayerName}</strong><small>Individual taxpayer</small></div><DemoLogout /></div>
-        <div className={`mobile-navigation ${open ? "is-open" : ""}`} id="mobile-primary-menu" hidden={!open}><ul className="mobile-navigation__links">{navigation.map(([label, href]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href} onClick={() => setOpen(false)}>{label}</Link></li>; })}</ul></div>
-      </div></nav>
-    </header>
-    <main className="portal-container main-content" id="main-content" tabIndex={-1}>{children}</main>
-    <footer className="portal-footer"><div className="portal-footer__inner portal-container"><p>Income Tax e-Filing</p><p>Synthetic demo data</p></div></footer>
+    <aside className="revised-sidebar">
+      <Link className="revised-app-brand" href="/dashboard" aria-label="Civic Interface dashboard"><span aria-hidden="true"><Grid3X3 /></span><div><strong>Civic Interface</strong><small>Income Tax pilot</small></div></Link>
+      <nav aria-label="Primary navigation"><p>Workspace</p><ul>{navigation.map(([label, href, Icon]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href}><Icon aria-hidden="true" />{label}</Link></li>; })}</ul></nav>
+      <div className="revised-sidebar-account"><DitherAvatar animate={false} name={taxpayerName} size={38} /><div><strong>{taxpayerName}</strong><small>Individual taxpayer</small></div><DemoLogout /></div>
+    </aside>
+    <header className="revised-mobile-header"><Link className="revised-app-brand" href="/dashboard"><span aria-hidden="true"><Grid3X3 /></span><strong>Civic Interface</strong></Link><button ref={menuButtonRef} className="portal-menu-button" type="button" aria-expanded={open} aria-controls="mobile-primary-menu" onClick={() => setOpen((current) => !current)}><Menu aria-hidden="true" /> Menu</button></header>
+    <div className={`mobile-navigation revised-mobile-navigation ${open ? "is-open" : ""}`} id="mobile-primary-menu" hidden={!open}><ul>{navigation.map(([label, href, Icon]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href} onClick={() => setOpen(false)}><Icon aria-hidden="true" />{label}</Link></li>; })}</ul></div>
+    <main className="main-content revised-main-content" id="main-content" tabIndex={-1}>{children}</main>
+    <footer className="portal-footer revised-app-footer"><p>Generative public services · Synthetic demonstration</p></footer>
   </div>
   </div>
   <div className="assistance-handle-anchor"><AssistanceDrawerHandle controls={assistanceId} expanded={assistanceOpen} handleRef={assistanceHandleRef} onOpen={openAssistance} /></div>

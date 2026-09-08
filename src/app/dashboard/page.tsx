@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { ArrowRight, Check, CircleAlert, FileCheck2, ReceiptText, UserRound } from "lucide-react";
-import { DashboardDemandCardContent } from "../../components/portal/CaseAwareDemandCards";
+import { ArrowRight, Check, ChevronRight, CircleAlert, FileText, ReceiptText } from "lucide-react";
+import { DitherAvatar } from "../../components/dither-kit/avatar";
+import { DitherGradient } from "../../components/dither-kit/gradient";
 import CaseStateLabel from "../../components/portal/CaseStateLabel";
 import { getOutstandingDemand, getProcessingResult, getTaxPayment, getTaxpayer, getTaxReturn } from "../../data/mock";
 import { formatAssessmentYear, formatIndianCurrency, formatIndianDate, formatIndianShortDate, formatRecordLabel } from "../../lib/format-tax";
 
-const serviceGroups = [
-  { label: "Your tax", links: [["File or view return", "/returns"], ["Payments & Tax Records", "/payments"], ["Form 26AS", "/payments/form-26as"], ["Services", "/services"]] },
-  { label: "Account & support", links: [["Pending Actions", "/pending-actions"], ["Help", "/help"]] },
+const services = [
+  ["File or view return", "/returns", FileText],
+  ["Payments and tax records", "/payments", ReceiptText],
+  ["Pending actions", "/pending-actions", CircleAlert],
 ] as const;
 
 export default function DashboardPage() {
@@ -18,34 +20,55 @@ export default function DashboardPage() {
   const processing = getProcessingResult();
   const assessmentYear = formatAssessmentYear(demand.assessmentYear);
 
-  return <div className="tax-account-home dashboard-recomposed">
-    <header className="tax-account-heading"><div><h1>Your tax account</h1><p>Income Tax records and actions for this assessment year.</p></div><p>AY <strong>{assessmentYear}</strong></p></header>
+  return (
+    <div className="revised-dashboard">
+      <header className="revised-dashboard-heading">
+        <div><p className="revised-kicker"><span>Overview</span> Assessment year {assessmentYear}</p><h1>Good morning, {taxpayer.name.split(" ")[0]}.</h1><p>Here is the one item that needs your attention today.</p></div>
+        <div className="revised-account-chip"><DitherAvatar animate name={taxpayer.name} size={38} /><span><strong>{taxpayer.name}</strong><small>{taxpayer.panMasked}</small></span></div>
+      </header>
 
-    <div className="dashboard-priority-grid">
-      <section className="tax-account-attention" aria-labelledby="attention-title">
-        <div className="tax-account-demand-card"><DashboardDemandCardContent demand={demand} /></div>
+      <div className="revised-dashboard-layout">
+        <section className="revised-focus-panel" aria-labelledby="focus-title">
+          <DitherGradient cell={3} className="revised-focus-wash" direction="left" from="purple" opacity={0.2} to="blue" />
+          <div className="revised-focus-meta"><span><CircleAlert aria-hidden="true" /> Needs attention</span><span>AY {assessmentYear}</span></div>
+          <div className="revised-focus-copy">
+            <p>Outstanding demand</p>
+            <h2 id="focus-title">The portal says you owe {formatIndianCurrency(demand.amount, demand.currency)}.</h2>
+            <p>Your payment is present in Form 26AS, but it was not included when your return was processed. We can help you understand and resolve the mismatch.</p>
+          </div>
+          <div className="revised-focus-footer">
+            <div><span>Current status</span><CaseStateLabel compact /></div>
+            <Link href="/pending-actions/demand">Understand this issue <ArrowRight aria-hidden="true" /></Link>
+          </div>
+        </section>
+
+        <aside className="revised-account-panel" aria-label="Tax account summary">
+          <header><p>Tax account</p><span>Updated today</span></header>
+          <dl>
+            <div><dt>Return</dt><dd><span className="revised-dot is-success" />Processed</dd></div>
+            <div><dt>Taxes paid</dt><dd>{formatIndianCurrency(payment.amount, payment.currency)}</dd></div>
+            <div><dt>Profile</dt><dd><Check aria-hidden="true" />Complete</dd></div>
+          </dl>
+          <Link href="/returns">View account details <ChevronRight aria-hidden="true" /></Link>
+        </aside>
+      </div>
+
+      <section className="revised-dashboard-section" aria-labelledby="services-title">
+        <header><div><p className="revised-kicker"><span>Services</span> Direct access</p><h2 id="services-title">Your tax workspace</h2></div><Link href="/services">View all services <ArrowRight aria-hidden="true" /></Link></header>
+        <div className="revised-service-row">
+          {services.map(([label, href, Icon], index) => <Link href={href} key={href}><span>0{index + 1}</span><Icon aria-hidden="true" /><strong>{label}</strong><ArrowRight aria-hidden="true" /></Link>)}
+        </div>
       </section>
 
-      <aside className="taxpayer-account-card" aria-labelledby="taxpayer-account-title">
-        <header><span className="taxpayer-account-icon" aria-hidden="true"><UserRound /></span><div><p>Taxpayer account</p><h2 id="taxpayer-account-title">Your account</h2></div></header>
-        <div className="taxpayer-account-identity"><strong>{taxpayer.name}</strong><span>{formatRecordLabel(taxpayer.accountType)} taxpayer</span></div>
-        <dl><div><dt>PAN</dt><dd>{taxpayer.panMasked}</dd></div><div><dt>Last sign in</dt><dd>{formatIndianDate(taxpayer.lastSignIn)}</dd></div></dl>
-        <p className="taxpayer-profile-status"><Check aria-hidden="true" />Profile {formatRecordLabel(taxpayer.profileStatus).toLowerCase()}</p>
-      </aside>
+      <section className="revised-dashboard-section revised-activity-section" aria-labelledby="activity-title">
+        <header><div><p className="revised-kicker"><span>Records</span> Recent updates</p><h2 id="activity-title">Recent activity</h2></div></header>
+        <ol>
+          <li><time dateTime={processing.processedOn}>{formatIndianShortDate(processing.processedOn)}</time><span><strong>Return processed</strong><small>{processing.processingId}</small></span><span>{formatRecordLabel(processing.status)}</span></li>
+          <li><time dateTime={taxReturn.filedOn}>{formatIndianShortDate(taxReturn.filedOn)}</time><span><strong>Income Tax Return filed</strong><small>AY {assessmentYear}</small></span><span>{formatRecordLabel(taxReturn.filingStatus)}</span></li>
+          <li><time dateTime={payment.paymentDate}>{formatIndianShortDate(payment.paymentDate)}</time><span><strong>Self-Assessment Tax payment</strong><small>{payment.challanReference}</small></span><span>{formatIndianCurrency(payment.amount, payment.currency)}</span></li>
+        </ol>
+        <p className="revised-activity-note">Last sign in {formatIndianDate(taxpayer.lastSignIn)}</p>
+      </section>
     </div>
-
-    <section className="dashboard-glance" aria-labelledby="account-summary-title">
-      <h2 id="account-summary-title">Account at a glance</h2>
-      <div className="account-summary-surface"><dl>
-        <div><span className="summary-icon summary-icon--sage"><FileCheck2 aria-hidden="true" /></span><dt>Return</dt><dd><strong>Processed</strong><span>{formatIndianDate(processing.processedOn)}</span></dd></div>
-        <div><span className="summary-icon summary-icon--sage"><ReceiptText aria-hidden="true" /></span><dt>Taxes paid</dt><dd><strong>{formatIndianCurrency(payment.amount, payment.currency)}</strong><span>{formatRecordLabel(payment.status)}</span></dd></div>
-        <div><span className="summary-icon summary-icon--amber"><CircleAlert aria-hidden="true" /></span><dt>Case status</dt><dd><CaseStateLabel compact /></dd></div>
-      </dl></div>
-    </section>
-
-    <div className="tax-account-lower-grid">
-      <section className="account-standard-surface dashboard-activity" aria-labelledby="activity-title"><h2 id="activity-title">Recent tax activity</h2><ul className="activity-list"><li><time dateTime={processing.processedOn}>{formatIndianShortDate(processing.processedOn)}</time><span><strong>Return processed</strong><small>{processing.processingId}</small></span><span>{formatRecordLabel(processing.status)}</span></li><li><time dateTime={taxReturn.filedOn}>{formatIndianShortDate(taxReturn.filedOn)}</time><span><strong>Income Tax Return filed</strong><small>AY {assessmentYear}</small></span><span>{formatRecordLabel(taxReturn.filingStatus)}</span></li><li><time dateTime={payment.paymentDate}>{formatIndianShortDate(payment.paymentDate)}</time><span><strong>Self-Assessment Tax payment</strong><small>{payment.challanReference}</small></span><span>{formatIndianCurrency(payment.amount, payment.currency)}</span></li></ul><p className="activity-footer-label">View full activity <ArrowRight aria-hidden="true" /></p></section>
-      <section className="account-standard-surface dashboard-tax-services" aria-labelledby="tax-services-title"><h2 id="tax-services-title">Tax services</h2>{serviceGroups.map((group) => <nav aria-label={group.label} key={group.label}><h3>{group.label}</h3><ul>{group.links.map(([label, href]) => <li key={href}><Link href={href}>{label}<ArrowRight aria-hidden="true" /></Link></li>)}</ul></nav>)}</section>
-    </div>
-  </div>;
+  );
 }
