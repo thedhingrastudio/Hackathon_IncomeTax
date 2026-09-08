@@ -39,7 +39,7 @@ export default function DemoLoginForm() {
     router.refresh();
   }
 
-  return <form className="demo-login-form" onSubmit={submit}>
+  return <form action="/api/demo-login" className="demo-login-form" method="post" onSubmit={submit}>
     <div className="login-field"><label htmlFor="userId">User ID</label><input autoComplete="username" id="userId" name="userId" onChange={(event) => updateUserId(event.target.value)} required value={userId} /></div>
     <div className="login-field"><label htmlFor="password">Password</label><div className="password-control"><input autoComplete="current-password" id="password" name="password" onChange={(event) => updatePassword(event.target.value)} required type={showPassword ? "text" : "password"} value={password} /><button aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword} onClick={() => setShowPassword((visible) => !visible)} type="button">{showPassword ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}</button></div></div>
     {error ? <p className="login-error" role="alert">{error}</p> : null}

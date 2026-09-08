@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { CircleHelp, FileText, Grid3X3, Home, Menu, ReceiptText, TriangleAlert } from "lucide-react";
+import { Bell, CircleHelp, FileText, Globe2, Grid3X3, Home, Menu, ReceiptText, Search, TriangleAlert } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { OutstandingDemand } from "../../types/tax";
@@ -21,14 +21,13 @@ import {
 } from "../../lib/workflows";
 import { getStoredCase, saveCase } from "../../lib/storage/case-storage";
 import { routeAssistanceQuestion, type AssistanceQuestionIntent } from "../../lib/assistance/question-router";
-import AssistanceDrawerHandle from "../assistance/AssistanceDrawerHandle";
 import AssistanceWorkspace, { type AssistanceSurface } from "../assistance/AssistanceWorkspace";
 import DemoLogout from "../auth/DemoLogout";
 import { DitherAvatar } from "../dither-kit/avatar";
 const navigation = [["Dashboard", "/dashboard", Home], ["Returns", "/returns", FileText], ["Payments", "/payments", ReceiptText], ["Pending Actions", "/pending-actions", TriangleAlert], ["Services", "/services", Grid3X3], ["Help", "/help", CircleHelp]] as const;
 const assistanceId = "assistance-workspace";
 export default function PortalShell({ children, taxpayerId, taxpayerName, demand, understanding }: { children: ReactNode; taxpayerId: string; taxpayerName: string; demand: OutstandingDemand; understanding: DemandUnderstanding | null }) {
-  const pathname = usePathname(); const router = useRouter(); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(false); const [assistanceSurface, setAssistanceSurface] = useState<AssistanceSurface>("home");
+  const pathname = usePathname(); const router = useRouter(); const opensGuidedWorkspace = pathname.endsWith("/workspace"); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(opensGuidedWorkspace); const [assistanceSurface, setAssistanceSurface] = useState<AssistanceSurface>(opensGuidedWorkspace ? "understanding" : "home");
   const [homeAssembled, setHomeAssembled] = useState(false);
   const [questionMode, setQuestionMode] = useState(false);
   const [reconfiguring, setReconfiguring] = useState(false);
@@ -38,7 +37,6 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   const [responseSubmission, setResponseSubmission] = useState<AssistedDemandResponseSubmission | null>(null);
   const [assistanceHistory, setAssistanceHistory] = useState<AssistanceSurface[]>([]);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const assistanceHandleRef = useRef<HTMLButtonElement>(null);
   const assistanceCloseRef = useRef<HTMLButtonElement>(null);
   const checkingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const questionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,7 +56,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     function closeAssistance(event: KeyboardEvent) {
       if (event.key === "Escape" && assistanceOpen) {
         setAssistanceOpen(false);
-        window.setTimeout(() => assistanceHandleRef.current?.focus(), 0);
+        window.setTimeout(() => document.getElementById("main-content")?.focus(), 0);
       }
     }
     document.addEventListener("keydown", closeAssistance);
@@ -66,15 +64,9 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   }, [assistanceOpen]);
   useEffect(() => () => { if (checkingTimerRef.current) clearTimeout(checkingTimerRef.current); if (questionTimerRef.current) clearTimeout(questionTimerRef.current); }, []);
 
-  function openAssistance() {
-    setAssistanceOpen(true);
-    setOpen(false);
-    window.setTimeout(() => assistanceCloseRef.current?.focus(), 0);
-  }
-
   function closeAssistance() {
     setAssistanceOpen(false);
-    window.setTimeout(() => assistanceHandleRef.current?.focus(), 0);
+    window.setTimeout(() => document.getElementById("main-content")?.focus(), 0);
   }
 
   function showAssistanceSurface(next: AssistanceSurface, mode: "push" | "replace" | "reset" = "push") {
@@ -205,24 +197,36 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
     setAssistanceSurface("demand_response_submitted");
   }
 
+  useEffect(() => {
+    function handleWorkspaceRequest(event: Event) {
+      const question = (event as CustomEvent<{ question?: string }>).detail?.question?.trim();
+      setAssistanceOpen(true);
+      setOpen(false);
+      window.setTimeout(() => assistanceCloseRef.current?.focus(), 0);
+      if (question) askAssistance(question);
+      else showAssistanceSurface("home", "reset");
+    }
+    window.addEventListener("civic:open-workspace", handleWorkspaceRequest);
+    return () => window.removeEventListener("civic:open-workspace", handleWorkspaceRequest);
+  });
+
   if (pathname === "/" || pathname === "/login") return <>{children}</>;
 
   return <div className={`desktop-workspace revised-workspace ${assistanceOpen ? "is-open" : "is-closed"}`}>
   <div className="portal-workspace revised-portal-workspace">
   <div className="site-shell revised-app-shell">
     <a className="skip-link" href="#main-content">Skip to main content</a>
-    <aside className="revised-sidebar">
-      <Link className="revised-app-brand" href="/dashboard" aria-label="Civic Interface dashboard"><span aria-hidden="true"><Grid3X3 /></span><div><strong>Civic Interface</strong><small>Income Tax pilot</small></div></Link>
-      <nav aria-label="Primary navigation"><p>Workspace</p><ul>{navigation.map(([label, href, Icon]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href}><Icon aria-hidden="true" />{label}</Link></li>; })}</ul></nav>
-      <div className="revised-sidebar-account"><DitherAvatar animate={false} name={taxpayerName} size={38} /><div><strong>{taxpayerName}</strong><small>Individual taxpayer</small></div><DemoLogout /></div>
-    </aside>
-    <header className="revised-mobile-header"><Link className="revised-app-brand" href="/dashboard"><span aria-hidden="true"><Grid3X3 /></span><strong>Civic Interface</strong></Link><button ref={menuButtonRef} className="portal-menu-button" type="button" aria-expanded={open} aria-controls="mobile-primary-menu" onClick={() => setOpen((current) => !current)}><Menu aria-hidden="true" /> Menu</button></header>
+    <header className="civic-app-header">
+      <Link className="revised-app-brand" href="/dashboard" aria-label="Civic Portal dashboard"><span aria-hidden="true"><Grid3X3 /></span><strong>Civic Portal</strong></Link>
+      <nav aria-label="Primary navigation"><Link aria-current={pathname === "/dashboard" ? "page" : undefined} href="/dashboard">Home</Link><Link aria-current={pathname.startsWith("/services") ? "page" : undefined} href="/services">All services</Link><Link aria-current={pathname.startsWith("/returns") || pathname.startsWith("/payments") ? "page" : undefined} href="/returns">Your records</Link><Link aria-current={pathname.startsWith("/help") ? "page" : undefined} href="/help">Help</Link></nav>
+      <div className="civic-header-tools"><button aria-label="Search services" type="button"><Search aria-hidden="true" /></button><span><Globe2 aria-hidden="true" />English</span><button aria-label="Notifications" type="button"><Bell aria-hidden="true" /></button><div><DitherAvatar animate={false} name={taxpayerName} size={36} /><span><small>Hello,</small><strong>{taxpayerName.split(" ")[0]}</strong></span></div><DemoLogout /></div>
+      <button ref={menuButtonRef} className="portal-menu-button civic-menu-button" type="button" aria-expanded={open} aria-controls="mobile-primary-menu" onClick={() => setOpen((current) => !current)}><Menu aria-hidden="true" /> Menu</button>
+    </header>
     <div className={`mobile-navigation revised-mobile-navigation ${open ? "is-open" : ""}`} id="mobile-primary-menu" hidden={!open}><ul>{navigation.map(([label, href, Icon]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href} onClick={() => setOpen(false)}><Icon aria-hidden="true" />{label}</Link></li>; })}</ul></div>
     <main className="main-content revised-main-content" id="main-content" tabIndex={-1}>{children}</main>
     <footer className="portal-footer revised-app-footer"><p>Generative public services · Synthetic demonstration</p></footer>
   </div>
   </div>
-  <div className="assistance-handle-anchor"><AssistanceDrawerHandle controls={assistanceId} expanded={assistanceOpen} handleRef={assistanceHandleRef} onOpen={openAssistance} /></div>
   {assistanceOpen ? <AssistanceWorkspace assembleHome={!homeAssembled} canGoBack={assistanceSurface !== "home" && assistanceHistory.length > 0} closeButtonRef={assistanceCloseRef} demand={demand} id={assistanceId} onAsk={askAssistance} onBack={goBackInAssistance} onBackToAction={goBackInAssistance} onClose={closeAssistance} onConfirmDemandResponse={confirmDemandResponse} onConfirmRectification={confirmRectification} onFix={assistanceSurface === "action" ? reviewRectification : showCorrectivePlan} onHomeAssembled={markHomeAssembled} onOverview={returnToOverview} onQuestionNextAction={() => showQuestionIntent("next_action")} onReviewResponse={reviewDemandResponse} onUnderstand={understandDemand} onViewCase={() => showAssistanceSurface("tracking")} questionMode={questionMode} reconfiguring={reconfiguring} rectificationDraft={rectificationDraft} rectificationSubmission={rectificationSubmission} responseDraft={responseDraft} responseSubmission={responseSubmission} surface={assistanceSurface} taxpayerName={taxpayerName} understanding={understanding} /> : null}
   </div>;
 }
