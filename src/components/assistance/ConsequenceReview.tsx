@@ -1,11 +1,11 @@
-import { Check, Info } from "lucide-react";
+import { Check, CircleCheckBig, FileCheck2, Info, LockKeyhole, ShieldCheck } from "lucide-react";
 import type { RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { formatAssessmentYear, formatIndianCurrency, formatIndianDate } from "@/lib/format-tax";
 import type { AssistedDemandResponseDraft, AssistedDemandResponseSubmission, RectificationDraft, RectificationSubmission } from "@/lib/workflows";
 
 function ReviewHeader({ eyebrow, id, title, description, headingRef }: { eyebrow: string; id: string; title: string; description: string; headingRef: RefObject<HTMLHeadingElement | null> }) {
-  return <header className="consequence-review-header"><p className="assistance-kicker">{eyebrow}</p><h2 id={id} ref={headingRef} tabIndex={-1}>{title}</h2><p>{description}</p></header>;
+  return <header className="consequence-review-header"><span className="consequence-review-icon" aria-hidden="true"><FileCheck2 /></span><div><p className="assistance-kicker">{eyebrow}</p><h2 id={id} ref={headingRef} tabIndex={-1}>{title}</h2><p>{description}</p></div></header>;
 }
 
 function Fact({ label, value, highlight = false, help }: { label: string; value: string; highlight?: boolean; help?: string }) {
@@ -13,7 +13,7 @@ function Fact({ label, value, highlight = false, help }: { label: string; value:
 }
 
 function ConsequenceNotice() {
-  return <div className="consequence-review-notice" role="note"><strong>Nothing has been submitted yet.</strong><p>Review the government request below before you confirm.</p></div>;
+  return <div className="consequence-review-notice" role="note"><LockKeyhole aria-hidden="true" /><div><strong>Nothing has been submitted yet.</strong><p>You remain in control. Review the request before you confirm.</p></div></div>;
 }
 
 export function RectificationReview({ draft, headingRef, onBack, onConfirm }: { draft: RectificationDraft; headingRef: RefObject<HTMLHeadingElement | null>; onBack: () => void; onConfirm: () => void }) {
@@ -26,7 +26,7 @@ export function RectificationReview({ draft, headingRef, onBack, onConfirm }: { 
       <Fact label="Payment type" value="Self-Assessment Tax" />
       <Fact label="Challan added" value={draft.challanReference} highlight help="This challan proves the ₹18,420 payment. It is being added because the processed return did not count that payment as tax credit." />
     </dl>
-    <section className="government-request" aria-labelledby="government-request-title"><p className="assistance-kicker">Government request</p><h3 id="government-request-title">Correct tax-credit details</h3><p>Tax Credit Mismatch Correction</p></section>
+    <section className="government-request" aria-labelledby="government-request-title"><ShieldCheck aria-hidden="true" /><div><p className="assistance-kicker">Official government process</p><h3 id="government-request-title">Correct tax-credit details</h3><p>Tax Credit Mismatch Correction</p></div></section>
     <ConsequenceNotice />
     <div className="consequence-review-actions"><Button className="app-action app-action-primary consequence-primary-action" size="lg" type="button" onClick={onConfirm}>Confirm and submit correction</Button><Button className="app-action app-action-tertiary consequence-back-action" size="lg" type="button" variant="ghost" onClick={onBack}>Back</Button></div>
   </section>;
@@ -49,9 +49,10 @@ export function DemandResponseReview({ draft, headingRef, onBack, onConfirm }: {
 
 export function DemandResponseSubmitted({ headingRef, onViewCase, rectification, response }: { headingRef: RefObject<HTMLHeadingElement | null>; onViewCase: () => void; rectification: RectificationSubmission; response: AssistedDemandResponseSubmission }) {
   return <section aria-labelledby="response-submitted-title" className="consequence-review submission-result">
-    <span className="submission-result-icon" aria-hidden="true"><Check /></span>
+    <div className="submission-result-visual"><span className="submission-result-icon" aria-hidden="true"><CircleCheckBig /></span><span>Both required requests are complete</span></div>
     <ReviewHeader eyebrow="Submitted" id="response-submitted-title" title="Response submitted" description="Income Tax review is pending. The outstanding demand has not been marked as resolved." headingRef={headingRef} />
     <dl className="consequence-review-facts"><Fact label="Demand response" value={response.reference} /><Fact label="Related rectification" value={rectification.reference} highlight /><Fact label="Status" value="Waiting for Income Tax review" /></dl>
+    <div className="submission-result-next"><Check aria-hidden="true" /><div><strong>Nothing else is needed from you</strong><p>The case is ready for Income Tax review.</p></div></div>
     <Button className="app-action app-action-secondary submission-view-case" onClick={onViewCase} size="lg" type="button">View case status</Button>
   </section>;
 }

@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, Check, Sparkles, X } from "lucide-react";
 import { useEffect, useRef, type RefObject } from "react";
 import { Button } from "@/components/ui/button";
-import { BlurFade } from "@/components/ui/blur-fade";
 import { Separator } from "@/components/ui/separator";
 import type { OutstandingDemand } from "@/types/tax";
 import type { DemandUnderstanding } from "@/lib/ai";
@@ -31,6 +30,7 @@ export default function AssistanceWorkspace({ canGoBack, closeButtonRef, demand,
   const consequenceMode = surface === "rectification_review" || surface === "demand_response_review" || surface === "demand_response_submitted";
   const assemblingHome = surface === "home" && assembleHome;
   const waiting = taxCase?.state === "WAITING_FOR_REVIEW";
+  const pathStage = surface === "home" ? 1 : surface === "checking" || reconfiguring || assemblingHome ? 2 : 3;
   useEffect(() => { if (surface !== "home" && !reconfiguring) surfaceHeadingRef.current?.focus(); }, [surface, reconfiguring]);
 
   let content;
@@ -63,11 +63,14 @@ export default function AssistanceWorkspace({ canGoBack, closeButtonRef, demand,
   }
 
   return <aside aria-label="Assistance Workspace" className="assistance-workspace" id={id}>
-    <div className="assistance-workspace-bar"><div>{canGoBack ? <Button aria-label="Go back" onClick={onBack} size="icon-lg" type="button" variant="ghost"><ArrowLeft aria-hidden="true" /></Button> : null}<span aria-hidden="true" className="assistance-mark">A</span><strong>Assistance</strong></div><Button aria-label="Close assistance" onClick={onClose} ref={closeButtonRef} size="icon-lg" type="button" variant="ghost"><X aria-hidden="true" /></Button></div>
+    <div className="assistance-workspace-bar"><div>{canGoBack ? <Button aria-label="Go back" onClick={onBack} size="icon-lg" type="button" variant="ghost"><ArrowLeft aria-hidden="true" /></Button> : null}<span aria-hidden="true" className="assistance-mark"><Sparkles /></span><span><strong>Generated workspace</strong><small>Built from your request and verified records</small></span></div><Button aria-label="Close generated workspace" onClick={onClose} ref={closeButtonRef} size="icon-lg" type="button" variant="ghost"><X aria-hidden="true" /></Button></div>
     <Separator />
+    <ol className="civic-generation-path" aria-label="Workspace generation progress">
+      {[["Understanding", "Your request is clear"], ["Checking records", "Relevant information found"], ["Interface ready", "Your path is ready"]].map(([title, description], index) => { const step = index + 1; const complete = step < pathStage; const current = step === pathStage; return <li aria-current={current ? "step" : undefined} className={complete ? "is-complete" : current ? "is-current" : ""} key={title}><span>{complete ? <Check aria-hidden="true" /> : step}</span><div><strong>{title}</strong><small>{description}</small></div></li>; })}
+    </ol>
     <div className="assistance-workspace-scroll">
       {questionMode && !reconfiguring && surface !== "no_case" ? <Button className="assistance-back-overview" onClick={onOverview} type="button" variant="link"><ArrowLeft aria-hidden="true" />Back to overview</Button> : null}
-      {surface === "rectification_review" || surface === "demand_response_review" ? content : <BlurFade key={reconfiguring ? "reconfiguring" : surface} duration={0.28}>{content}</BlurFade>}
+      {surface === "rectification_review" || surface === "demand_response_review" ? content : <div className="civic-surface-transition" key={reconfiguring ? "reconfiguring" : surface}>{content}</div>}
       {questionSet ? <ContextualQuestions onAsk={onAsk} set={questionSet} /> : null}
     </div>
     {consequenceMode || assemblingHome ? null : <AssistanceComposer caseContext={surface === "tracking" || waiting} contextual={surface !== "home"} onAsk={onAsk} />}

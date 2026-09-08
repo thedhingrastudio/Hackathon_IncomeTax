@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Bell, CircleHelp, FileText, Globe2, Grid3X3, Home, Menu, ReceiptText, Search, TriangleAlert } from "lucide-react";
+import { Bell, CircleHelp, Files, Globe2, Grid3X3, Home, Menu, Search } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { OutstandingDemand } from "../../types/tax";
@@ -24,14 +24,22 @@ import { routeAssistanceQuestion, type AssistanceQuestionIntent } from "../../li
 import AssistanceWorkspace, { type AssistanceSurface } from "../assistance/AssistanceWorkspace";
 import DemoLogout from "../auth/DemoLogout";
 import { DitherAvatar } from "../dither-kit/avatar";
-const navigation = [["Dashboard", "/dashboard", Home], ["Returns", "/returns", FileText], ["Payments", "/payments", ReceiptText], ["Pending Actions", "/pending-actions", TriangleAlert], ["Services", "/services", Grid3X3], ["Help", "/help", CircleHelp]] as const;
+import RequestContextPanel from "./RequestContextPanel";
+const navigation = [["Home", "/dashboard", Home], ["All services", "/services", Grid3X3], ["Your records", "/returns", Files], ["Help", "/help", CircleHelp]] as const;
 const assistanceId = "assistance-workspace";
 export default function PortalShell({ children, taxpayerId, taxpayerName, demand, understanding }: { children: ReactNode; taxpayerId: string; taxpayerName: string; demand: OutstandingDemand; understanding: DemandUnderstanding | null }) {
-  const pathname = usePathname(); const router = useRouter(); const opensGuidedWorkspace = pathname.endsWith("/workspace"); const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(opensGuidedWorkspace); const [assistanceSurface, setAssistanceSurface] = useState<AssistanceSurface>(opensGuidedWorkspace ? "understanding" : "home");
+  const pathname = usePathname(); const router = useRouter(); const opensGuidedWorkspace = pathname.includes("/workspace");
+  const initialAssistanceSurface: AssistanceSurface = pathname.endsWith("/rectification") ? "rectification_review" : pathname.endsWith("/action") ? "action" : opensGuidedWorkspace ? "understanding" : "home";
+  const [open, setOpen] = useState(false); const [assistanceOpen, setAssistanceOpen] = useState(opensGuidedWorkspace); const [assistanceSurface, setAssistanceSurface] = useState<AssistanceSurface>(initialAssistanceSurface);
+  const [activeQuestion, setActiveQuestion] = useState(opensGuidedWorkspace ? "Why is this demand showing?" : "");
   const [homeAssembled, setHomeAssembled] = useState(false);
   const [questionMode, setQuestionMode] = useState(false);
   const [reconfiguring, setReconfiguring] = useState(false);
-  const [rectificationDraft, setRectificationDraft] = useState<RectificationDraft | null>(null);
+  const [rectificationDraft, setRectificationDraft] = useState<RectificationDraft | null>(() => {
+    if (initialAssistanceSurface !== "rectification_review" || !understanding) return null;
+    const prepared = prepareRectificationDraft(understanding.workflowContext);
+    return prepared.success ? prepared.data : null;
+  });
   const [rectificationSubmission, setRectificationSubmission] = useState<RectificationSubmission | null>(null);
   const [responseDraft, setResponseDraft] = useState<AssistedDemandResponseDraft | null>(null);
   const [responseSubmission, setResponseSubmission] = useState<AssistedDemandResponseSubmission | null>(null);
@@ -41,6 +49,13 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   const checkingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const questionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const markHomeAssembled = useCallback(() => setHomeAssembled(true), []);
+
+  useEffect(() => {
+    if (initialAssistanceSurface !== "rectification_review" || !understanding || getStoredCase()) return;
+    const created = createTaxDemandCase(understanding.evidence, taxpayerId);
+    const reviewing = transitionCase(created, "RECTIFICATION_REVIEW");
+    if (reviewing) saveCase(reviewing);
+  }, [initialAssistanceSurface, taxpayerId, understanding]);
 
   useEffect(() => {
     function closeMenu(event: KeyboardEvent) {
@@ -119,6 +134,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
   }
 
   function askAssistance(question: string) {
+    setActiveQuestion(question);
     setQuestionMode(true);
     setReconfiguring(true);
     if (questionTimerRef.current) clearTimeout(questionTimerRef.current);
@@ -223,7 +239,7 @@ export default function PortalShell({ children, taxpayerId, taxpayerName, demand
       <button ref={menuButtonRef} className="portal-menu-button civic-menu-button" type="button" aria-expanded={open} aria-controls="mobile-primary-menu" onClick={() => setOpen((current) => !current)}><Menu aria-hidden="true" /> Menu</button>
     </header>
     <div className={`mobile-navigation revised-mobile-navigation ${open ? "is-open" : ""}`} id="mobile-primary-menu" hidden={!open}><ul>{navigation.map(([label, href, Icon]) => { const isCurrent = pathname === href || pathname.startsWith(`${href}/`); return <li key={href}><Link aria-current={isCurrent ? "page" : undefined} href={href} onClick={() => setOpen(false)}><Icon aria-hidden="true" />{label}</Link></li>; })}</ul></div>
-    <main className="main-content revised-main-content" id="main-content" tabIndex={-1}>{children}</main>
+    <main className="main-content revised-main-content" id="main-content" tabIndex={-1}>{assistanceOpen ? <RequestContextPanel question={activeQuestion} surface={assistanceSurface} /> : children}</main>
     <footer className="portal-footer revised-app-footer"><p>Generative public services · Synthetic demonstration</p></footer>
   </div>
   </div>
